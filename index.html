@@ -5,16 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ArenaHub - Liên Quân Mobile Social</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bakbak+One&family=Montserrat:wght@300;400;500;600;700;800&family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script>
       tailwind.config = {
         theme: {
           extend: {
             fontFamily: {
-              sans: ['Inter', 'sans-serif'],
-              display: ['Rajdhani', 'sans-serif'],
+              sans: ['Montserrat', 'Inter', 'sans-serif'],
+              display: ['Bakbak One', 'Rajdhani', 'sans-serif'],
+              bakbak: ['Bakbak One', 'cursive'],
+              montserrat: ['Montserrat', 'sans-serif'],
             },
             colors: {
+              primary: '#8c67f6',
+              bg: {
+                main: '#1a1c26',
+                secondary: '#272932',
+              },
               gold: {
                 400: '#fbbf24',
                 500: '#f59e0b',
@@ -35,47 +42,45 @@
     </script>
     <style>
       body {
-        font-family: 'Inter', sans-serif;
-        background-color: #020617;
-        background-image: 
-          radial-gradient(circle at 15% 50%, rgba(56, 189, 248, 0.08) 0%, transparent 25%), 
-          radial-gradient(circle at 85% 30%, rgba(245, 158, 11, 0.08) 0%, transparent 25%);
+        font-family: 'Montserrat', sans-serif;
+        background-color: #1a1c26;
         color: #f1f5f9;
         min-height: 100vh;
       }
       
-      /* Custom Scrollbar */
+      /* Custom Scrollbar - Figma Style */
       ::-webkit-scrollbar {
         width: 6px;
       }
       ::-webkit-scrollbar-track {
-        background: #0f172a; 
+        background: transparent; 
       }
       ::-webkit-scrollbar-thumb {
-        background: linear-gradient(to bottom, #334155, #475569); 
-        border-radius: 0px;
+        background: rgba(255, 255, 255, 0.05); 
+        border-radius: 10px;
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: #fbbf24; 
+        background: #8c67f6; 
       }
 
-      /* Gaming shapes */
-      .clip-angled {
-        clip-path: polygon(
-          0 0,
-          100% 0,
-          100% calc(100% - 15px),
-          calc(100% - 15px) 100%,
-          0 100%
-        );
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
       }
-      
-      .clip-hex-button {
-        clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
       }
 
-      .glow-text {
-        text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+      /* Image Filters for Icons */
+      .filter-primary {
+        filter: invert(47%) sepia(85%) saturate(2256%) hue-rotate(228deg) brightness(101%) contrast(102%);
+      }
+      .filter-white {
+        filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
+      }
+
+      .glow-primary {
+        box-shadow: 0 0 15px rgba(140, 103, 246, 0.3);
       }
     </style>
   </head>

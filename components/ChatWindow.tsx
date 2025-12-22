@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Send, Image, X, ChevronLeft, MoreVertical, Phone, Video, User as UserIcon, Users, Smile, Paperclip, Check, CheckCheck, Loader2 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Send, X, ChevronLeft, User as UserIcon, Users, Smile, Paperclip, Check, CheckCheck, Loader2 } from 'lucide-react';
 import EmojiPicker, { EmojiClickData, Theme } from 'emoji-picker-react';
 import { useAuth } from '../contexts/authContext';
 import { GroupMembersModal } from './GroupMembersModal';
@@ -64,22 +64,14 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const wsRef = useRef<WebSocket | null>(null);
 
-    // Current user ID from auth context
     const currentUserId = user?.id || null;
 
     useEffect(() => {
         fetchMessages();
-
-        // Setup WebSocket for realtime updates
-        if (token) {
-            setupWebSocket();
-        }
+        if (token) setupWebSocket();
 
         return () => {
-            // Cleanup WebSocket on unmount
-            if (wsRef.current) {
-                wsRef.current.close();
-            }
+            if (wsRef.current) wsRef.current.close();
         };
     }, [conversationId, token]);
 
@@ -99,18 +91,14 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         };
 
         ws.onclose = () => {
-            // Reconnect after 3 seconds if closed unexpectedly
             setTimeout(() => {
-                if (wsRef.current === ws) {
-                    setupWebSocket();
-                }
+                if (wsRef.current === ws) setupWebSocket();
             }, 3000);
         };
     };
 
     const handleWebSocketMessage = (data: any) => {
         if (data.type === 'NEW_MESSAGE' && data.conversationId === conversationId) {
-            // Add new message from another user
             const newMessage: MessageItem = {
                 id: data.messageId,
                 conversation_id: data.conversationId,
@@ -125,29 +113,24 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                 created_at: data.createdAt || new Date().toISOString(),
             };
             setMessages(prev => {
-                // Avoid duplicates
                 if (prev.find(m => m.id === newMessage.id)) return prev;
                 return [...prev, newMessage];
             });
         } else if (data.type === 'TYPING' && data.conversationId === conversationId) {
-            // Handle typing indicator
             setTypingUsers(prev => {
                 if (data.userId !== currentUserId && !prev.includes(data.username)) {
                     return [...prev, data.username];
                 }
                 return prev;
             });
-            // Clear typing after 3 seconds
             setTimeout(() => {
                 setTypingUsers(prev => prev.filter(u => u !== data.username));
             }, 3000);
         } else if (data.type === 'MESSAGE_STATUS' && data.conversationId === conversationId) {
-            // Update message status
             setMessages(prev => prev.map(m =>
                 m.id === data.messageId ? { ...m, status: data.status } : m
             ));
         } else if (data.type === 'MESSAGE_SEEN' && data.conversationId === conversationId) {
-            // Update all own messages to SEEN when recipient has seen them
             setMessages(prev => prev.map(m =>
                 m.sender_id === currentUserId && m.status !== 'SEEN'
                     ? { ...m, status: 'SEEN' }
@@ -200,7 +183,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                 setNextCursor(data.next_cursor);
                 setHasMore(data.has_more);
 
-                // Mark conversation as seen if there are messages
                 if (data.data && data.data.length > 0) {
                     const lastMessage = data.data[data.data.length - 1];
                     markConversationSeen(lastMessage.id);
@@ -217,7 +199,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
-    // Handle file upload - same logic as Feed.tsx
     const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if (!files || !token) return;
@@ -229,7 +210,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
 
             try {
                 if (isVideo) {
-                    // Video upload via pre-signed URL
                     const requestResponse = await fetch(`${API_URL}/videos/upload-request`, {
                         method: 'POST',
                         headers: {
@@ -246,7 +226,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
 
                     const { video_id, upload_url } = await requestResponse.json();
 
-                    // Upload to S3
                     const uploadResponse = await fetch(upload_url, {
                         method: 'PUT',
                         headers: { 'Content-Type': file.type },
@@ -255,7 +234,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
 
                     if (!uploadResponse.ok) continue;
 
-                    // Mark complete
                     const completeResponse = await fetch(`${API_URL}/videos/${video_id}/complete`, {
                         method: 'POST',
                         headers: { 'Authorization': `Bearer ${token}` },
@@ -275,7 +253,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                         }]);
                     }
                 } else {
-                    // Image upload
                     const formData = new FormData();
                     formData.append('image', file);
 
@@ -299,9 +276,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         }
 
         setIsUploading(false);
-        if (fileInputRef.current) {
-            fileInputRef.current.value = '';
-        }
+        if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
     const removePendingMedia = (index: number) => {
@@ -317,7 +292,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         setPendingMedia([]);
         setIsSending(true);
 
-        // Optimistic update
         const tempId = `temp-${Date.now()}`;
         const tempMessage: MessageItem = {
             id: tempId,
@@ -352,12 +326,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
 
             if (response.ok) {
                 const data = await response.json();
-                // Replace temp message with real one
-                setMessages(prev => prev.map(m =>
-                    m.id === tempId ? data.data : m
-                ));
+                setMessages(prev => prev.map(m => m.id === tempId ? data.data : m));
             } else {
-                // Remove temp message on error
                 setMessages(prev => prev.filter(m => m.id !== tempId));
             }
         } catch (error) {
@@ -375,21 +345,15 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         }
     };
 
-    // Send typing indicator via WebSocket (debounced)
     const sendTyping = () => {
         if (wsRef.current?.readyState === WebSocket.OPEN) {
-            // Clear existing timeout
-            if (typingTimeoutRef.current) {
-                clearTimeout(typingTimeoutRef.current);
-            }
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
 
-            // Send typing event
             wsRef.current.send(JSON.stringify({
                 type: 'TYPING',
                 conversationId: conversationId,
             }));
 
-            // Set timeout to prevent spamming (resend allowed after 2s)
             typingTimeoutRef.current = setTimeout(() => {
                 typingTimeoutRef.current = null;
             }, 2000);
@@ -398,10 +362,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
 
     const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setInputValue(e.target.value);
-        // Send typing indicator (debounced)
-        if (e.target.value.length > 0 && !typingTimeoutRef.current) {
-            sendTyping();
-        }
+        if (e.target.value.length > 0 && !typingTimeoutRef.current) sendTyping();
     };
 
     const formatTime = (dateString: string) => {
@@ -415,13 +376,9 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         const yesterday = new Date(today);
         yesterday.setDate(yesterday.getDate() - 1);
 
-        if (date.toDateString() === today.toDateString()) {
-            return 'Hôm nay';
-        } else if (date.toDateString() === yesterday.toDateString()) {
-            return 'Hôm qua';
-        } else {
-            return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        }
+        if (date.toDateString() === today.toDateString()) return 'Hôm nay';
+        if (date.toDateString() === yesterday.toDateString()) return 'Hôm qua';
+        return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
     };
 
     const shouldShowDateHeader = (message: MessageItem, index: number) => {
@@ -431,50 +388,44 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         return prevDate !== currDate;
     };
 
-    const isOwnMessage = (message: MessageItem) => {
-        return message.sender_id === currentUserId;
-    };
+    const isOwnMessage = (message: MessageItem) => message.sender_id === currentUserId;
 
-    // Find the index of the last own message with SEEN status
     const lastSeenOwnMessageIndex = (() => {
         for (let i = messages.length - 1; i >= 0; i--) {
-            if (messages[i].sender_id === currentUserId && messages[i].status === 'SEEN') {
-                return i;
-            }
+            if (messages[i].sender_id === currentUserId && messages[i].status === 'SEEN') return i;
         }
         return -1;
     })();
 
     const getStatusIcon = (status: string, index: number) => {
         if (status === 'SEEN') {
-            // Only show "Đã xem" text for the last seen own message
             if (index === lastSeenOwnMessageIndex) {
-                return <span className="text-[10px] text-gold-500 font-medium">Đã xem</span>;
+                return <span className="text-[9px] text-primary font-medium">Đã xem</span>;
             }
-            return <CheckCheck className="w-3 h-3 text-gold-500" />;
+            return <CheckCheck className="w-3 h-3 text-primary" />;
         } else if (status === 'DELIVERED') {
-            return <CheckCheck className="w-3 h-3 text-slate-400" />;
+            return <CheckCheck className="w-3 h-3 text-[#7f7f7f]" />;
         }
-        return <Check className="w-3 h-3 text-slate-400" />;
+        return <Check className="w-3 h-3 text-[#7f7f7f]" />;
     };
 
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 md:p-0">
             {/* Backdrop */}
             <div
-                className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
                 onClick={onClose}
             />
 
             {/* Chat Window */}
-            <div className="relative bg-slate-900 border border-slate-700 rounded-xl md:rounded-none w-full max-w-md md:max-w-sm h-[80vh] md:h-full md:fixed md:right-0 md:top-0 md:bottom-0 shadow-2xl shadow-black/50 flex flex-col overflow-hidden">
+            <div className="relative bg-bg-secondary border border-white/10 rounded-[12px] md:rounded-none w-full max-w-md md:max-w-sm h-[80vh] md:h-full md:fixed md:right-0 md:top-0 md:bottom-0 shadow-2xl flex flex-col overflow-hidden">
                 {/* Header */}
-                <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-800 flex-shrink-0 bg-slate-900/95">
+                <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10 flex-shrink-0 bg-bg-secondary">
                     <button
                         onClick={onBack}
-                        className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-800 transition-colors"
+                        className="w-8 h-8 flex items-center justify-center rounded-[8px] hover:bg-white/5 transition-colors"
                     >
-                        <ChevronLeft className="w-5 h-5 text-slate-400" />
+                        <ChevronLeft className="w-5 h-5 text-white/60" />
                     </button>
 
                     {/* Avatar */}
@@ -482,23 +433,23 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                         <img
                             src={conversationAvatar}
                             alt=""
-                            className="w-10 h-10 rounded-full object-cover"
+                            className="w-[40px] h-[40px] rounded-[10px] object-cover"
                         />
                     ) : (
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center">
+                        <div className="w-[40px] h-[40px] rounded-[10px] bg-bg-main flex items-center justify-center">
                             {conversationType === 'GROUP' ? (
-                                <Users className="w-5 h-5 text-slate-400" />
+                                <Users className="w-5 h-5 text-[#7f7f7f]" />
                             ) : (
-                                <UserIcon className="w-5 h-5 text-slate-400" />
+                                <UserIcon className="w-5 h-5 text-[#7f7f7f]" />
                             )}
                         </div>
                     )}
 
                     {/* Name */}
                     <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-white truncate">{conversationName}</h3>
+                        <h3 className="font-montserrat font-semibold text-[13px] text-white truncate">{conversationName}</h3>
                         {typingUsers.length > 0 && (
-                            <p className="text-xs text-gold-400">Đang nhập...</p>
+                            <p className="text-[10px] text-primary font-medium">Đang nhập...</p>
                         )}
                     </div>
 
@@ -506,39 +457,39 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                     {conversationType === 'GROUP' && (
                         <button
                             onClick={() => setShowGroupMembers(true)}
-                            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-800 transition-colors"
+                            className="w-8 h-8 flex items-center justify-center rounded-[8px] hover:bg-white/5 transition-colors"
                             title="Thành viên nhóm"
                         >
-                            <Users className="w-4 h-4 text-gold-400" />
+                            <Users className="w-4 h-4 text-primary" />
                         </button>
                     )}
                     <button
                         onClick={onClose}
-                        className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-800 transition-colors"
+                        className="w-8 h-8 flex items-center justify-center rounded-[8px] hover:bg-white/5 transition-colors"
                     >
-                        <X className="w-4 h-4 text-slate-400" />
+                        <X className="w-4 h-4 text-white/60" />
                     </button>
                 </div>
 
                 {/* Messages */}
                 <div
                     ref={messagesContainerRef}
-                    className="flex-1 overflow-y-auto px-4 py-3 space-y-2"
+                    className="flex-1 overflow-y-auto px-4 py-3 space-y-2 no-scrollbar"
                 >
                     {isLoading ? (
                         <div className="flex items-center justify-center py-12">
-                            <div className="w-8 h-8 border-2 border-gold-500 border-t-transparent rounded-full animate-spin"></div>
+                            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
                         </div>
                     ) : messages.length === 0 ? (
-                        <div className="text-center py-12 text-slate-500">
-                            <p className="text-sm">Bắt đầu cuộc trò chuyện...</p>
+                        <div className="text-center py-12 text-[#7f7f7f]">
+                            <p className="text-[12px] font-montserrat">Bắt đầu cuộc trò chuyện...</p>
                         </div>
                     ) : (
                         <>
                             {hasMore && (
                                 <button
                                     onClick={() => fetchMessages(nextCursor || undefined)}
-                                    className="w-full text-center py-2 text-sm text-gold-400 hover:text-gold-300"
+                                    className="w-full text-center py-2 text-[11px] text-primary hover:text-primary/80 font-medium transition-colors"
                                 >
                                     Tải thêm tin nhắn
                                 </button>
@@ -548,25 +499,25 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                                 <React.Fragment key={message.id}>
                                     {shouldShowDateHeader(message, index) && (
                                         <div className="flex items-center justify-center py-2">
-                                            <span className="text-xs text-slate-500 bg-slate-800/50 px-3 py-1 rounded-full">
+                                            <span className="text-[10px] text-[#7f7f7f] bg-bg-main/50 px-3 py-1 rounded-full font-montserrat">
                                                 {formatDateHeader(message.created_at)}
                                             </span>
                                         </div>
                                     )}
 
                                     <div className={`flex items-end gap-2 ${isOwnMessage(message) ? 'justify-end' : 'justify-start'}`}>
-                                        {/* Avatar for others */}
+                                        {/* Avatar for others in group */}
                                         {!isOwnMessage(message) && conversationType === 'GROUP' && (
                                             <div className="flex-shrink-0 w-6 h-6">
                                                 {message.sender_avatar ? (
                                                     <img
                                                         src={message.sender_avatar}
                                                         alt=""
-                                                        className="w-6 h-6 rounded-full object-cover"
+                                                        className="w-6 h-6 rounded-[6px] object-cover"
                                                     />
                                                 ) : (
-                                                    <div className="w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center">
-                                                        <UserIcon className="w-3 h-3 text-slate-400" />
+                                                    <div className="w-6 h-6 rounded-[6px] bg-bg-main flex items-center justify-center">
+                                                        <UserIcon className="w-3 h-3 text-[#7f7f7f]" />
                                                     </div>
                                                 )}
                                             </div>
@@ -576,15 +527,15 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                                         <div className={`max-w-[75%] ${isOwnMessage(message) ? 'order-first' : ''}`}>
                                             {/* Sender name for group */}
                                             {!isOwnMessage(message) && conversationType === 'GROUP' && (
-                                                <p className="text-xs text-slate-500 mb-1 ml-1">
+                                                <p className="text-[10px] text-[#7f7f7f] mb-1 ml-1 font-montserrat">
                                                     {message.sender_username}
                                                 </p>
                                             )}
 
-                                            <div className={`rounded-2xl px-4 py-2 ${isOwnMessage(message)
-                                                ? 'bg-gold-500 text-white rounded-br-md'
-                                                : 'bg-slate-800 text-slate-200 rounded-bl-md'
-                                                }`}>
+                                            <div className={`rounded-[12px] px-4 py-2.5 ${isOwnMessage(message)
+                                                ? 'bg-primary text-white rounded-br-[4px]'
+                                                : 'bg-bg-main text-white/90 rounded-bl-[4px]'
+                                            }`}>
                                                 {/* Media */}
                                                 {message.media && message.media.length > 0 && (
                                                     <div className="mb-2">
@@ -594,14 +545,14 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                                                                     key={i}
                                                                     src={m.url}
                                                                     alt=""
-                                                                    className="rounded-lg max-w-full"
+                                                                    className="rounded-[8px] max-w-full"
                                                                 />
                                                             ) : (
                                                                 <video
                                                                     key={i}
                                                                     src={m.url}
                                                                     controls
-                                                                    className="rounded-lg max-w-full"
+                                                                    className="rounded-[8px] max-w-full"
                                                                 />
                                                             )
                                                         ))}
@@ -610,16 +561,15 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
 
                                                 {/* Text */}
                                                 {message.content && (
-                                                    <p className="text-sm whitespace-pre-wrap break-words">
+                                                    <p className="text-[12px] whitespace-pre-wrap break-words leading-relaxed">
                                                         {message.content}
                                                     </p>
                                                 )}
                                             </div>
 
                                             {/* Time and status */}
-                                            <div className={`flex items-center gap-1 mt-1 ${isOwnMessage(message) ? 'justify-end' : 'justify-start'
-                                                }`}>
-                                                <span className="text-xs text-slate-500">
+                                            <div className={`flex items-center gap-1 mt-1 ${isOwnMessage(message) ? 'justify-end' : 'justify-start'}`}>
+                                                <span className="text-[9px] text-[#7f7f7f]">
                                                     {formatTime(message.created_at)}
                                                 </span>
                                                 {isOwnMessage(message) && getStatusIcon(message.status, index)}
@@ -635,13 +585,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
 
                 {/* Typing indicator */}
                 {typingUsers.length > 0 && (
-                    <div className="px-4 py-1 text-xs text-slate-400 italic">
+                    <div className="px-4 py-1 text-[10px] text-[#7f7f7f] italic font-montserrat">
                         {typingUsers.join(', ')} đang gõ...
                     </div>
                 )}
 
-                {/* Input */}
-                <div className="flex-shrink-0 border-t border-slate-800 bg-slate-900/95 p-3">
+                {/* Input Area */}
+                <div className="flex-shrink-0 border-t border-white/10 bg-bg-secondary p-3">
                     {/* Hidden file input */}
                     <input
                         ref={fileInputRef}
@@ -654,17 +604,17 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
 
                     {/* Media Preview */}
                     {pendingMedia.length > 0 && (
-                        <div className="mb-2 flex gap-2 overflow-x-auto pb-2">
+                        <div className="mb-2 flex gap-2 overflow-x-auto pb-2 no-scrollbar">
                             {pendingMedia.map((item, index) => (
                                 <div key={index} className="relative flex-shrink-0">
                                     {item.type === 'image' ? (
-                                        <img src={item.url} alt="" className="w-16 h-16 object-cover rounded-lg" />
+                                        <img src={item.url} alt="" className="w-14 h-14 object-cover rounded-[8px]" />
                                     ) : (
-                                        <video src={item.url} className="w-16 h-16 object-cover rounded-lg" />
+                                        <video src={item.url} className="w-14 h-14 object-cover rounded-[8px]" />
                                     )}
                                     <button
                                         onClick={() => removePendingMedia(index)}
-                                        className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center"
+                                        className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center shadow-lg"
                                     >
                                         <X className="w-3 h-3 text-white" />
                                     </button>
@@ -678,12 +628,12 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                         <button
                             onClick={() => fileInputRef.current?.click()}
                             disabled={isUploading}
-                            className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-full hover:bg-slate-800 transition-colors disabled:opacity-50"
+                            className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-[8px] hover:bg-white/5 transition-colors disabled:opacity-50"
                         >
                             {isUploading ? (
-                                <Loader2 className="w-5 h-5 text-gold-500 animate-spin" />
+                                <Loader2 className="w-5 h-5 text-primary animate-spin" />
                             ) : (
-                                <Paperclip className="w-5 h-5 text-slate-400" />
+                                <Paperclip className="w-5 h-5 text-[#7f7f7f]" />
                             )}
                         </button>
 
@@ -696,7 +646,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                                 onKeyDown={handleKeyDown}
                                 placeholder="Nhập tin nhắn..."
                                 rows={1}
-                                className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-2xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-gold-500/50 resize-none max-h-32"
+                                className="w-full px-4 py-2.5 bg-bg-main/50 border border-white/10 rounded-[10px] text-[12px] text-white placeholder-[#7f7f7f] focus:outline-none focus:border-primary/50 resize-none max-h-28 font-montserrat transition-colors"
                                 style={{ minHeight: '40px' }}
                             />
                         </div>
@@ -705,9 +655,9 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                         <div className="relative">
                             <button
                                 onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                                className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-full hover:bg-slate-800 transition-colors"
+                                className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-[8px] hover:bg-white/5 transition-colors"
                             >
-                                <Smile className="w-5 h-5 text-slate-400" />
+                                <Smile className="w-5 h-5 text-[#7f7f7f]" />
                             </button>
                             {showEmojiPicker && (
                                 <div className="absolute bottom-12 right-0 z-50">
@@ -717,8 +667,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                                             setInputValue(prev => prev + emojiData.emoji);
                                             setShowEmojiPicker(false);
                                         }}
-                                        width={300}
-                                        height={400}
+                                        width={280}
+                                        height={350}
                                     />
                                 </div>
                             )}
@@ -728,7 +678,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                         <button
                             onClick={handleSendMessage}
                             disabled={(!inputValue.trim() && pendingMedia.length === 0) || isSending || isUploading}
-                            className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-full bg-gold-500 hover:bg-gold-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-[8px] bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:scale-105 active:scale-95"
                         >
                             <Send className="w-4 h-4 text-white" />
                         </button>

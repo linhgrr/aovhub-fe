@@ -1,5 +1,4 @@
 import React from 'react';
-import { Home, Users, MessagesSquare, User as UserIcon, Settings, LogOut, UsersRound, Shield, PlayCircle } from 'lucide-react';
 import { useAuth } from '../contexts/authContext';
 
 interface NavigationProps {
@@ -8,83 +7,105 @@ interface NavigationProps {
 }
 
 export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab }) => {
-  const { logout, user } = useAuth();
-
-  // Check if user is admin (using role from /auth/me or is_superuser)
-  const isAdmin = user?.role === 'ADMIN' || user?.is_superuser === true;
+  const { logout } = useAuth();
 
   const navItems = [
-    { id: 'feed', icon: Home, label: 'TRANG CHỦ' },
-    { id: 'reels', icon: PlayCircle, label: 'REELS' },
-    { id: 'forum', icon: MessagesSquare, label: 'DIỄN ĐÀN' },
-    { id: 'lfg', icon: Users, label: 'TÌM TEAM' },
-    { id: 'friends', icon: UsersRound, label: 'BẠN BÈ' },
-    // Profile and Settings moved to Header
+    { id: 'feed', icon: '/assets/images/home.svg', label: 'Home' },
+    { id: 'reels', icon: '/assets/images/game.svg', label: 'Games' },
+    { id: 'lfg', icon: '/assets/images/chart.svg', label: 'Stats' },
+    { id: 'forum', icon: '/assets/images/activity.svg', label: 'Activity' },
+    { id: 'profile', icon: '/assets/images/profile.svg', label: 'Profile' },
+    { id: 'settings', icon: '/assets/images/setting.svg', label: 'Settings' },
   ];
 
-  // Add admin item if user is admin
-  if (isAdmin) {
-    navItems.push({ id: 'admin', icon: Shield, label: 'QUẢN TRỊ' });
-  }
-
   return (
-    <nav className="fixed bottom-0 left-0 w-full bg-slate-950/90 backdrop-blur-md border-t border-slate-800 md:relative md:top-0 md:w-60 md:h-[calc(100vh-3.5rem)] md:border-r md:border-t-0 z-40 shadow-[0_-5px_20px_rgba(0,0,0,0.5)]">
-      <div className="flex md:flex-col justify-between md:justify-start h-16 md:h-full md:p-0">
+    <>
+      {/* Desktop Sidebar - Fixed position with spacer */}
+      <aside className="fixed left-0 top-0 h-screen w-[126px] z-40 hidden md:block">
+        <div className="relative h-full w-full flex flex-col">
+          {/* Sidebar Background */}
+          <div className="absolute inset-0 bg-bg-secondary border-r border-white/5"></div>
+          
+          {/* Content */}
+          <div className="relative z-10 flex flex-col items-center h-full py-12">
+            {/* Logo */}
+            <div className="mb-24">
+               <button onClick={() => setActiveTab('feed')} className="font-bakbak text-[22px] text-white uppercase tracking-wider">
+                  LOGO
+               </button>
+            </div>
 
-        {/* Logo Area - Hidden (now in Header) */}
+            {/* Nav Items */}
+            <div className="flex flex-col gap-10 items-center w-full">
+              {navItems.map((item) => {
+                const isActive = activeTab === item.id || 
+                  (item.id === 'forum' && (activeTab === 'forum-category' || activeTab === 'forum-thread'));
+                
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => setActiveTab(item.id)}
+                    className={`group relative p-2 transition-all duration-300 ${
+                      isActive ? 'scale-110' : 'opacity-40 hover:opacity-100 hover:scale-105'
+                    }`}
+                    title={item.label}
+                  >
+                     {isActive && (
+                        <div className="absolute inset-0 bg-primary/30 blur-lg rounded-full animate-pulse"></div>
+                     )}
+                     <img 
+                      src={item.icon} 
+                      alt={item.label} 
+                      className={`w-6 h-6 relative z-10 transition-all ${isActive ? 'filter-primary brightness-150' : 'filter-white'}`}
+                    />
+                  </button>
+                );
+              })}
+            </div>
 
-        {/* Nav Items */}
-        <div className="flex md:flex-col w-full justify-around md:justify-start md:p-4 md:gap-2">
-          {navItems.map((item) => {
-            const isActive = activeTab === item.id ||
-              (item.id === 'forum' && (activeTab === 'forum-category' || activeTab === 'forum-thread'));
-            const isAdminItem = item.id === 'admin';
+            {/* Bottom Section */}
+            <div className="mt-auto flex flex-col items-center gap-10 pb-10">
+              <div className="w-[59px] h-[1px] bg-white/10"></div>
+              <button
+                onClick={() => logout()}
+                className="group opacity-40 hover:opacity-100 transition-all hover:scale-110"
+                title="Đăng xuất"
+              >
+                <img 
+                  src="/assets/images/logout.svg" 
+                  alt="Logout" 
+                  className="w-6 h-6 filter-white"
+                />
+              </button>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      {/* Spacer to push content - Desktop only */}
+      <div className="hidden md:block w-[126px] flex-shrink-0"></div>
+
+      {/* Mobile Navigation */}
+      <nav className="fixed bottom-0 left-0 w-full bg-bg-main/95 backdrop-blur-md border-t border-white/5 md:hidden z-50 px-6 py-3">
+        <div className="flex justify-between items-center">
+          {navItems.slice(0, 4).map((item) => {
+            const isActive = activeTab === item.id;
             return (
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`group relative flex flex-col md:flex-row items-center md:gap-4 p-2 md:px-6 md:py-4 transition-all duration-300 w-full md:text-left overflow-hidden
-                  ${isActive
-                    ? isAdminItem
-                      ? 'text-red-400 md:bg-gradient-to-r md:from-red-500/10 md:to-transparent'
-                      : 'text-gold-400 md:bg-gradient-to-r md:from-gold-500/10 md:to-transparent'
-                    : isAdminItem
-                      ? 'text-red-400/60 hover:text-red-400 hover:bg-red-500/10'
-                      : 'text-slate-500 hover:text-slate-200 hover:bg-slate-800/30'
-                  }
-                `}
+                className={`p-2 transition-all ${isActive ? 'text-primary' : 'text-white/40'}`}
               >
-                {/* Active Indicator Line (Desktop) */}
-                {isActive && (
-                  <div className={`hidden md:block absolute left-0 top-0 bottom-0 w-1 ${isAdminItem ? 'bg-red-500 shadow-[0_0_10px_#ef4444]' : 'bg-gold-500 shadow-[0_0_10px_#f59e0b]'}`}></div>
-                )}
-
-                {/* Icon */}
-                <item.icon
-                  className={`w-6 h-6 md:w-5 md:h-5 transition-all duration-300 ${isActive ? 'stroke-[2.5px] drop-shadow-[0_0_5px_rgba(245,158,11,0.5)]' : 'group-hover:scale-110'
-                    }`}
+                <img 
+                  src={item.icon} 
+                  alt={item.label} 
+                  className={`w-6 h-6 ${isActive ? 'filter-primary' : 'filter-white'}`}
                 />
-
-                {/* Label */}
-                <span className={`text-[10px] md:text-sm font-bold tracking-wider md:font-display uppercase ${isActive ? isAdminItem ? 'text-red-400' : 'text-gold-400' : ''}`}>
-                  {item.label}
-                </span>
-
-                {/* Hover Glint Effect */}
-                <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/5 to-transparent skew-x-12 md:block hidden" />
               </button>
             );
           })}
         </div>
-
-        {/* Footer Info (Desktop) */}
-        <div className="hidden md:block mt-auto p-6 border-t border-slate-800/50">
-          <div className="bg-slate-900/50 p-3 rounded border border-slate-800 flex items-center gap-3">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_5px_#22c55e]"></div>
-            <span className="text-xs text-slate-400 font-mono">SERVER: ONLINE</span>
-          </div>
-        </div>
-      </div>
-    </nav>
+      </nav>
+    </>
   );
 };

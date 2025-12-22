@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Share2, Loader2 } from 'lucide-react';
+import { X, Share2, Loader2, Send } from 'lucide-react';
 import { FeedPost } from './PostCard';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
@@ -78,56 +78,60 @@ export const SharePostModal: React.FC<SharePostModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/80 backdrop-blur-md animate-in fade-in duration-300"
         onClick={onClose}
       />
       
       {/* Modal */}
-      <div className="relative bg-slate-900 w-full max-w-lg rounded-lg border border-slate-700 shadow-2xl max-h-[80vh] overflow-y-auto">
+      <div className="relative bg-bg-secondary w-full max-w-lg rounded-[20px] border border-white/10 shadow-2xl max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-300">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-slate-700">
-          <h2 className="text-lg font-bold text-white">Chia sẻ bài viết</h2>
+        <div className="flex items-center justify-between p-5 border-b border-white/5">
+          <h2 className="text-[18px] font-bakbak text-white flex items-center gap-2">
+            <Share2 className="w-5 h-5 text-primary" />
+            Share post
+          </h2>
           <button 
             onClick={onClose}
-            className="text-slate-400 hover:text-white transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 text-white/60 hover:text-white hover:bg-white/10 transition-all"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Caption Input */}
-        <div className="p-4">
+        <div className="p-5">
           <textarea
             value={caption}
             onChange={(e) => setCaption(e.target.value)}
-            placeholder="Viết gì đó về bài viết này..."
-            className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white placeholder-slate-500 resize-none focus:outline-none focus:border-gold-500 transition-colors"
+            placeholder="Bạn muốn nói gì về bài viết này?"
+            className="w-full bg-bg-main/50 border border-white/5 rounded-[12px] p-4 text-white text-[14px] md:text-[15px] placeholder-white/30 resize-none focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all min-h-[100px]"
             rows={3}
+            autoFocus
           />
         </div>
 
         {/* Post Preview */}
-        <div className="px-4 pb-4">
-          <div className="border border-slate-700 rounded-lg overflow-hidden bg-slate-800/50">
+        <div className="px-5 pb-5">
+          <div className="border border-white/10 rounded-[16px] overflow-hidden bg-bg-main/30">
             {/* Original Author Header */}
-            <div className="flex items-center gap-3 p-3 border-b border-slate-700/50">
+            <div className="flex items-center gap-3 p-4 border-b border-white/5">
               <img 
-                src={displayPost.author.avatar_url || 'https://via.placeholder.com/40'} 
+                src={displayPost.author.avatar_url || '/assets/images/home.svg'} 
                 alt={displayPost.author.username}
-                className="w-10 h-10 rounded-full object-cover"
+                className="w-10 h-10 rounded-full object-cover ring-2 ring-white/5"
               />
               <div>
-                <p className="font-semibold text-white text-sm">{displayPost.author.username}</p>
-                <p className="text-xs text-slate-500">{formatTime(displayPost.created_at)}</p>
+                <p className="font-montserrat font-bold text-white text-[13px]">{displayPost.author.username}</p>
+                <p className="text-[11px] text-white/40 uppercase tracking-wider">{formatTime(displayPost.created_at)}</p>
               </div>
             </div>
             
             {/* Post Content */}
             {displayPost.content && (
-              <div className="p-3 text-slate-300 text-sm">
+              <div className="p-4 text-white/80 text-[13px] leading-relaxed">
                 {displayPost.content.length > 200 
                   ? displayPost.content.slice(0, 200) + '...' 
                   : displayPost.content
@@ -137,45 +141,67 @@ export const SharePostModal: React.FC<SharePostModalProps> = ({
             
             {/* Media Preview */}
             {displayPost.media && displayPost.media.length > 0 && (
-              <div className="px-3 pb-3">
-                {displayPost.media[0].type === 'image' ? (
-                  <img 
-                    src={displayPost.media[0].url} 
-                    alt="" 
-                    className="w-full h-40 object-cover rounded"
-                  />
-                ) : (
-                  <video 
-                    src={displayPost.media[0].url} 
-                    className="w-full h-40 object-cover rounded"
-                  />
-                )}
-                {displayPost.media.length > 1 && (
-                  <p className="text-xs text-slate-500 mt-1">
-                    +{displayPost.media.length - 1} ảnh/video khác
-                  </p>
-                )}
+              <div className="px-4 pb-4">
+                <div className={`grid gap-1.5 ${
+                  displayPost.media.length === 1 ? 'grid-cols-1' : 
+                  displayPost.media.length === 2 ? 'grid-cols-2' : 
+                  'grid-cols-2'
+                }`}>
+                  {displayPost.media.map((item, index) => (
+                      <div 
+                        key={index} 
+                        className={`relative rounded-[12px] overflow-hidden border border-white/5 bg-black/20 ${
+                          displayPost.media.length === 1 ? 'aspect-video' : 'aspect-square'
+                        }`}
+                      >
+                        {item.type === 'image' ? (
+                          <img 
+                            src={item.url} 
+                            alt="" 
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="relative w-full h-full bg-black flex items-center justify-center">
+                            <video 
+                              src={item.url} 
+                              className="w-full h-full object-contain"
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                              <Share2 className="w-6 h-6 text-white opacity-50" />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                </div>
               </div>
             )}
           </div>
         </div>
 
         {/* Actions */}
-        <div className="p-4 border-t border-slate-700">
+        <div className="p-5 border-t border-white/5 bg-bg-main/20 flex gap-3">
+          <button
+            onClick={onClose}
+            disabled={isSubmitting}
+            className="flex-1 px-5 py-3 rounded-[12px] bg-white/5 text-white font-bold text-[14px] hover:bg-white/10 transition-all disabled:opacity-50"
+          >
+            Hủy
+          </button>
           <button
             onClick={handleShare}
             disabled={isSubmitting}
-            className="w-full flex items-center justify-center gap-2 bg-gold-500 hover:bg-gold-400 text-slate-900 font-bold py-3 rounded-lg transition-colors disabled:opacity-50"
+            className="flex-[2] flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-[12px] shadow-lg shadow-primary/20 transition-all active:scale-95 disabled:opacity-50"
           >
             {isSubmitting ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
-                Đang chia sẻ...
+                <span>Đang xử lý...</span>
               </>
             ) : (
               <>
-                <Share2 className="w-5 h-5" />
-                Chia sẻ ngay
+                <span>Chia sẻ ngay</span>
+                <Send className="w-4 h-4" />
               </>
             )}
           </button>

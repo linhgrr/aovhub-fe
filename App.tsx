@@ -14,6 +14,7 @@ import { ForumThreadPage } from './components/ForumThread';
 import { AdminDashboard } from './components/AdminDashboard';
 import { Reels } from './components/Reels';
 import { SearchResults } from './components/SearchResults';
+import { RightSidebar } from './components/RightSidebar';
 import { AuthProvider, useAuth } from './contexts/authContext';
 
 type Route = 'feed' | 'reels' | 'lfg' | 'friends' | 'profile' | 'settings' | 'register' | 'login' | 'forum' | 'forum-category' | 'forum-thread' | 'admin' | 'search';
@@ -121,18 +122,24 @@ const AppContent: React.FC = () => {
   const showHeader = showNavigation && currentRoute !== 'reels';
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 font-sans selection:bg-amber-500/30">
-      {/* Top Header */}
-      {showHeader && <Header onNavigate={handleTabChange} />}
-
-      <div className={`flex flex-col md:flex-row ${showHeader ? 'pt-14' : ''}`}>
-        {/* Left Sidebar Navigation */}
+    <div className="min-h-screen bg-bg-main text-white font-montserrat selection:bg-primary/30 overflow-x-hidden">
+      <div className="flex">
+        {/* Sidebar Navigation - Fixed width, not floating */}
         {showNavigation && <Navigation activeTab={currentRoute} setActiveTab={handleTabChange} />}
 
-        {/* Main Content */}
-        <main className="flex-1 md:h-[calc(100vh-3.5rem)] md:overflow-y-auto relative">
-          {renderContent()}
-        </main>
+        {/* Main Area */}
+        <div className="flex-1 flex flex-col min-h-screen">
+          {/* Top Header */}
+          {showHeader && <Header onNavigate={handleTabChange} />}
+
+          {/* Main Content */}
+          <main className={`flex-1 ${showHeader ? 'mt-[110px]' : ''} relative`}>
+            {renderContent()}
+          </main>
+        </div>
+
+        {/* Right Sidebar - only on feed for now to match Figma design */}
+        {showNavigation && currentRoute === 'feed' && <RightSidebar />}
       </div>
     </div>
   );

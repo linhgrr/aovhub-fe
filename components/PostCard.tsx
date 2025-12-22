@@ -1,6 +1,6 @@
-import React from 'react';
-import { Heart, MessageCircle, Share2, Zap } from 'lucide-react';
+import React, { useState } from 'react';
 import { VideoPlayer } from './VideoPlayer';
+import { LikesModal } from './LikesModal';
 
 // Types matching backend
 export interface MediaItem {
@@ -17,13 +17,18 @@ export interface PostAuthor {
   level: number | null;
 }
 
-// Shared post info (embedded in FeedPost when it's a share)
 export interface SharedPostInfo {
   id: string;
   author: PostAuthor;
   content: string;
   media: MediaItem[];
   created_at: string;
+}
+
+export interface RecentLiker {
+  id: string;
+  username: string;
+  avatar_url: string | null;
 }
 
 export interface FeedPost {
@@ -36,43 +41,16 @@ export interface FeedPost {
   comment_count: number;
   share_count: number;
   is_liked: boolean;
-  shared_post: SharedPostInfo | null;  // Original post if this is a share
+  shared_post: SharedPostInfo | null;
+  recent_likers?: RecentLiker[];  // Optional for backward compatibility
   created_at: string;
 }
-
-// Rank display mapping
-const RANK_DISPLAY: Record<string, string> = {
-  'BRONZE': 'Đồng',
-  'SILVER': 'Bạc', 
-  'GOLD': 'Vàng',
-  'PLATINUM': 'Bạch Kim',
-  'DIAMOND': 'Kim Cương',
-  'VETERAN': 'Tinh Anh',
-  'MASTER': 'Cao Thủ',
-  'CONQUEROR': 'Thách Đấu',
-};
-
-// Format timestamp
-const formatTime = (isoString: string): string => {
-  const date = new Date(isoString);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMin = Math.floor(diffMs / 60000);
-  const diffHour = Math.floor(diffMs / 3600000);
-  const diffDay = Math.floor(diffMs / 86400000);
-
-  if (diffMin < 1) return 'Vừa xong';
-  if (diffMin < 60) return `${diffMin} phút trước`;
-  if (diffHour < 24) return `${diffHour} giờ trước`;
-  if (diffDay < 7) return `${diffDay} ngày trước`;
-  return date.toLocaleDateString('vi-VN');
-};
 
 interface PostCardProps {
   post: FeedPost;
   onLike: (postId: string, isLiked: boolean) => void;
   onOpenComments: (post: FeedPost) => void;
-  onShare?: (post: FeedPost) => void;  // Share callback
+  onShare?: (post: FeedPost) => void;
   showAuthor?: boolean;
 }
 
@@ -83,182 +61,255 @@ export const PostCard: React.FC<PostCardProps> = ({
   onShare,
   showAuthor = true,
 }) => {
-  // Check if this is a shared post
-  const isSharedPost = !!post.shared_post;
+  const [showLikesModal, setShowLikesModal] = useState(false);
+
   return (
-    <div className="group relative bg-slate-900 border border-slate-800 hover:border-slate-600 transition-colors">
-      {/* Decorative corner accents */}
-      <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-gold-500"></div>
-      <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-gold-500"></div>
-      <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-gold-500"></div>
-      <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-gold-500"></div>
-
-      <div className="p-5">
-        {/* Header - Author info */}
-        {showAuthor && (
-          <div className="flex items-start gap-4 mb-4">
-            <a 
-              href={`#profile/${post.author.id}`}
-              className="relative cursor-pointer group-hover:scale-105 transition-transform"
-            >
-              <img 
-                src={post.author.avatar_url || 'https://via.placeholder.com/48'} 
-                alt={post.author.username} 
-                className="w-12 h-12 object-cover clip-hex-button border-2 border-slate-700" 
-              />
-              {post.author.rank && (
-                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-slate-950 text-[10px] font-bold px-2 py-0.5 border border-slate-700 text-gold-500 whitespace-nowrap">
-                  {RANK_DISPLAY[post.author.rank] || post.author.rank}
-                </div>
-              )}
+    <>
+    <LikesModal 
+      postId={post.id}
+      isOpen={showLikesModal}
+      onClose={() => setShowLikesModal(false)}
+      totalCount={post.like_count}
+    />
+    <div className="bg-bg-secondary rounded-[10px] md:rounded-[12px] overflow-hidden mb-4 md:mb-6 border border-white/5">
+      {/* Header - Responsive */}
+      <div className="p-4 md:p-6 flex items-center justify-between">
+        <div className="flex items-center gap-2 md:gap-3">
+            <a href={`#profile/${post.author.id}`}>
+                <img 
+                    src={post.author.avatar_url || '/assets/images/home.svg'} 
+                    alt="" 
+                    className="w-[32px] h-[32px] md:w-[38px] md:h-[38px] rounded-[8px] md:rounded-[10px] object-cover"
+                />
             </a>
-            <div className="flex-1">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-display font-bold text-lg text-white tracking-wide flex items-center gap-2">
-                    <a href={`#profile/${post.author.id}`} className="hover:text-gold-400 transition-colors">
+            <div>
+                <div className="flex items-center gap-1.5">
+                  <a href={`#profile/${post.author.id}`} className="font-montserrat font-semibold text-white text-[12px] md:text-[14px] hover:text-primary transition-colors">
                       {post.author.username}
-                    </a>
-                    {post.author.level && post.author.level >= 30 && <Zap className="w-4 h-4 text-gold-400 fill-gold-400" />}
-                  </h3>
-                  <p className="text-slate-500 text-xs font-mono uppercase tracking-wider">
-                    {formatTime(post.created_at)}
-                  </p>
+                  </a>
+                  {post.shared_post && (
+                    <span className="text-[#7f7f7f] text-[10px] md:text-[11px]">shared a post</span>
+                  )}
                 </div>
-              </div>
+                <span className="text-[#7f7f7f] text-[9px] md:text-[10px] uppercase">Public</span>
             </div>
-          </div>
-        )}
+        </div>
+  
+      </div>
 
-        {/* Time for no-author mode */}
-        {!showAuthor && (
-          <p className="text-slate-500 text-xs font-mono uppercase tracking-wider mb-3">
-            {formatTime(post.created_at)}
-          </p>
-        )}
-        
-        {/* Content - Caption for shared posts, or regular content */}
-        {post.content && (
-          <p 
-            onClick={() => onOpenComments(post)}
-            className="text-slate-200 mb-4 text-sm leading-relaxed font-light whitespace-pre-wrap border-l-2 border-slate-700 pl-3 cursor-pointer hover:text-white transition-colors"
-          >
+      {/* Share caption (if this is a shared post) */}
+      {post.shared_post && post.content && (
+        <div className="px-4 md:px-6 pb-3">
+          <p className="text-white/90 text-[11px] md:text-[12px] leading-relaxed">
             {post.content}
           </p>
-        )}
+        </div>
+      )}
 
-        {/* Shared Post Embed (for shared posts) */}
-        {isSharedPost && post.shared_post && (
-          <div className="mb-4 border border-slate-700 rounded-lg overflow-hidden bg-slate-800/50">
-            {/* Shared post author header */}
-            <div className="flex items-center gap-3 p-3 border-b border-slate-700/50">
-              <a href={`#profile/${post.shared_post.author.id}`}>
-                <img 
-                  src={post.shared_post.author.avatar_url || 'https://via.placeholder.com/40'} 
-                  alt={post.shared_post.author.username}
-                  className="w-10 h-10 rounded-full object-cover border border-slate-600"
-                />
+      {/* Shared Post Content */}
+      {post.shared_post && (
+        <div className="mx-4 md:mx-6 mb-3 md:mb-4 border border-white/10 rounded-[10px] md:rounded-[12px] overflow-hidden bg-bg-main/30">
+          {/* Shared Post Header */}
+          <div className="p-3 md:p-4 flex items-center gap-2 md:gap-3">
+            <a href={`#profile/${post.shared_post.author.id}`}>
+              <img 
+                src={post.shared_post.author.avatar_url || '/assets/images/home.svg'} 
+                alt="" 
+                className="w-[28px] h-[28px] md:w-[32px] md:h-[32px] rounded-[6px] md:rounded-[8px] object-cover"
+              />
+            </a>
+            <div>
+              <a href={`#profile/${post.shared_post.author.id}`} className="font-montserrat font-semibold text-white text-[11px] md:text-[12px] block hover:text-primary transition-colors">
+                {post.shared_post.author.username}
               </a>
-              <div>
-                <a 
-                  href={`#profile/${post.shared_post.author.id}`}
-                  className="font-semibold text-white text-sm hover:text-gold-400 transition-colors"
-                >
-                  {post.shared_post.author.username}
-                </a>
-                <p className="text-xs text-slate-500">{formatTime(post.shared_post.created_at)}</p>
+              <span className="text-[#7f7f7f] text-[8px] md:text-[9px]">
+                {new Date(post.shared_post.created_at).toLocaleDateString('vi-VN')}
+              </span>
+            </div>
+          </div>
+
+          {/* Shared Post Media */}
+          {post.shared_post.media && post.shared_post.media.length > 0 && (
+            <div className="px-3 md:px-4 pb-3 md:pb-4">
+              <div className={`grid gap-1.5 ${
+                post.shared_post.media.length === 1 ? 'grid-cols-1' : 
+                post.shared_post.media.length === 2 ? 'grid-cols-2' : 
+                'grid-cols-2 md:grid-cols-3'
+              }`}>
+                {post.shared_post.media.map((item, index) => (
+                    <div 
+                      key={index} 
+                      className={`relative rounded-[8px] md:rounded-[10px] overflow-hidden group bg-black/20 ${
+                        post.shared_post!.media.length === 1 ? 'aspect-auto' : 'aspect-square'
+                      }`}
+                    >
+                      {item.type === 'image' ? (
+                        <img 
+                          src={item.url} 
+                          alt="Shared content" 
+                          className="w-full h-full object-cover cursor-pointer"
+                          onClick={() => onOpenComments(post)}
+                        />
+                      ) : (
+                        <VideoPlayer 
+                          src={item.url} 
+                          poster={item.thumbnail_url}
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                    </div>
+                  ))}
               </div>
             </div>
-            
-            {/* Shared post content */}
-            {post.shared_post.content && (
-              <div 
-                className="p-3 text-slate-300 text-sm cursor-pointer hover:text-white transition-colors"
-                onClick={() => onOpenComments(post)}
-              >
+          )}
+
+          {/* Shared Post Content */}
+          {post.shared_post.content && (
+            <div className="px-3 md:px-4 pb-3 md:pb-4">
+              <p className="text-white/70 text-[10px] md:text-[11px] leading-relaxed line-clamp-3">
                 {post.shared_post.content}
-              </div>
-            )}
-            
-            {/* Shared post media */}
-            {post.shared_post.media && post.shared_post.media.length > 0 && (
-              <div className={`grid gap-1 ${post.shared_post.media.length > 1 ? 'grid-cols-2' : ''}`}>
-                {post.shared_post.media.map((item, index) => (
-                  <div key={index} className="relative">
-                    {item.type === 'image' ? (
-                      <img 
-                        src={item.url} 
-                        alt="" 
-                        className="w-full h-48 object-cover" 
-                      />
-                    ) : (
-                      <VideoPlayer 
-                        src={item.url} 
-                        poster={item.thumbnail_url}
-                        className="w-full h-48"
-                      />
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-        
-        {/* Media (only for non-shared posts, or if sharer adds media) */}
-        {!isSharedPost && post.media.length > 0 && (
-          <div className={`grid gap-2 mb-4 ${post.media.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Original Media Content (only show if NOT a shared post) */}
+      {!post.shared_post && post.media && post.media.length > 0 && (
+        <div className="px-4 md:px-6 pb-3 md:pb-4">
+          <div className={`grid gap-2 ${
+            post.media.length === 1 ? 'grid-cols-1' : 
+            post.media.length === 2 ? 'grid-cols-2' : 
+            'grid-cols-2 md:grid-cols-3'
+          }`}>
             {post.media.map((item, index) => (
-              <div key={index} className="relative group-hover:brightness-110 transition-all">
-                <div className="absolute inset-0 border border-white/10 pointer-events-none z-10"></div>
-                {item.type === 'image' ? (
-                  <img 
-                    src={item.url} 
-                    alt="Post content" 
-                    className="w-full h-64 object-cover clip-angled" 
-                  />
-                ) : (
-                  <VideoPlayer 
-                    src={item.url} 
-                    poster={item.thumbnail_url}
-                    className="w-full h-64 clip-angled"
-                  />
-                )}
-              </div>
-            ))}
+                <div 
+                  key={index} 
+                  className={`relative rounded-[10px] md:rounded-[12px] overflow-hidden group bg-black/20 ${
+                    post.media.length === 1 ? 'aspect-auto' : 'aspect-square'
+                  }`}
+                >
+                  {item.type === 'image' ? (
+                    <img 
+                      src={item.url} 
+                      alt={`Content ${index + 1}`} 
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 cursor-pointer"
+                      onClick={() => onOpenComments(post)}
+                    />
+                  ) : (
+                    <VideoPlayer 
+                      src={item.url} 
+                      poster={item.thumbnail_url}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                </div>
+              ))}
           </div>
+        </div>
+      )}
+
+      {/* Interactions - Responsive */}
+      <div className="px-4 md:px-6 pb-3 md:pb-4 flex items-center justify-between">
+        <div className="flex items-center gap-4 md:gap-5">
+            <button 
+                onClick={() => onLike(post.id, post.is_liked)}
+                className={`transition-all hover:scale-110 ${post.is_liked ? '' : 'opacity-60 hover:opacity-100'}`}
+            >
+                <svg className={`w-[18px] h-[18px] md:w-5 md:h-5 ${post.is_liked ? 'text-primary fill-primary' : 'text-white'}`} viewBox="0 0 24 24" fill={post.is_liked ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+            </button>
+            <button 
+                onClick={() => onOpenComments(post)}
+                className="opacity-60 hover:opacity-100 transition-all hover:scale-110"
+            >
+                <svg className="w-[18px] h-[18px] md:w-5 md:h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                </svg>
+            </button>
+            <button 
+                onClick={() => onShare?.(post)}
+                className="opacity-60 hover:opacity-100 transition-all hover:scale-110"
+            >
+                <svg className="w-[18px] h-[18px] md:w-5 md:h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                </svg>
+            </button>
+        </div>
+
+        <button className="opacity-60 hover:opacity-100 transition-all">
+            <svg className="w-[18px] h-[18px] md:w-5 md:h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+            </svg>
+        </button>
+      </div>
+
+      {/* Stats and Content - Responsive */}
+      <div className="px-4 md:px-6 pb-4 md:pb-6">
+        {/* Clickable Likes Section - Only show if there are likes */}
+        {post.like_count > 0 && (
+          <button 
+            onClick={() => setShowLikesModal(true)}
+            className="flex items-center gap-2 mb-2 md:mb-3 hover:opacity-80 transition-opacity cursor-pointer"
+          >
+              {/* Show real avatars of recent likers */}
+              {post.recent_likers && post.recent_likers.length > 0 && (
+                <div className="flex -space-x-2">
+                  {post.recent_likers.slice(0, 3).map((liker) => (
+                    <img 
+                      key={liker.id}
+                      src={liker.avatar_url || '/assets/images/home.svg'} 
+                      alt={liker.username}
+                      className="w-5 h-5 md:w-6 md:h-6 rounded-full border-2 border-bg-secondary object-cover"
+                    />
+                  ))}
+                </div>
+              )}
+              <p className="text-white/80 text-[11px] md:text-[13px] text-left">
+                {post.recent_likers && post.recent_likers.length > 0 ? (
+                  <>
+                    Liked by <span className="font-semibold">{post.recent_likers[0].username}</span>
+                    {post.like_count > 1 && (
+                      <> and <span className="font-semibold">{post.like_count - 1} {post.like_count === 2 ? 'other' : 'others'}</span></>
+                    )}
+                  </>
+                ) : (
+                  <>Liked by <span className="font-semibold">{post.like_count}</span> {post.like_count === 1 ? 'person' : 'people'}</>
+                )}
+              </p>
+          </button>
         )}
 
-        {/* Actions */}
-        <div className="flex items-center gap-6 text-slate-400 border-t border-slate-800 pt-3 mt-2">
-          <button 
-            onClick={() => onLike(post.id, post.is_liked)}
-            className={`flex items-center gap-2 transition-colors group/btn ${
-              post.is_liked ? 'text-gold-400' : 'hover:text-gold-400'
-            }`}
-          >
-            <Heart className={`w-5 h-5 group-hover/btn:scale-110 transition-transform ${
-              post.is_liked ? 'fill-gold-400' : ''
-            }`} />
-            <span className="text-sm font-bold">{post.like_count}</span>
-          </button>
-          <button 
+        {/* Only show content here if NOT a shared post (shared posts show caption above) */}
+        {!post.shared_post && post.content && (
+          <p className="text-white/90 text-[11px] md:text-[12px] leading-relaxed mb-3 md:mb-4">
+              {post.content}
+          </p>
+        )}
+
+        {/* Post Comment Input - Click opens comment modal - Responsive */}
+        <div 
+            className="flex items-center gap-2 md:gap-3 pt-3 md:pt-4 border-t border-white/5 cursor-pointer group"
             onClick={() => onOpenComments(post)}
-            className="flex items-center gap-2 hover:text-blue-400 transition-colors group/btn"
-          >
-            <MessageCircle className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
-            <span className="text-sm font-bold">{post.comment_count}</span>
-          </button>
-          <button 
-            onClick={() => onShare?.(post)}
-            className="flex items-center gap-2 hover:text-cyan-400 transition-colors ml-auto group/btn"
-          >
-            <Share2 className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
-            {post.share_count > 0 && <span className="text-sm font-bold">{post.share_count}</span>}
-          </button>
+        >
+            <img 
+                src={post.author.avatar_url || '/assets/images/home.svg'} 
+                alt="" 
+                className="w-8 h-8 md:w-10 md:h-10 rounded-[8px] md:rounded-[10px] object-cover"
+            />
+            <div className="flex-1 relative">
+                <div className="w-full bg-bg-main/50 h-9 md:h-10 rounded-[8px] md:rounded-[10px] px-3 md:px-4 text-[10px] md:text-[11px] text-[#a5a5a5] flex items-center group-hover:bg-bg-main/70 transition-colors">
+                    Post a comment..
+                </div>
+                <div className="absolute right-1 md:right-1.5 top-1 md:top-1.5 h-6 md:h-7 px-3 md:px-4 rounded-[6px] text-[10px] md:text-[11px] font-semibold bg-primary/20 text-white/40 flex items-center">
+                    Post
+                </div>
+            </div>
         </div>
       </div>
     </div>
+    </>
   );
 };
 

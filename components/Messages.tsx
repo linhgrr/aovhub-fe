@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageCircle, Search, Plus, Users, User as UserIcon, X, ChevronLeft } from 'lucide-react';
+import { MessageCircle, Search, Plus, Users, User as UserIcon, X } from 'lucide-react';
 import { ChatWindow } from './ChatWindow';
 import { CreateGroupModal } from './CreateGroupModal';
 
@@ -44,29 +44,20 @@ export const Messages: React.FC<MessagesProps> = ({ isOpen, onClose, onRefreshUn
     const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
-        if (isOpen) {
-            fetchConversations();
-        }
+        if (isOpen) fetchConversations();
     }, [isOpen]);
 
-    // Search users when query changes
     useEffect(() => {
-        if (searchTimeoutRef.current) {
-            clearTimeout(searchTimeoutRef.current);
-        }
+        if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
 
         if (searchQuery.trim().length > 0) {
-            searchTimeoutRef.current = setTimeout(() => {
-                searchUsers(searchQuery);
-            }, 300);
+            searchTimeoutRef.current = setTimeout(() => searchUsers(searchQuery), 300);
         } else {
             setSearchResults([]);
         }
 
         return () => {
-            if (searchTimeoutRef.current) {
-                clearTimeout(searchTimeoutRef.current);
-            }
+            if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
         };
     }, [searchQuery]);
 
@@ -152,7 +143,6 @@ export const Messages: React.FC<MessagesProps> = ({ isOpen, onClose, onRefreshUn
         return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
     };
 
-    // Filter conversations that match search if no API results
     const filteredConversations = searchQuery
         ? conversations.filter(conv =>
             conv.name?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -161,7 +151,7 @@ export const Messages: React.FC<MessagesProps> = ({ isOpen, onClose, onRefreshUn
 
     if (!isOpen) return null;
 
-    // If a conversation is selected, show ChatWindow
+    // Chat Window View
     if (selectedConversation) {
         return (
             <ChatWindow
@@ -171,12 +161,12 @@ export const Messages: React.FC<MessagesProps> = ({ isOpen, onClose, onRefreshUn
                 conversationType={selectedConversation.type}
                 onBack={() => {
                     setSelectedConversation(null);
-                    fetchConversations(); // Refresh list
-                    onRefreshUnread?.(); // Refresh unread badge
+                    fetchConversations();
+                    onRefreshUnread?.();
                 }}
                 onClose={() => {
                     onClose();
-                    onRefreshUnread?.(); // Refresh when closing
+                    onRefreshUnread?.();
                 }}
             />
         );
@@ -188,52 +178,52 @@ export const Messages: React.FC<MessagesProps> = ({ isOpen, onClose, onRefreshUn
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 md:p-0">
             {/* Backdrop */}
             <div
-                className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
                 onClick={onClose}
             />
 
             {/* Messages Panel */}
             <div
                 ref={containerRef}
-                className="relative bg-slate-900 border border-slate-700 rounded-xl md:rounded-none w-full max-w-md md:max-w-sm h-[80vh] md:h-full md:fixed md:right-0 md:top-0 md:bottom-0 shadow-2xl shadow-black/50 flex flex-col overflow-hidden"
+                className="relative bg-bg-secondary border border-white/10 rounded-[12px] md:rounded-none w-full max-w-md md:max-w-sm h-[80vh] md:h-full md:fixed md:right-0 md:top-0 md:bottom-0 shadow-2xl flex flex-col overflow-hidden"
             >
                 {/* Header */}
-                <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800 flex-shrink-0 bg-slate-900/95">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 flex-shrink-0 bg-bg-secondary">
                     <div className="flex items-center gap-3">
-                        <MessageCircle className="w-6 h-6 text-gold-500" />
-                        <h2 className="text-lg font-bold text-white">Tin nhắn</h2>
+                        <MessageCircle className="w-5 h-5 text-primary" />
+                        <h2 className="font-montserrat font-bold text-[14px] text-white">Tin nhắn</h2>
                     </div>
                     <div className="flex items-center gap-2">
                         <button
                             onClick={() => setShowCreateGroup(true)}
-                            className="w-8 h-8 flex items-center justify-center rounded-full bg-gold-500 hover:bg-gold-400 transition-colors"
+                            className="w-8 h-8 flex items-center justify-center rounded-[8px] bg-primary hover:bg-primary/90 transition-all hover:scale-105"
                             title="Tạo nhóm chat"
                         >
-                            <Plus className="w-4 h-4 text-slate-950" />
+                            <Plus className="w-4 h-4 text-white" />
                         </button>
                         <button
                             onClick={onClose}
-                            className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-800 hover:bg-slate-700 transition-colors"
+                            className="w-8 h-8 flex items-center justify-center rounded-[8px] bg-white/5 hover:bg-white/10 transition-all"
                         >
-                            <X className="w-4 h-4 text-slate-400" />
+                            <X className="w-4 h-4 text-white/60" />
                         </button>
                     </div>
                 </div>
 
                 {/* Search */}
-                <div className="px-4 py-2 border-b border-slate-800">
+                <div className="px-4 py-3 border-b border-white/5">
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-500" />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#7f7f7f]" />
                         <input
                             type="text"
                             placeholder="Tìm kiếm người dùng hoặc nhóm..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-gold-500/50 transition-colors"
+                            className="w-full pl-10 pr-4 py-2.5 bg-bg-main/50 border border-white/10 rounded-[10px] text-[12px] text-white placeholder-[#7f7f7f] focus:outline-none focus:border-primary/50 transition-colors font-montserrat"
                         />
                         {isSearching && (
                             <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                                <div className="w-4 h-4 border-2 border-gold-500 border-t-transparent rounded-full animate-spin"></div>
+                                <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
                             </div>
                         )}
                     </div>
@@ -241,30 +231,30 @@ export const Messages: React.FC<MessagesProps> = ({ isOpen, onClose, onRefreshUn
 
                 {/* Search Results */}
                 {showSearchResults && (
-                    <div className="border-b border-slate-800 max-h-48 overflow-y-auto">
-                        <div className="px-4 py-2 text-xs text-slate-500 font-medium">
+                    <div className="border-b border-white/5 max-h-48 overflow-y-auto">
+                        <div className="px-4 py-2 text-[10px] text-[#7f7f7f] font-montserrat font-medium uppercase tracking-wider">
                             Người dùng
                         </div>
                         {searchResults.map((user) => (
                             <button
                                 key={user.id}
                                 onClick={() => openDirectChat(user)}
-                                className="w-full flex items-center gap-3 px-4 py-2 hover:bg-slate-800/50 transition-colors text-left"
+                                className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-white/5 transition-colors text-left group"
                             >
                                 {user.avatar_url ? (
                                     <img
                                         src={user.avatar_url}
                                         alt=""
-                                        className="w-10 h-10 rounded-full object-cover"
+                                        className="w-[40px] h-[40px] rounded-[10px] object-cover transition-transform group-hover:scale-105"
                                     />
                                 ) : (
-                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center">
-                                        <UserIcon className="w-4 h-4 text-slate-400" />
+                                    <div className="w-[40px] h-[40px] rounded-[10px] bg-bg-main flex items-center justify-center">
+                                        <UserIcon className="w-4 h-4 text-[#7f7f7f]" />
                                     </div>
                                 )}
                                 <div>
-                                    <span className="font-medium text-white">{user.username}</span>
-                                    <p className="text-xs text-slate-500">Nhấn để nhắn tin</p>
+                                    <span className="font-montserrat font-medium text-[12px] text-white">{user.username}</span>
+                                    <p className="text-[10px] text-[#7f7f7f]">Nhấn để nhắn tin</p>
                                 </div>
                             </button>
                         ))}
@@ -272,26 +262,25 @@ export const Messages: React.FC<MessagesProps> = ({ isOpen, onClose, onRefreshUn
                 )}
 
                 {/* Conversation List */}
-                <div className="flex-1 overflow-y-auto">
-                    {/* Section header when searching */}
+                <div className="flex-1 overflow-y-auto no-scrollbar">
                     {searchQuery && filteredConversations.length > 0 && (
-                        <div className="px-4 py-2 text-xs text-slate-500 font-medium">
+                        <div className="px-4 py-2 text-[10px] text-[#7f7f7f] font-montserrat font-medium uppercase tracking-wider">
                             Cuộc trò chuyện
                         </div>
                     )}
 
                     {isLoading ? (
                         <div className="flex items-center justify-center py-12">
-                            <div className="w-8 h-8 border-2 border-gold-500 border-t-transparent rounded-full animate-spin"></div>
+                            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
                         </div>
                     ) : filteredConversations.length === 0 && !showSearchResults ? (
-                        <div className="text-center py-12 text-slate-500">
-                            <MessageCircle className="w-16 h-16 mx-auto mb-3 opacity-50" />
-                            <p className="text-sm">
+                        <div className="text-center py-12 text-[#7f7f7f]">
+                            <MessageCircle className="w-14 h-14 mx-auto mb-3 opacity-40" />
+                            <p className="text-[12px] font-montserrat">
                                 {searchQuery ? 'Không tìm thấy kết quả' : 'Chưa có tin nhắn nào'}
                             </p>
                             {!searchQuery && (
-                                <p className="text-xs mt-2">Tìm kiếm người dùng để bắt đầu</p>
+                                <p className="text-[10px] mt-2 text-[#5f5f5f]">Tìm kiếm người dùng để bắt đầu</p>
                             )}
                         </div>
                     ) : (
@@ -304,8 +293,9 @@ export const Messages: React.FC<MessagesProps> = ({ isOpen, onClose, onRefreshUn
                                     avatar_url: conversation.avatar_url,
                                     type: conversation.type,
                                 })}
-                                className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-800/50 transition-colors text-left ${conversation.unread_count > 0 ? 'bg-gold-500/5' : ''
-                                    }`}
+                                className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors text-left group ${
+                                    conversation.unread_count > 0 ? 'bg-primary/5' : ''
+                                }`}
                             >
                                 {/* Avatar */}
                                 <div className="relative flex-shrink-0">
@@ -313,32 +303,36 @@ export const Messages: React.FC<MessagesProps> = ({ isOpen, onClose, onRefreshUn
                                         <img
                                             src={conversation.avatar_url}
                                             alt=""
-                                            className="w-12 h-12 rounded-full object-cover"
+                                            className="w-[43px] h-[43px] rounded-[10px] object-cover transition-transform group-hover:scale-105"
                                         />
                                     ) : (
-                                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center">
+                                        <div className="w-[43px] h-[43px] rounded-[10px] bg-bg-main flex items-center justify-center">
                                             {conversation.type === 'GROUP' ? (
-                                                <Users className="w-5 h-5 text-slate-400" />
+                                                <Users className="w-5 h-5 text-[#7f7f7f]" />
                                             ) : (
-                                                <UserIcon className="w-5 h-5 text-slate-400" />
+                                                <UserIcon className="w-5 h-5 text-[#7f7f7f]" />
                                             )}
                                         </div>
                                     )}
+                                    {/* Online indicator */}
+                                    <div className="absolute -bottom-0.5 -right-0.5 w-[8px] h-[8px] bg-[#22c55e] rounded-full border-2 border-bg-secondary"></div>
                                 </div>
 
                                 {/* Content */}
                                 <div className="flex-1 min-w-0">
-                                    <div className="flex items-center justify-between">
-                                        <span className={`font-medium truncate ${conversation.unread_count > 0 ? 'text-white' : 'text-slate-300'
-                                            }`}>
+                                    <div className="flex items-center justify-between mb-1">
+                                        <span className={`font-montserrat font-medium text-[11px] truncate group-hover:text-primary transition-colors ${
+                                            conversation.unread_count > 0 ? 'text-white' : 'text-white/90'
+                                        }`}>
                                             {conversation.name || 'Cuộc trò chuyện'}
                                         </span>
-                                        <span className="text-xs text-slate-500 flex-shrink-0 ml-2">
+                                        <span className="text-[10px] text-[#7f7f7f] flex-shrink-0 ml-2">
                                             {formatTimeAgo(conversation.last_message_at)}
                                         </span>
                                     </div>
-                                    <p className={`text-sm truncate mt-0.5 ${conversation.unread_count > 0 ? 'text-slate-300 font-medium' : 'text-slate-500'
-                                        }`}>
+                                    <p className={`text-[10px] truncate leading-relaxed ${
+                                        conversation.unread_count > 0 ? 'text-white/70 font-medium' : 'text-white/50'
+                                    }`}>
                                         {conversation.last_message_content || 'Bắt đầu cuộc trò chuyện...'}
                                     </p>
                                 </div>
@@ -346,7 +340,7 @@ export const Messages: React.FC<MessagesProps> = ({ isOpen, onClose, onRefreshUn
                                 {/* Unread badge */}
                                 {conversation.unread_count > 0 && (
                                     <div className="flex-shrink-0">
-                                        <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold text-white bg-gold-500 rounded-full">
+                                        <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1.5 text-[10px] font-bold text-white bg-primary rounded-full">
                                             {conversation.unread_count > 99 ? '99+' : conversation.unread_count}
                                         </span>
                                     </div>
@@ -368,7 +362,7 @@ export const Messages: React.FC<MessagesProps> = ({ isOpen, onClose, onRefreshUn
                         avatar_url: null,
                         type: 'GROUP',
                     });
-                    fetchConversations(); // Refresh list
+                    fetchConversations();
                 }}
             />
         </div>

@@ -300,203 +300,154 @@ export const Register: React.FC = () => {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="relative">
-              <div className="absolute inset-0 bg-gold-500 blur-md opacity-50"></div>
-              <Sword className="text-gold-400 w-10 h-10 relative z-10 rotate-45" strokeWidth={2.5} />
+              <div className="absolute inset-0 bg-primary blur-md opacity-30"></div>
+              <Sword className="text-primary w-10 h-10 relative z-10 rotate-45" strokeWidth={2.5} />
             </div>
-            <h1 className="text-4xl font-display font-bold text-white tracking-wider italic">
-              ARENA<span className="text-gold-500 glow-text">HUB</span>
+            <h1 className="text-4xl font-bakbak font-bold text-white tracking-wider uppercase">
+              ARENA<span className="text-primary glow-primary">HUB</span>
             </h1>
           </div>
-          <h2 className="text-2xl font-display font-bold text-white mb-2">ĐĂNG KÝ TÀI KHOẢN</h2>
-          <p className="text-slate-400">Tham gia cộng đồng game thủ Liên Quân Mobile</p>
+          <h2 className="text-2xl font-montserrat font-bold text-white mb-2 uppercase">ĐĂNG KÝ TÀI KHOẢN</h2>
+          <p className="text-[#7f7f7f] text-sm font-montserrat">Tham gia cộng đồng game thủ Liên Quân Mobile</p>
         </div>
 
         {/* Registration Form */}
         <form onSubmit={handleSubmit}>
-          <div className="bg-slate-900/80 backdrop-blur border border-slate-700 p-1 rounded-none clip-angled shadow-[0_0_15px_rgba(0,0,0,0.3)]">
-            <div className="bg-slate-800/50 p-6 md:p-8 clip-angled border-l-2 border-gold-500">
+          <div className="bg-bg-secondary/80 backdrop-blur border border-white/5 p-8 rounded-[20px] shadow-2xl">
+            {/* API Error Message */}
+            {apiError && (
+              <div className="mb-6 bg-red-900/20 border border-red-500/50 p-4 rounded-lg flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-red-400 font-bold text-xs mb-1 uppercase tracking-wider">LỖI ĐĂNG KÝ</p>
+                  <p className="text-red-300 text-xs">{apiError}</p>
+                </div>
+              </div>
+            )}
 
-              {/* API Error Message */}
-              {apiError && (
-                <div className="mb-6 bg-red-900/20 border border-red-500/50 p-4 flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-red-400 font-bold text-sm mb-1">LỖI ĐĂNG KÝ</p>
-                    <p className="text-red-300 text-sm">{apiError}</p>
+            {/* Basic Info Section */}
+            <div className="mb-10">
+              <h3 className="text-primary font-montserrat font-bold text-[12px] mb-6 flex items-center gap-2 uppercase tracking-widest">
+                <UserIcon className="w-4 h-4" />
+                THÔNG TIN CƠ BẢN
+              </h3>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Username */}
+                <div>
+                  <label className="block text-[#7f7f7f] text-[10px] font-bold mb-2 uppercase tracking-widest">
+                    Tên người dùng *
+                  </label>
+                  <div className="relative">
+                    <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#7f7f7f]" />
+                    <input
+                      type="text"
+                      value={formData.username}
+                      onChange={(e) => handleInputChange('username', e.target.value)}
+                      className={`w-full bg-bg-main/50 text-white pl-12 pr-4 py-3.5 rounded-[12px] border ${
+                        errors.username ? 'border-red-500' : 'border-white/5'
+                      } focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all text-sm`}
+                      placeholder="vd: ProGamerVN"
+                    />
                   </div>
                 </div>
-              )}
 
-              {/* Basic Info Section */}
-              <div className="mb-8">
-                <h3 className="text-gold-400 font-display font-bold text-lg mb-4 flex items-center gap-2">
-                  <UserIcon className="w-5 h-5" />
-                  THÔNG TIN CƠ BẢN
-                </h3>
-
-                <div className="grid md:grid-cols-2 gap-6">
-                  {/* Username */}
-                  <div>
-                    <label className="block text-slate-300 text-sm font-bold mb-2 uppercase tracking-wider">
-                      Tên người dùng *
-                    </label>
-                    <div className="relative">
-                      <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-                      <input
-                        type="text"
-                        value={formData.username}
-                        onChange={(e) => handleInputChange('username', e.target.value)}
-                        className={`w-full bg-slate-950/50 text-white pl-11 pr-4 py-3 border ${
-                          errors.username ? 'border-red-500' : 'border-slate-700'
-                        } focus:outline-none focus:ring-1 focus:ring-gold-500/50 transition-all`}
-                        placeholder="vd: ProGamerVN"
-                      />
-                    </div>
-                    {errors.username && (
-                      <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
-                        <AlertCircle className="w-3 h-3" />
-                        {errors.username}
-                      </p>
-                    )}
+                {/* Email */}
+                <div>
+                  <label className="block text-[#7f7f7f] text-[10px] font-bold mb-2 uppercase tracking-widest">
+                    Email *
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#7f7f7f]" />
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      className={`w-full bg-bg-main/50 text-white pl-12 pr-4 py-3.5 rounded-[12px] border ${
+                        errors.email ? 'border-red-500' : 'border-white/5'
+                      } focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all text-sm`}
+                      placeholder="email@example.com"
+                    />
                   </div>
+                </div>
 
-                  {/* Email */}
-                  <div>
-                    <label className="block text-slate-300 text-sm font-bold mb-2 uppercase tracking-wider">
-                      Email *
-                    </label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-                      <input
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => handleInputChange('email', e.target.value)}
-                        className={`w-full bg-slate-950/50 text-white pl-11 pr-4 py-3 border ${
-                          errors.email ? 'border-red-500' : 'border-slate-700'
-                        } focus:outline-none focus:ring-1 focus:ring-gold-500/50 transition-all`}
-                        placeholder="email@example.com"
-                      />
-                    </div>
-                    {errors.email && (
-                      <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
-                        <AlertCircle className="w-3 h-3" />
-                        {errors.email}
-                      </p>
-                    )}
+                {/* Password */}
+                <div>
+                  <label className="block text-[#7f7f7f] text-[10px] font-bold mb-2 uppercase tracking-widest">
+                    Mật khẩu *
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#7f7f7f]" />
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      value={formData.password}
+                      onChange={(e) => handleInputChange('password', e.target.value)}
+                      className={`w-full bg-bg-main/50 text-white pl-12 pr-12 py-3.5 rounded-[12px] border ${
+                        errors.password ? 'border-red-500' : 'border-white/5'
+                      } focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all text-sm`}
+                      placeholder="Tối thiểu 8 ký tự"
+                    />
                   </div>
+                </div>
 
-                  {/* Password */}
-                  <div>
-                    <label className="block text-slate-300 text-sm font-bold mb-2 uppercase tracking-wider">
-                      Mật khẩu *
-                    </label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-                      <input
-                        type={showPassword ? 'text' : 'password'}
-                        value={formData.password}
-                        onChange={(e) => handleInputChange('password', e.target.value)}
-                        className={`w-full bg-slate-950/50 text-white pl-11 pr-11 py-3 border ${
-                          errors.password ? 'border-red-500' : 'border-slate-700'
-                        } focus:outline-none focus:ring-1 focus:ring-gold-500/50 transition-all`}
-                        placeholder="Tối thiểu 8 ký tự"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
-                      >
-                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                      </button>
-                    </div>
-                    {errors.password && (
-                      <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
-                        <AlertCircle className="w-3 h-3" />
-                        {errors.password}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Confirm Password */}
-                  <div>
-                    <label className="block text-slate-300 text-sm font-bold mb-2 uppercase tracking-wider">
-                      Xác nhận mật khẩu *
-                    </label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-                      <input
-                        type={showConfirmPassword ? 'text' : 'password'}
-                        value={formData.confirmPassword}
-                        onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                        className={`w-full bg-slate-950/50 text-white pl-11 pr-11 py-3 border ${
-                          errors.confirmPassword ? 'border-red-500' : 'border-slate-700'
-                        } focus:outline-none focus:ring-1 focus:ring-gold-500/50 transition-all`}
-                        placeholder="Nhập lại mật khẩu"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
-                      >
-                        {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                      </button>
-                    </div>
-                    {errors.confirmPassword && (
-                      <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
-                        <AlertCircle className="w-3 h-3" />
-                        {errors.confirmPassword}
-                      </p>
-                    )}
+                {/* Confirm Password */}
+                <div>
+                  <label className="block text-[#7f7f7f] text-[10px] font-bold mb-2 uppercase tracking-widest">
+                    Xác nhận mật khẩu *
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#7f7f7f]" />
+                    <input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      value={formData.confirmPassword}
+                      onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                      className={`w-full bg-bg-main/50 text-white pl-12 pr-12 py-3.5 rounded-[12px] border ${
+                        errors.confirmPassword ? 'border-red-500' : 'border-white/5'
+                      } focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all text-sm`}
+                      placeholder="Nhập lại mật khẩu"
+                    />
                   </div>
                 </div>
               </div>
+            </div>
 
-              {/* Game Profile Section */}
-              <div className="mb-8">
-                <h3 className="text-gold-400 font-display font-bold text-lg mb-4 flex items-center gap-2">
-                  <Trophy className="w-5 h-5" />
-                  HỒ SƠ GAME
-                </h3>
+            {/* Game Profile Section */}
+            <div className="mb-10">
+              <h3 className="text-primary font-montserrat font-bold text-[12px] mb-6 flex items-center gap-2 uppercase tracking-widest">
+                <Trophy className="w-4 h-4" />
+                HỒ SƠ GAME
+              </h3>
 
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Main Role */}
-                <div className="mb-6">
-                  <label className="block text-slate-300 text-sm font-bold mb-2 uppercase tracking-wider">
+                <div>
+                  <label className="block text-[#7f7f7f] text-[10px] font-bold mb-2 uppercase tracking-widest">
                     Vị trí chính *
                   </label>
                   <div className="relative">
-                    <Sword className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 z-10" />
+                    <Sword className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#7f7f7f] z-10" />
                     <select
                       value={formData.mainRole}
                       onChange={(e) => handleInputChange('mainRole', e.target.value)}
-                      className={`w-full bg-slate-950/50 text-white pl-11 pr-4 py-3 border ${
-                        errors.mainRole ? 'border-red-500' : 'border-slate-700'
-                      } focus:outline-none focus:ring-1 focus:ring-gold-500/50 transition-all appearance-none cursor-pointer`}
+                      className={`w-full bg-bg-main/50 text-white pl-12 pr-4 py-3.5 rounded-[12px] border ${
+                        errors.mainRole ? 'border-red-500' : 'border-white/5'
+                      } focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all appearance-none cursor-pointer text-sm`}
                     >
                       <option value="">-- Chọn vị trí --</option>
                       {renderRoleOptions()}
                     </select>
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                      <div className="w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-slate-400"></div>
-                    </div>
                   </div>
-                  {errors.mainRole && (
-                    <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
-                      <AlertCircle className="w-3 h-3" />
-                      {errors.mainRole}
-                    </p>
-                  )}
                 </div>
 
                 {/* Profile Screenshot Upload */}
                 <div>
-                  <label className="block text-slate-300 text-sm font-bold mb-2 uppercase tracking-wider">
+                  <label className="block text-[#7f7f7f] text-[10px] font-bold mb-2 uppercase tracking-widest">
                     Ảnh hồ sơ game *
-                    <span className="text-slate-500 text-xs font-normal ml-2">(Chụp màn hình hồ sơ trong game)</span>
                   </label>
 
                   <div className={`border-2 border-dashed ${
-                    errors.profileScreenshot ? 'border-red-500' : 'border-slate-600'
-                  } bg-slate-950/30 p-6 transition-all hover:border-gold-500/50 cursor-pointer relative`}>
+                    errors.profileScreenshot ? 'border-red-500' : 'border-white/5'
+                  } bg-bg-main/30 p-6 rounded-[12px] transition-all hover:border-primary/50 cursor-pointer relative`}>
                     <input
                       type="file"
                       accept="image/jpeg,image/jpg,image/png"
@@ -509,77 +460,45 @@ export const Register: React.FC = () => {
                         <img
                           src={previewUrl}
                           alt="Preview"
-                          className="max-h-64 object-contain mb-4 border border-slate-700"
+                          className="max-h-40 object-contain mb-3 rounded-lg border border-white/5"
                         />
-                        <p className="text-slate-400 text-sm">
-                          {formData.profileScreenshot?.name}
-                          <span className="text-slate-600 ml-2">
-                            ({(formData.profileScreenshot!.size / 1024 / 1024).toFixed(2)} MB)
-                          </span>
-                        </p>
-                        <p className="text-gold-400 text-xs mt-2">Click để thay đổi ảnh</p>
+                        <p className="text-white/40 text-[10px]">Click để thay đổi ảnh</p>
                       </div>
                     ) : (
                       <div className="flex flex-col items-center text-center">
-                        <Upload className="w-12 h-12 text-slate-500 mb-3" />
-                        <p className="text-slate-300 font-bold mb-1">
-                          Tải lên ảnh hồ sơ game
-                        </p>
-                        <p className="text-slate-500 text-sm mb-2">
-                          Kéo thả hoặc click để chọn file
-                        </p>
-                        <p className="text-slate-600 text-xs">
-                          JPG, PNG • Tối đa 5MB
-                        </p>
+                        <Upload className="w-8 h-8 text-[#7f7f7f] mb-2" />
+                        <p className="text-white font-bold text-xs mb-1">Tải lên ảnh hồ sơ</p>
+                        <p className="text-[#7f7f7f] text-[10px]">JPG, PNG • Tối đa 5MB</p>
                       </div>
                     )}
                   </div>
-
-                  {errors.profileScreenshot && (
-                    <p className="text-red-400 text-xs mt-2 flex items-center gap-1">
-                      <AlertCircle className="w-3 h-3" />
-                      {errors.profileScreenshot}
-                    </p>
-                  )}
-
-                  {/* Info box */}
-                  <div className="mt-4 bg-blue-900/20 border border-blue-500/30 p-3 flex gap-3">
-                    <Shield className="w-5 h-5 text-blue-400 flex-shrink-0" />
-                    <div className="text-sm text-blue-300">
-                      <p className="font-bold mb-1">Xác thực hồ sơ tự động</p>
-                      <p className="text-blue-400/80 text-xs">
-                        Hệ thống sẽ tự động trích xuất thông tin từ ảnh: <strong>Rank, Level, Số trận, Tỷ lệ thắng, Uy tín</strong>.
-                        Vui lòng chụp rõ các thông tin này.
-                      </p>
-                    </div>
-                  </div>
                 </div>
               </div>
+            </div>
 
-              {/* Submit Button */}
-              <div className="flex flex-col gap-4">
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full bg-gold-500 hover:bg-gold-400 disabled:bg-slate-700 disabled:cursor-not-allowed text-slate-950 disabled:text-slate-500 font-display font-bold py-4 px-6 clip-hex-button transition-all hover:translate-y-[-2px] hover:shadow-[0_0_15px_rgba(245,158,11,0.4)] disabled:translate-y-0 disabled:shadow-none flex items-center justify-center gap-2"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader className="w-5 h-5 animate-spin" />
-                      ĐANG XỬ LÝ...
-                    </>
-                  ) : (
-                    'ĐĂNG KÝ'
-                  )}
-                </button>
+            {/* Submit Button */}
+            <div className="flex flex-col gap-6">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-primary hover:bg-primary/90 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-montserrat font-bold py-4 px-6 rounded-[12px] transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader className="w-4 h-4 animate-spin" />
+                    ĐANG XỬ LÝ...
+                  </>
+                ) : (
+                  'ĐĂNG KÝ'
+                )}
+              </button>
 
-                <p className="text-center text-slate-400 text-sm">
-                  Đã có tài khoản?{' '}
-                  <a href="#login" className="text-gold-400 hover:text-gold-300 font-bold transition-colors">
-                    Đăng nhập ngay
-                  </a>
-                </p>
-              </div>
+              <p className="text-center text-[#7f7f7f] text-xs">
+                Đã có tài khoản?{' '}
+                <a href="#login" className="text-primary hover:underline font-bold transition-colors">
+                  Đăng nhập ngay
+                </a>
+              </p>
             </div>
           </div>
         </form>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Heart, MessageCircle, Share2, X, Loader2, Send, MoreHorizontal, Trash2 } from 'lucide-react';
+import { X, Loader2, Trash2 } from 'lucide-react';
 import { useAuth } from '../contexts/authContext';
+import { VideoPlayer } from './VideoPlayer';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
@@ -92,13 +93,11 @@ const renderContentWithMentions = (
   return parts.map((part, index) => {
     if (part.startsWith('@')) {
       const username = part.slice(1);
-      // First try userMapping (includes comment authors), then friends list
       let userId = userMapping.get(username);
       if (!userId) {
         const mentionedUser = friends.find(f => f.username === username);
         userId = mentionedUser?.id;
       }
-      // Link to user ID if found, otherwise don't link (can't resolve)
       const profileLink = userId ? `#profile/${userId}` : null;
       
       if (profileLink) {
@@ -106,14 +105,13 @@ const renderContentWithMentions = (
           <a
             key={index}
             href={profileLink}
-            className="text-blue-400 hover:underline font-semibold"
+            className="text-primary hover:underline font-semibold"
           >
             {part}
           </a>
         );
       }
-      // No link if we can't resolve the user ID
-      return <span key={index} className="text-blue-400 font-semibold">{part}</span>;
+      return <span key={index} className="text-primary font-semibold">{part}</span>;
     }
     return part;
   });
@@ -134,28 +132,22 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
   const [expandedReplies, setExpandedReplies] = useState<Record<string, Comment[]>>({});
   const [loadingReplies, setLoadingReplies] = useState<Record<string, boolean>>({});
   
-  // Local post state for like updates
   const [localPost, setLocalPost] = useState(post);
   
-  // Mention autocomplete state
   const [showMentionDropdown, setShowMentionDropdown] = useState(false);
   const [mentionSearch, setMentionSearch] = useState('');
   const [mentionStartIndex, setMentionStartIndex] = useState(-1);
   const [friends, setFriends] = useState<FriendForMention[]>([]);
   const [filteredFriends, setFilteredFriends] = useState<FriendForMention[]>([]);
-  
-  // User mapping for mention lookups (username -> user id)
   const [userMapping, setUserMapping] = useState<Map<string, string>>(new Map());
   
   const inputRef = useRef<HTMLInputElement>(null);
   const commentsContainerRef = useRef<HTMLDivElement>(null);
 
-  // Sync localPost with prop changes
   useEffect(() => {
     setLocalPost(post);
   }, [post]);
 
-  // Fetch comments when modal opens
   useEffect(() => {
     if (isOpen && post.id) {
       fetchComments();
@@ -163,7 +155,6 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
     }
   }, [isOpen, post.id]);
 
-  // Auto-focus input when replying
   useEffect(() => {
     if (replyingTo && inputRef.current) {
       setCommentContent(`@${replyingTo.username} `);
@@ -171,7 +162,6 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
     }
   }, [replyingTo]);
 
-  // Filter friends for mention dropdown
   useEffect(() => {
     if (mentionSearch) {
       const filtered = friends.filter(f => 
@@ -195,7 +185,6 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
         const commentsData = result.data || [];
         setComments(commentsData);
         
-        // Build user mapping from comment authors for mention lookups
         const newMapping = new Map(userMapping);
         commentsData.forEach((comment: Comment) => {
           if (comment.author?.username && comment.author?.id) {
@@ -222,7 +211,6 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
         const friendsData = result.data || [];
         setFriends(friendsData);
         
-        // Also add friends to user mapping
         const newMapping = new Map(userMapping);
         friendsData.forEach((friend: FriendForMention) => {
           if (friend.username && friend.id) {
@@ -236,7 +224,6 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
     }
   };
 
-  // Handle post like
   const handleLikePost = async () => {
     if (!token) return;
     
@@ -251,7 +238,6 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
         const data = await response.json();
         const updatedPost = { ...localPost, like_count: data.like_count, is_liked: data.is_liked };
         setLocalPost(updatedPost);
-        // Notify parent to update
         if (onPostUpdate) {
           onPostUpdate(updatedPost);
         }
@@ -285,7 +271,6 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
     
     setIsSubmitting(true);
     try {
-      // Extract mentions from content
       const mentionMatches = commentContent.match(/@(\w+)/g) || [];
       const mentionedUsernames = mentionMatches.map(m => m.slice(1));
       const mentionedUserIds = friends
@@ -299,7 +284,6 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
       
       if (replyingTo) {
         body.parent_id = replyingTo.commentId;
-        // Find the user being replied to
         const replyToUser = friends.find(f => f.username === replyingTo.username);
         if (replyToUser) {
           body.reply_to_user_id = replyToUser.id;
@@ -320,23 +304,19 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
         const newComment = result.data;
         
         if (replyingTo) {
-          // Add to expanded replies
           setExpandedReplies(prev => ({
             ...prev,
             [replyingTo.commentId]: [newComment, ...(prev[replyingTo.commentId] || [])],
           }));
-          // Update reply count on parent comment
           setComments(prev => prev.map(c => 
             c.id === replyingTo.commentId 
               ? { ...c, reply_count: c.reply_count + 1 }
               : c
           ));
         } else {
-          // Add to root comments
           setComments(prev => [newComment, ...prev]);
         }
         
-        // Update post comment count
         if (onPostUpdate) {
           onPostUpdate({ ...post, comment_count: post.comment_count + 1 });
         }
@@ -401,14 +381,12 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
             ...prev,
             [parentId]: prev[parentId]?.filter(c => c.id !== commentId) || [],
           }));
-          // Update reply count
           setComments(prev => prev.map(c =>
             c.id === parentId
               ? { ...c, reply_count: Math.max(0, c.reply_count - 1) }
               : c
           ));
         } else {
-          // Remove root comment and its replies from count
           const comment = comments.find(c => c.id === commentId);
           const deletedCount = 1 + (comment?.reply_count || 0);
           setComments(prev => prev.filter(c => c.id !== commentId));
@@ -428,13 +406,11 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
     const cursorPos = e.target.selectionStart || 0;
     setCommentContent(value);
     
-    // Check for @ mention trigger
     const textBeforeCursor = value.slice(0, cursorPos);
     const lastAtIndex = textBeforeCursor.lastIndexOf('@');
     
     if (lastAtIndex !== -1) {
       const textAfterAt = textBeforeCursor.slice(lastAtIndex + 1);
-      // Only show dropdown if there's no space after @
       if (!textAfterAt.includes(' ')) {
         setShowMentionDropdown(true);
         setMentionStartIndex(lastAtIndex);
@@ -474,7 +450,7 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in">
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-black/80 backdrop-blur-sm"
@@ -482,52 +458,52 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
       />
       
       {/* Modal Content */}
-      <div className="relative bg-slate-900 border border-slate-700 rounded-lg w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl shadow-black/50">
+      <div className="relative bg-bg-secondary border border-white/5 rounded-[20px] w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl animate-in zoom-in-95">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-slate-700 shrink-0">
+        <div className="flex items-center justify-between p-5 border-b border-white/5 shrink-0">
           <div className="w-10" />
-          <h2 className="text-lg font-bold text-white">Bài viết của {post.author.username}</h2>
+          <h2 className="text-[14px] font-montserrat font-bold text-white">Bài viết của {post.author.username}</h2>
           <button 
             onClick={onClose}
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-800 hover:bg-slate-700 transition-colors"
+            className="w-10 h-10 flex items-center justify-center rounded-[12px] bg-bg-main hover:bg-white/10 transition-colors"
           >
-            <X className="w-5 h-5 text-slate-400" />
+            <X className="w-5 h-5 text-white/60" />
           </button>
         </div>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto" ref={commentsContainerRef}>
+        <div className="flex-1 overflow-y-auto custom-scrollbar" ref={commentsContainerRef}>
           {/* Post Content */}
-          <div className="p-4 border-b border-slate-700">
+          <div className="p-5 border-b border-white/5">
             {/* Author */}
-            <div className="flex items-center gap-3 mb-3">
+            <div className="flex items-center gap-3 mb-4">
               <a href={`#profile/${post.author.id}`}>
                 <img 
-                  src={post.author.avatar_url || 'https://via.placeholder.com/48'} 
+                  src={post.author.avatar_url || '/assets/images/home.svg'} 
                   alt={post.author.username}
-                  className="w-10 h-10 rounded-full object-cover border border-slate-600"
+                  className="w-[44px] h-[44px] rounded-[12px] object-cover"
                 />
               </a>
               <div>
-                <a href={`#profile/${post.author.id}`} className="font-semibold text-white hover:underline">
+                <a href={`#profile/${post.author.id}`} className="font-montserrat font-semibold text-white text-[14px] hover:text-primary transition-colors">
                   {post.author.username}
                 </a>
-                <p className="text-slate-500 text-xs">{formatTime(post.created_at)}</p>
+                <p className="text-[#7f7f7f] text-[11px]">{formatTime(post.created_at)}</p>
               </div>
             </div>
             
             {/* Content */}
-            <p className="text-slate-200 mb-3 whitespace-pre-wrap">{post.content}</p>
+            <p className="text-white/90 text-[13px] leading-relaxed mb-4 whitespace-pre-wrap">{post.content}</p>
             
             {/* Media */}
             {post.media.length > 0 && (
-              <div className={`grid gap-2 mb-3 ${post.media.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
+              <div className={`grid gap-2 mb-4 ${post.media.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
                 {post.media.map((item, index) => (
-                  <div key={index}>
+                  <div key={index} className="rounded-[12px] overflow-hidden">
                     {item.type === 'image' ? (
-                      <img src={item.url} alt="" className="w-full rounded-lg object-cover max-h-80" />
+                      <img src={item.url} alt="" className="w-full object-cover max-h-80" />
                     ) : (
-                      <video src={item.url} controls className="w-full rounded-lg max-h-80" />
+                      <VideoPlayer src={item.url} poster={item.thumbnail_url} className="w-full max-h-80" />
                     )}
                   </div>
                 ))}
@@ -535,41 +511,47 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
             )}
             
             {/* Stats */}
-            <div className="flex items-center justify-between text-sm text-slate-400 py-2 border-y border-slate-700/50">
+            <div className="flex items-center justify-between text-[12px] text-[#7f7f7f] py-3 border-y border-white/5">
               <span>{localPost.like_count} lượt thích</span>
               <span>{localPost.comment_count} bình luận</span>
             </div>
             
             {/* Actions */}
-            <div className="flex items-center justify-around py-2">
+            <div className="flex items-center justify-around py-3">
               <button 
                 onClick={handleLikePost}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                  localPost.is_liked ? 'text-gold-400' : 'text-slate-400 hover:bg-slate-800'
+                className={`flex items-center gap-2 px-4 py-2 rounded-[10px] transition-all ${
+                  localPost.is_liked ? 'text-primary bg-primary/10' : 'text-[#7f7f7f] hover:bg-white/5'
                 }`}
               >
-                <Heart className={`w-5 h-5 ${localPost.is_liked ? 'fill-gold-400' : ''}`} />
-                <span>Thích</span>
+                <svg className={`w-5 h-5 ${localPost.is_liked ? 'fill-primary' : ''}`} viewBox="0 0 24 24" fill={localPost.is_liked ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+                <span className="text-[12px] font-semibold">Thích</span>
               </button>
-              <button className="flex items-center gap-2 px-4 py-2 rounded-lg text-slate-400 hover:bg-slate-800 transition-colors">
-                <MessageCircle className="w-5 h-5" />
-                <span>Bình luận</span>
+              <button className="flex items-center gap-2 px-4 py-2 rounded-[10px] text-[#7f7f7f] hover:bg-white/5 transition-colors">
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                </svg>
+                <span className="text-[12px] font-semibold">Bình luận</span>
               </button>
-              <button className="flex items-center gap-2 px-4 py-2 rounded-lg text-slate-400 hover:bg-slate-800 transition-colors">
-                <Share2 className="w-5 h-5" />
-                <span>Chia sẻ</span>
+              <button className="flex items-center gap-2 px-4 py-2 rounded-[10px] text-[#7f7f7f] hover:bg-white/5 transition-colors">
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                </svg>
+                <span className="text-[12px] font-semibold">Chia sẻ</span>
               </button>
             </div>
           </div>
 
           {/* Comments Section */}
-          <div className="p-4">
+          <div className="p-5">
             {isLoadingComments ? (
               <div className="flex justify-center py-8">
-                <Loader2 className="w-6 h-6 text-gold-500 animate-spin" />
+                <Loader2 className="w-6 h-6 text-primary animate-spin" />
               </div>
             ) : comments.length === 0 ? (
-              <p className="text-center text-slate-500 py-8">Chưa có bình luận nào</p>
+              <p className="text-center text-[#7f7f7f] text-[12px] py-8">Chưa có bình luận nào</p>
             ) : (
               <div className="space-y-4">
                 {comments.map(comment => (
@@ -578,56 +560,51 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
                     <div className="flex gap-3">
                       <a href={`#profile/${comment.author.id}`}>
                         <img 
-                          src={comment.author.avatar_url || 'https://via.placeholder.com/40'}
+                          src={comment.author.avatar_url || '/assets/images/home.svg'}
                           alt={comment.author.username}
-                          className="w-8 h-8 rounded-full object-cover"
+                          className="w-[36px] h-[36px] rounded-[10px] object-cover"
                         />
                       </a>
                       <div className="flex-1">
-                        <div className="bg-slate-800 rounded-2xl px-3 py-2 inline-block">
-                          <a href={`#profile/${comment.author.id}`} className="font-semibold text-white text-sm hover:underline">
+                        <div className="bg-bg-main rounded-[12px] px-4 py-3 inline-block">
+                          <a href={`#profile/${comment.author.id}`} className="font-montserrat font-semibold text-white text-[12px] hover:text-primary transition-colors">
                             {comment.author.username}
                           </a>
-                          <p className="text-slate-200 text-sm">
+                          <p className="text-white/80 text-[12px] mt-1">
                             {renderContentWithMentions(comment.content, friends, userMapping)}
                           </p>
                         </div>
-                        <div className="flex items-center gap-3 mt-1 ml-1 text-xs">
-                          <span className="text-slate-500">{formatTime(comment.created_at)}</span>
+                        <div className="flex items-center gap-4 mt-2 ml-1 text-[11px]">
+                          <span className="text-[#7f7f7f]">{formatTime(comment.created_at)}</span>
                           <button 
                             onClick={() => handleLikeComment(comment.id, comment.is_liked)}
-                            className={`font-semibold ${comment.is_liked ? 'text-gold-400' : 'text-slate-400 hover:text-slate-300'}`}
+                            className={`font-semibold transition-colors ${comment.is_liked ? 'text-primary' : 'text-[#7f7f7f] hover:text-white'}`}
                           >
-                            Thích
+                            Thích {comment.like_count > 0 && `(${comment.like_count})`}
                           </button>
                           <button 
                             onClick={() => setReplyingTo({ commentId: comment.id, username: comment.author.username })}
-                            className="font-semibold text-slate-400 hover:text-slate-300"
+                            className="font-semibold text-[#7f7f7f] hover:text-white transition-colors"
                           >
                             Trả lời
                           </button>
-                          {comment.like_count > 0 && (
-                            <span className="text-slate-400">
-                              <Heart className="w-3 h-3 inline fill-gold-400 text-gold-400" /> {comment.like_count}
-                            </span>
-                          )}
                           {comment.author_id === user?.id && (
                             <button 
                               onClick={() => handleDeleteComment(comment.id)}
-                              className="text-slate-500 hover:text-red-400"
+                              className="text-[#7f7f7f] hover:text-red-400 transition-colors"
                             >
-                              <Trash2 className="w-3 h-3" />
+                              <Trash2 className="w-3.5 h-3.5" />
                             </button>
                           )}
                         </div>
                         
                         {/* Replies */}
                         {comment.reply_count > 0 && (
-                          <div className="mt-2">
+                          <div className="mt-3">
                             {!expandedReplies[comment.id] ? (
                               <button 
                                 onClick={() => fetchReplies(comment.id)}
-                                className="text-sm text-slate-400 hover:text-slate-300 flex items-center gap-1"
+                                className="text-[11px] text-primary hover:underline flex items-center gap-1"
                                 disabled={loadingReplies[comment.id]}
                               >
                                 {loadingReplies[comment.id] ? (
@@ -637,48 +614,43 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
                                 )}
                               </button>
                             ) : (
-                              <div className="space-y-3 mt-2">
+                              <div className="space-y-3 mt-3 pl-2 border-l-2 border-white/5">
                                 {expandedReplies[comment.id]?.map(reply => (
-                                  <div key={reply.id} className="flex gap-2 ml-2">
+                                  <div key={reply.id} className="flex gap-2">
                                     <a href={`#profile/${reply.author.id}`}>
                                       <img 
-                                        src={reply.author.avatar_url || 'https://via.placeholder.com/32'}
+                                        src={reply.author.avatar_url || '/assets/images/home.svg'}
                                         alt={reply.author.username}
-                                        className="w-6 h-6 rounded-full object-cover"
+                                        className="w-[28px] h-[28px] rounded-[8px] object-cover"
                                       />
                                     </a>
                                     <div className="flex-1">
-                                      <div className="bg-slate-800 rounded-2xl px-3 py-2 inline-block">
-                                        <a href={`#profile/${reply.author.id}`} className="font-semibold text-white text-sm hover:underline">
+                                      <div className="bg-bg-main rounded-[10px] px-3 py-2 inline-block">
+                                        <a href={`#profile/${reply.author.id}`} className="font-montserrat font-semibold text-white text-[11px] hover:text-primary transition-colors">
                                           {reply.author.username}
                                         </a>
-                                        <p className="text-slate-200 text-sm">
+                                        <p className="text-white/80 text-[11px] mt-0.5">
                                           {renderContentWithMentions(reply.content, friends, userMapping)}
                                         </p>
                                       </div>
-                                      <div className="flex items-center gap-3 mt-1 ml-1 text-xs">
-                                        <span className="text-slate-500">{formatTime(reply.created_at)}</span>
+                                      <div className="flex items-center gap-3 mt-1.5 ml-1 text-[10px]">
+                                        <span className="text-[#7f7f7f]">{formatTime(reply.created_at)}</span>
                                         <button 
                                           onClick={() => handleLikeComment(reply.id, reply.is_liked, true, comment.id)}
-                                          className={`font-semibold ${reply.is_liked ? 'text-gold-400' : 'text-slate-400 hover:text-slate-300'}`}
+                                          className={`font-semibold transition-colors ${reply.is_liked ? 'text-primary' : 'text-[#7f7f7f] hover:text-white'}`}
                                         >
-                                          Thích
+                                          Thích {reply.like_count > 0 && `(${reply.like_count})`}
                                         </button>
                                         <button 
                                           onClick={() => setReplyingTo({ commentId: comment.id, username: reply.author.username })}
-                                          className="font-semibold text-slate-400 hover:text-slate-300"
+                                          className="font-semibold text-[#7f7f7f] hover:text-white transition-colors"
                                         >
                                           Trả lời
                                         </button>
-                                        {reply.like_count > 0 && (
-                                          <span className="text-slate-400">
-                                            <Heart className="w-3 h-3 inline fill-gold-400 text-gold-400" /> {reply.like_count}
-                                          </span>
-                                        )}
                                         {reply.author_id === user?.id && (
                                           <button 
                                             onClick={() => handleDeleteComment(reply.id, true, comment.id)}
-                                            className="text-slate-500 hover:text-red-400"
+                                            className="text-[#7f7f7f] hover:text-red-400 transition-colors"
                                           >
                                             <Trash2 className="w-3 h-3" />
                                           </button>
@@ -701,16 +673,16 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
         </div>
 
         {/* Comment Input */}
-        <div className="p-4 border-t border-slate-700 shrink-0">
+        <div className="p-4 border-t border-white/5 shrink-0">
           {replyingTo && (
-            <div className="flex items-center gap-2 mb-2 text-sm text-slate-400">
-              <span>Đang trả lời <span className="text-blue-400">@{replyingTo.username}</span></span>
+            <div className="flex items-center gap-2 mb-3 text-[11px] text-[#7f7f7f]">
+              <span>Đang trả lời <span className="text-primary font-semibold">@{replyingTo.username}</span></span>
               <button 
                 onClick={() => {
                   setReplyingTo(null);
                   setCommentContent('');
                 }}
-                className="text-slate-500 hover:text-white"
+                className="text-[#7f7f7f] hover:text-white transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -718,9 +690,9 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
           )}
           <div className="flex items-center gap-3 relative">
             <img 
-              src={user?.avatar_url || 'https://via.placeholder.com/40'}
+              src={user?.avatar_url || '/assets/images/home.svg'}
               alt={user?.username}
-              className="w-8 h-8 rounded-full object-cover"
+              className="w-[36px] h-[36px] rounded-[10px] object-cover"
             />
             <div className="flex-1 relative">
               <input
@@ -730,24 +702,24 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
                 placeholder={`Bình luận dưới tên ${user?.username}...`}
-                className="w-full bg-slate-800 rounded-full px-4 py-2 text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/50"
+                className="w-full bg-bg-main rounded-[10px] px-4 py-3 text-white text-[12px] placeholder-[#7f7f7f] focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all"
               />
               
               {/* Mention Dropdown */}
               {showMentionDropdown && filteredFriends.length > 0 && (
-                <div className="absolute bottom-full left-0 w-full mb-2 bg-slate-800 border border-slate-700 rounded-lg shadow-xl max-h-48 overflow-y-auto">
+                <div className="absolute bottom-full left-0 w-full mb-2 bg-bg-main border border-white/10 rounded-[12px] shadow-xl max-h-48 overflow-y-auto">
                   {filteredFriends.map(friend => (
                     <button
                       key={friend.id}
                       onClick={() => handleSelectMention(friend)}
-                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-slate-700 transition-colors"
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors"
                     >
                       <img 
-                        src={friend.avatar_url || 'https://via.placeholder.com/32'}
+                        src={friend.avatar_url || '/assets/images/home.svg'}
                         alt={friend.username}
-                        className="w-8 h-8 rounded-full object-cover"
+                        className="w-[32px] h-[32px] rounded-[8px] object-cover"
                       />
-                      <span className="text-white text-sm">{friend.username}</span>
+                      <span className="text-white text-[12px] font-medium">{friend.username}</span>
                     </button>
                   ))}
                 </div>
@@ -756,12 +728,14 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
             <button
               onClick={handleSubmitComment}
               disabled={!commentContent.trim() || isSubmitting}
-              className="w-8 h-8 flex items-center justify-center text-gold-500 hover:text-gold-400 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-[36px] h-[36px] flex items-center justify-center rounded-[10px] bg-primary hover:bg-primary/80 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               {isSubmitting ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <Loader2 className="w-4 h-4 text-white animate-spin" />
               ) : (
-                <Send className="w-5 h-5" />
+                <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                </svg>
               )}
             </button>
           </div>

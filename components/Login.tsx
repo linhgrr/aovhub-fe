@@ -105,118 +105,115 @@ export const Login: React.FC = () => {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="relative">
-              <div className="absolute inset-0 bg-gold-500 blur-md opacity-50"></div>
-              <Sword className="text-gold-400 w-10 h-10 relative z-10 rotate-45" strokeWidth={2.5} />
+              <div className="absolute inset-0 bg-primary blur-md opacity-30"></div>
+              <Sword className="text-primary w-10 h-10 relative z-10 rotate-45" strokeWidth={2.5} />
             </div>
-            <h1 className="text-4xl font-display font-bold text-white tracking-wider italic">
-              ARENA<span className="text-gold-500 glow-text">HUB</span>
+            <h1 className="text-4xl font-bakbak font-bold text-white tracking-wider uppercase">
+              ARENA<span className="text-primary glow-primary">HUB</span>
             </h1>
           </div>
-          <h2 className="text-2xl font-display font-bold text-white mb-2">ĐĂNG NHẬP</h2>
-          <p className="text-slate-400">Chào mừng trở lại, chiến binh!</p>
+          <h2 className="text-2xl font-montserrat font-bold text-white mb-2">ĐĂNG NHẬP</h2>
+          <p className="text-[#7f7f7f] text-sm font-montserrat">Chào mừng trở lại, chiến binh!</p>
         </div>
 
         {/* Login Form */}
         <form onSubmit={handleSubmit}>
-          <div className="bg-slate-900/80 backdrop-blur border border-slate-700 p-1 rounded-none clip-angled shadow-[0_0_15px_rgba(0,0,0,0.3)]">
-            <div className="bg-slate-800/50 p-6 clip-angled border-l-2 border-gold-500">
-
-              {/* API Error Message */}
-              {apiError && (
-                <div className="mb-6 bg-red-900/20 border border-red-500/50 p-4 flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-red-400 font-bold text-sm mb-1">LỖI ĐĂNG NHẬP</p>
-                    <p className="text-red-300 text-sm">{apiError}</p>
-                  </div>
+          <div className="bg-bg-secondary/80 backdrop-blur border border-white/5 p-8 rounded-[20px] shadow-2xl">
+            {/* API Error Message */}
+            {apiError && (
+              <div className="mb-6 bg-red-900/20 border border-red-500/50 p-4 rounded-lg flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-red-400 font-bold text-xs mb-1 uppercase tracking-wider">LỖI ĐĂNG NHẬP</p>
+                  <p className="text-red-300 text-xs">{apiError}</p>
                 </div>
-              )}
-
-              {/* Email */}
-              <div className="mb-6">
-                <label className="block text-slate-300 text-sm font-bold mb-2 uppercase tracking-wider">
-                  Email
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
-                    className={`w-full bg-slate-950/50 text-white pl-11 pr-4 py-3 border ${
-                      errors.email ? 'border-red-500' : 'border-slate-700'
-                    } focus:outline-none focus:ring-1 focus:ring-gold-500/50 transition-all`}
-                    placeholder="email@example.com"
-                  />
-                </div>
-                {errors.email && (
-                  <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
-                    <AlertCircle className="w-3 h-3" />
-                    {errors.email}
-                  </p>
-                )}
               </div>
+            )}
 
-              {/* Password */}
-              <div className="mb-6">
-                <label className="block text-slate-300 text-sm font-bold mb-2 uppercase tracking-wider">
-                  Mật khẩu
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    value={formData.password}
-                    onChange={(e) => handleInputChange('password', e.target.value)}
-                    className={`w-full bg-slate-950/50 text-white pl-11 pr-11 py-3 border ${
-                      errors.password ? 'border-red-500' : 'border-slate-700'
-                    } focus:outline-none focus:ring-1 focus:ring-gold-500/50 transition-all`}
-                    placeholder="Nhập mật khẩu"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
-                  >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-                {errors.password && (
-                  <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
-                    <AlertCircle className="w-3 h-3" />
-                    {errors.password}
-                  </p>
-                )}
+            {/* Email */}
+            <div className="mb-6">
+              <label className="block text-[#7f7f7f] text-[10px] font-bold mb-2 uppercase tracking-widest">
+                Email
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#7f7f7f]" />
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  className={`w-full bg-bg-main/50 text-white pl-12 pr-4 py-3.5 rounded-[12px] border ${
+                    errors.email ? 'border-red-500' : 'border-white/5'
+                  } focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all text-sm`}
+                  placeholder="email@example.com"
+                />
               </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full bg-gold-500 hover:bg-gold-400 disabled:bg-slate-700 disabled:cursor-not-allowed text-slate-950 disabled:text-slate-500 font-display font-bold py-3 px-6 clip-hex-button transition-all hover:translate-y-[-2px] hover:shadow-[0_0_15px_rgba(245,158,11,0.4)] disabled:translate-y-0 disabled:shadow-none flex items-center justify-center gap-2 mb-4"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader className="w-5 h-5 animate-spin" />
-                    ĐANG XỬ LÝ...
-                  </>
-                ) : (
-                  'ĐĂNG NHẬP'
-                )}
-              </button>
-
-              {/* Links */}
-              <div className="text-center space-y-2">
-                <p className="text-slate-400 text-sm">
-                  Chưa có tài khoản?{' '}
-                  <a href="#register" className="text-gold-400 hover:text-gold-300 font-bold transition-colors">
-                    Đăng ký ngay
-                  </a>
+              {errors.email && (
+                <p className="text-red-400 text-[10px] mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {errors.email}
                 </p>
-                <a href="#forgot-password" className="text-slate-500 hover:text-slate-400 text-xs transition-colors block">
-                  Quên mật khẩu?
-                </a>
+              )}
+            </div>
+
+            {/* Password */}
+            <div className="mb-8">
+              <label className="block text-[#7f7f7f] text-[10px] font-bold mb-2 uppercase tracking-widest">
+                Mật khẩu
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#7f7f7f]" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={formData.password}
+                  onChange={(e) => handleInputChange('password', e.target.value)}
+                  className={`w-full bg-bg-main/50 text-white pl-12 pr-12 py-3.5 rounded-[12px] border ${
+                    errors.password ? 'border-red-500' : 'border-white/5'
+                  } focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all text-sm`}
+                  placeholder="Nhập mật khẩu"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#7f7f7f] hover:text-white transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
+              {errors.password && (
+                <p className="text-red-400 text-[10px] mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {errors.password}
+                </p>
+              )}
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-primary hover:bg-primary/90 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-montserrat font-bold py-4 px-6 rounded-[12px] transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-primary/20 flex items-center justify-center gap-2 mb-6"
+            >
+              {isLoading ? (
+                <>
+                  <Loader className="w-4 h-4 animate-spin" />
+                  ĐANG XỬ LÝ...
+                </>
+              ) : (
+                'ĐĂNG NHẬP'
+              )}
+            </button>
+
+            {/* Links */}
+            <div className="text-center space-y-3">
+              <p className="text-[#7f7f7f] text-xs">
+                Chưa có tài khoản?{' '}
+                <a href="#register" className="text-primary hover:underline font-bold transition-colors">
+                  Đăng ký ngay
+                </a>
+              </p>
+              <a href="#forgot-password" className="text-[#7f7f7f] hover:text-white text-[10px] transition-colors block uppercase tracking-widest">
+                Quên mật khẩu?
+              </a>
             </div>
           </div>
         </form>

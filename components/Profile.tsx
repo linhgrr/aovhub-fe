@@ -305,7 +305,7 @@ export const Profile: React.FC<ProfileProps> = ({ userId }) => {
     { name: 'Thắng', value: wins || 50 },
     { name: 'Thua', value: losses || 50 },
   ];
-  const COLORS = ['#f59e0b', '#334155'];
+  const COLORS = ['#8c67f6', '#334155'];
 
   const handleAvatarClick = () => {
     if (isOwnProfile) {
@@ -452,14 +452,14 @@ export const Profile: React.FC<ProfileProps> = ({ userId }) => {
       {/* Banner / Header */}
       <div className="relative mb-8 group">
          {/* Background Banner */}
-         <div className="h-48 w-full bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 rounded-t-none border-b-4 border-gold-500 relative overflow-hidden clip-angled">
+         <div className="h-48 w-full bg-gradient-to-r from-bg-main via-bg-secondary to-bg-main rounded-t-none border-b-4 border-primary relative overflow-hidden rounded-[20px]">
             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
-            <div className="absolute right-0 top-0 h-full w-1/2 bg-gradient-to-l from-gold-500/10 to-transparent transform skew-x-12 translate-x-20"></div>
+            <div className="absolute right-0 top-0 h-full w-1/2 bg-gradient-to-l from-primary/10 to-transparent transform skew-x-12 translate-x-20"></div>
          </div>
 
          {/* User Info Overlay */}
          <div className="px-6 md:px-10 relative -mt-16 flex flex-col md:flex-row items-end gap-6">
-            {/* Avatar with Hexagon Frame - Clickable for upload (only own profile) */}
+            {/* Avatar with Frame */}
             <div 
               className={`relative w-36 h-36 flex-shrink-0 mx-auto md:mx-0 ${isOwnProfile ? 'cursor-pointer' : ''} group/avatar`}
               onClick={handleAvatarClick}
@@ -473,24 +473,24 @@ export const Profile: React.FC<ProfileProps> = ({ userId }) => {
                    className="hidden"
                  />
                )}
-               <div className="absolute inset-0 bg-slate-900 clip-hex-button transform scale-105"></div>
+               <div className="absolute inset-0 bg-bg-main rounded-[20px] transform scale-105"></div>
                <img 
                  src={displayUser.avatar_url || 'https://via.placeholder.com/200?text=Avatar'} 
                  alt={displayUser.username} 
-                 className="w-full h-full object-cover clip-hex-button border-2 border-gold-500 relative z-10"
+                 className="w-full h-full object-cover rounded-[20px] border-2 border-primary relative z-10"
                />
-               {/* Upload overlay - only for own profile */}
+               {/* Upload overlay */}
                {isOwnProfile && (
-                 <div className="absolute inset-0 bg-black/60 clip-hex-button opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center z-20">
+                 <div className="absolute inset-0 bg-black/60 rounded-[20px] opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center z-20">
                    {isUploading ? (
-                     <Loader className="w-8 h-8 text-gold-500 animate-spin" />
+                     <Loader className="w-8 h-8 text-primary animate-spin" />
                    ) : (
-                     <Camera className="w-8 h-8 text-gold-500" />
+                     <Camera className="w-8 h-8 text-primary" />
                    )}
                  </div>
                )}
-               <div className="absolute bottom-0 right-0 bg-slate-900 p-1 z-20">
-                 <div className="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider border border-red-400">
+               <div className="absolute bottom-0 right-0 bg-bg-main p-1 z-20 rounded-lg">
+                 <div className="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider border border-red-400 rounded">
                     LV.{displayUser.level || 1}
                  </div>
                </div>
@@ -500,21 +500,21 @@ export const Profile: React.FC<ProfileProps> = ({ userId }) => {
             <div className="flex-1 text-center md:text-left mb-2 w-full">
                <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                   <div>
-                    <h1 className="text-4xl font-display font-bold text-white tracking-tight uppercase drop-shadow-md">
+                    <h1 className="text-4xl font-bakbak font-bold text-white tracking-tight uppercase drop-shadow-md">
                       {displayUser.username}
                     </h1>
                     <div className="flex items-center justify-center md:justify-start gap-3 mt-1">
-                      <span className="text-slate-400 text-sm font-mono bg-slate-800 px-2 py-0.5 rounded-sm border border-slate-700">
+                      <span className="text-[#7f7f7f] text-sm font-mono bg-bg-secondary px-2 py-0.5 rounded-sm border border-white/5">
                         UID: {displayUser.id.slice(0, 8)}
                       </span>
-                      <span className="text-gold-400 text-sm font-bold flex items-center gap-1">
+                      <span className="text-primary text-sm font-bold flex items-center gap-1">
                         <Shield className="w-3 h-3" /> Server Mặt Trời
                       </span>
                     </div>
                   </div>
                   
                   {isOwnProfile ? (
-                    <button className="bg-slate-800 hover:bg-gold-500 hover:text-slate-900 border border-gold-500 text-gold-500 font-bold py-2 px-8 clip-hex-button transition-all uppercase tracking-wider">
+                    <button className="bg-bg-secondary hover:bg-primary hover:text-white border border-white/5 text-[#7f7f7f] font-bold py-2.5 px-8 rounded-xl transition-all uppercase tracking-wider text-xs">
                       Chỉnh sửa
                     </button>
                   ) : (
@@ -526,7 +526,7 @@ export const Profile: React.FC<ProfileProps> = ({ userId }) => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
          {[
             { label: 'Bạn Bè', value: friendCount.toString(), color: 'text-cyan-400', sub: 'Friends', icon: Users },
             { label: 'Xếp Hạng', value: displayUser.rank ? RANK_DISPLAY[displayUser.rank] || displayUser.rank : 'Chưa xếp hạng', color: 'text-purple-400', sub: 'Mùa 24' },
@@ -534,25 +534,25 @@ export const Profile: React.FC<ProfileProps> = ({ userId }) => {
             { label: 'Tỉ Lệ Thắng', value: `${displayUser.win_rate?.toFixed(1) || 0}%`, color: 'text-green-400', sub: 'Thượng thừa' },
             { label: 'Số Trận', value: displayUser.total_matches?.toLocaleString() || '0', color: 'text-white', sub: 'Total Games' },
          ].map((stat, idx) => (
-           <div key={idx} className="bg-slate-900/80 p-4 border border-slate-700 clip-angled relative overflow-hidden group hover:border-gold-500/50 transition-colors">
-              <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+           <div key={idx} className="bg-bg-secondary p-5 rounded-[20px] border border-white/5 relative overflow-hidden group hover:border-primary/30 transition-colors shadow-lg">
+              <div className="absolute top-0 right-0 p-2 opacity-5 group-hover:opacity-10 transition-opacity">
                  <Hexagon className="w-12 h-12 text-white" />
               </div>
-              <div className="text-slate-500 text-[10px] uppercase font-bold tracking-wider mb-1">{stat.label}</div>
-              <div className={`font-display font-bold text-2xl ${stat.color} glow-text`}>{stat.value}</div>
-              <div className="text-slate-600 text-[10px] mt-1 font-mono">{stat.sub}</div>
+              <div className="text-[#7f7f7f] text-[10px] uppercase font-bold tracking-wider mb-1">{stat.label}</div>
+              <div className={`font-montserrat font-bold text-2xl ${stat.color}`}>{stat.value}</div>
+              <div className="text-[#7f7f7f]/60 text-[10px] mt-1 font-mono">{stat.sub}</div>
            </div>
          ))}
       </div>
 
       {/* Tabs Navigation */}
-      <div className="flex border-b border-slate-700 mb-6">
+      <div className="flex border-b border-white/5 mb-8">
         <button
           onClick={() => setActiveTab('profile')}
-          className={`flex items-center gap-2 px-6 py-3 font-bold text-sm transition-all border-b-2 ${
+          className={`flex items-center gap-2 px-8 py-4 font-bold text-sm transition-all border-b-2 ${
             activeTab === 'profile'
-              ? 'border-gold-500 text-gold-500'
-              : 'border-transparent text-slate-400 hover:text-white'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-[#7f7f7f] hover:text-white'
           }`}
         >
           <Shield className="w-4 h-4" />
@@ -560,10 +560,10 @@ export const Profile: React.FC<ProfileProps> = ({ userId }) => {
         </button>
         <button
           onClick={() => setActiveTab('posts')}
-          className={`flex items-center gap-2 px-6 py-3 font-bold text-sm transition-all border-b-2 ${
+          className={`flex items-center gap-2 px-8 py-4 font-bold text-sm transition-all border-b-2 ${
             activeTab === 'posts'
-              ? 'border-gold-500 text-gold-500'
-              : 'border-transparent text-slate-400 hover:text-white'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-[#7f7f7f] hover:text-white'
           }`}
         >
           <FileText className="w-4 h-4" />
@@ -573,23 +573,22 @@ export const Profile: React.FC<ProfileProps> = ({ userId }) => {
 
       {/* Tab Content */}
       {activeTab === 'profile' && (
-        <>
+        <div className="grid grid-cols-1 gap-8">
           {/* Winrate Chart Module */}
-          <div className="bg-slate-900 border border-slate-800 clip-angled p-6 relative">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gold-500 to-transparent opacity-50"></div>
-            <h3 className="text-lg font-display font-bold text-white mb-6 flex items-center gap-2 border-b border-slate-800 pb-2">
-              <Target className="w-5 h-5 text-gold-500" /> THỐNG KÊ MÙA GIẢI
+          <div className="bg-bg-secondary border border-white/5 rounded-[20px] p-8 relative shadow-xl">
+            <h3 className="text-sm font-montserrat font-bold text-white mb-8 flex items-center gap-2 uppercase tracking-widest">
+              <Target className="w-4 h-4 text-primary" /> THỐNG KÊ MÙA GIẢI
             </h3>
-            <div className="flex items-center gap-8">
-               <div className="h-40 w-40 relative">
+            <div className="flex flex-col md:flex-row items-center gap-12">
+               <div className="h-48 w-48 relative">
                   <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
                           data={data}
                           cx="50%"
                           cy="50%"
-                          innerRadius={50}
-                          outerRadius={70}
+                          innerRadius={60}
+                          outerRadius={85}
                           stroke="none"
                           dataKey="value"
                           startAngle={90}
@@ -602,27 +601,26 @@ export const Profile: React.FC<ProfileProps> = ({ userId }) => {
                       </PieChart>
                   </ResponsiveContainer>
                   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <span className="text-2xl font-bold text-white">{winRate.toFixed(0)}%</span>
-                    <span className="text-[10px] text-slate-500 uppercase">Winrate</span>
+                    <span className="text-3xl font-bold text-white">{winRate.toFixed(0)}%</span>
+                    <span className="text-[10px] text-[#7f7f7f] uppercase tracking-widest">Winrate</span>
                   </div>
                </div>
-               <div className="flex-1 space-y-3">
-                  <div className="flex justify-between items-center text-sm">
-                     <span className="text-slate-400 flex items-center gap-2"><div className="w-2 h-2 bg-gold-500 rounded-sm"></div> Chiến Thắng</span>
-                     <span className="text-white font-bold font-mono">{wins}</span>
+               <div className="flex-1 w-full space-y-4">
+                  <div className="flex justify-between items-center text-sm bg-bg-main/30 p-4 rounded-xl">
+                     <span className="text-[#7f7f7f] flex items-center gap-3"><div className="w-3 h-3 bg-primary rounded-full shadow-lg shadow-primary/20"></div> Chiến Thắng</span>
+                     <span className="text-white font-bold font-mono text-lg">{wins}</span>
                   </div>
-                  <div className="flex justify-between items-center text-sm">
-                     <span className="text-slate-400 flex items-center gap-2"><div className="w-2 h-2 bg-slate-700 rounded-sm"></div> Thất Bại</span>
-                     <span className="text-white font-bold font-mono">{losses}</span>
+                  <div className="flex justify-between items-center text-sm bg-bg-main/30 p-4 rounded-xl">
+                     <span className="text-[#7f7f7f] flex items-center gap-3"><div className="w-3 h-3 bg-bg-main rounded-full"></div> Thất Bại</span>
+                     <span className="text-white font-bold font-mono text-lg">{losses}</span>
                   </div>
-                  <div className="h-px bg-slate-800 my-2"></div>
-                  <div className="text-xs text-slate-500 text-center italic">
+                  <div className="pt-4 text-xs text-[#7f7f7f] text-center italic opacity-60">
                      {winRate >= 55 ? '"Phong độ đang rất cao!"' : winRate >= 50 ? '"Tiếp tục cố gắng!"' : '"Đừng bỏ cuộc, chiến binh!"'}
                   </div>
                </div>
             </div>
           </div>
-        </>
+        </div>
       )}
 
       {activeTab === 'posts' && (

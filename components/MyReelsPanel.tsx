@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FiFilm, FiBookmark, FiX, FiPlus } from 'react-icons/fi';
+import { X, Plus, Play, Bookmark, Loader2, Eye } from 'lucide-react';
 import { CreateReel } from './CreateReel';
 
 interface ReelThumbnail {
@@ -40,7 +40,6 @@ export const MyReelsPanel: React.FC<MyReelsPanelProps> = ({ isOpen, onClose, onR
 
             if (profileRes.ok) {
                 const profileData = await profileRes.json();
-                // API returns { user: {...} }
                 const userId = profileData.user?.id || profileData.id;
 
                 if (!userId) {
@@ -89,67 +88,66 @@ export const MyReelsPanel: React.FC<MyReelsPanelProps> = ({ isOpen, onClose, onR
             <div className="fixed inset-0 z-50 flex justify-end">
                 {/* Backdrop */}
                 <div
-                    className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+                    className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-in fade-in"
                     onClick={onClose}
                 />
 
-                {/* Side Panel - Full on mobile, 400px max on desktop */}
-                <div className="relative w-full md:max-w-md bg-slate-900 h-full flex flex-col shadow-2xl animate-slide-in-right">
+                {/* Side Panel */}
+                <div className="relative w-full md:max-w-[400px] bg-bg-secondary h-full flex flex-col shadow-2xl animate-in slide-in-from-right duration-300">
                     {/* Header */}
-                    <div className="flex items-center justify-between px-4 py-3 bg-slate-950 border-b border-slate-800 flex-shrink-0">
-                        <h2 className="text-lg font-bold text-white">Reels của tôi</h2>
+                    <div className="flex items-center justify-between px-5 py-4 bg-bg-main border-b border-white/5 flex-shrink-0">
+                        <h2 className="font-montserrat font-bold text-white text-[15px]">Reels của tôi</h2>
                         <button
                             onClick={onClose}
-                            className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-800 hover:bg-slate-700 transition-colors"
+                            className="w-9 h-9 flex items-center justify-center rounded-[10px] bg-bg-secondary hover:bg-bg-secondary/70 transition-colors"
                         >
-                            <FiX className="w-5 h-5 text-white" />
+                            <X className="w-4 h-4 text-[#7f7f7f]" />
                         </button>
                     </div>
 
-                    {/* Tabs - Icon Only */}
-                    <div className="flex border-b border-slate-800 bg-slate-950">
+                    {/* Tabs */}
+                    <div className="flex border-b border-white/5 bg-bg-main">
                         <button
                             onClick={() => setActiveTab('my')}
-                            className={`flex-1 py-4 flex items-center justify-center transition-colors ${activeTab === 'my'
-                                ? 'text-gold-400 border-b-2 border-gold-400 bg-slate-900/50'
-                                : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'
-                                }`}
+                            className={`flex-1 py-3.5 flex items-center justify-center gap-2 text-[12px] font-medium transition-all ${
+                                activeTab === 'my'
+                                    ? 'text-primary border-b-2 border-primary'
+                                    : 'text-[#7f7f7f] hover:text-white'
+                            }`}
                         >
-                            <FiFilm className="w-6 h-6" />
+                            <Play className="w-4 h-4" />
+                            <span>Reels của tôi</span>
                         </button>
                         <button
                             onClick={() => setActiveTab('saved')}
-                            className={`flex-1 py-4 flex items-center justify-center transition-colors ${activeTab === 'saved'
-                                ? 'text-gold-400 border-b-2 border-gold-400 bg-slate-900/50'
-                                : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'
-                                }`}
+                            className={`flex-1 py-3.5 flex items-center justify-center gap-2 text-[12px] font-medium transition-all ${
+                                activeTab === 'saved'
+                                    ? 'text-primary border-b-2 border-primary'
+                                    : 'text-[#7f7f7f] hover:text-white'
+                            }`}
                         >
-                            <FiBookmark className="w-6 h-6" />
+                            <Bookmark className="w-4 h-4" />
+                            <span>Đã lưu</span>
                         </button>
                     </div>
 
                     {/* Content */}
-                    <div className="flex-1 overflow-y-auto bg-black">
+                    <div className="flex-1 overflow-y-auto bg-bg-main custom-scrollbar">
                         {isLoading ? (
-                            <div className="flex items-center justify-center py-12">
-                                <div className="w-8 h-8 border-2 border-gold-500 border-t-transparent rounded-full animate-spin"></div>
+                            <div className="flex items-center justify-center py-16">
+                                <Loader2 className="w-8 h-8 text-primary animate-spin" />
                             </div>
                         ) : activeTab === 'my' ? (
-                            <div className="grid grid-cols-3 gap-0.5">
-                                {/* Upload Card - First Item */}
+                            <div className="grid grid-cols-3 gap-0.5 p-0.5">
+                                {/* Upload Card */}
                                 <button
                                     onClick={() => setShowCreateModal(true)}
-                                    className="aspect-[9/16] bg-gradient-to-br from-orange-500 via-pink-500 to-purple-600 flex flex-col items-center justify-center gap-3 hover:opacity-90 transition-opacity"
+                                    className="aspect-[9/16] bg-gradient-to-br from-primary/80 via-primary to-amber-500 flex flex-col items-center justify-center gap-2 hover:opacity-90 transition-opacity rounded-[4px] overflow-hidden"
                                 >
-                                    <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-lg">
-                                        <div className="relative">
-                                            <FiFilm className="w-7 h-7 text-pink-500" />
-                                            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-pink-500 rounded-full flex items-center justify-center">
-                                                <FiPlus className="w-2.5 h-2.5 text-white" />
-                                            </div>
-                                        </div>
+                                    <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-[12px] flex items-center justify-center">
+                                        <Plus className="w-6 h-6 text-white" />
                                     </div>
-                                    <span className="text-white font-bold text-xs text-center px-1">Tạo thước phim</span>
+                                    <span className="text-white font-semibold text-[10px] text-center px-2">Tạo Reel</span>
                                 </button>
 
                                 {/* User's Reels */}
@@ -157,49 +155,59 @@ export const MyReelsPanel: React.FC<MyReelsPanelProps> = ({ isOpen, onClose, onR
                                     <button
                                         key={reel.id}
                                         onClick={() => onReelClick?.(reel.id)}
-                                        className="aspect-[9/16] bg-slate-800 relative overflow-hidden group"
+                                        className="aspect-[9/16] bg-bg-secondary relative overflow-hidden group rounded-[4px]"
                                     >
                                         <img
                                             src={reel.thumbnail_url}
                                             alt=""
                                             className="w-full h-full object-cover"
                                         />
-                                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors" />
-                                        <div className="absolute bottom-1 left-1 flex items-center gap-1 text-white text-[10px]">
-                                            <FiFilm className="w-3 h-3" />
-                                            <span>{formatViews(reel.views_count)}</span>
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        <div className="absolute bottom-1.5 left-1.5 flex items-center gap-1 text-white text-[9px]">
+                                            <Eye className="w-3 h-3" />
+                                            <span className="font-medium">{formatViews(reel.views_count)}</span>
+                                        </div>
+                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <div className="w-10 h-10 bg-black/40 rounded-full flex items-center justify-center backdrop-blur-sm">
+                                                <Play className="w-5 h-5 text-white ml-0.5" />
+                                            </div>
                                         </div>
                                     </button>
                                 ))}
 
-                                {/* Empty State for My Reels */}
+                                {/* Empty State */}
                                 {myReels.length === 0 && (
-                                    <div className="col-span-2 flex items-center justify-center py-8 text-slate-500">
-                                        <p className="text-sm">Chưa có reel nào</p>
+                                    <div className="col-span-2 flex flex-col items-center justify-center py-12 text-[#7f7f7f]">
+                                        <Play className="w-10 h-10 mb-2 opacity-40" />
+                                        <p className="text-[12px]">Chưa có reel nào</p>
                                     </div>
                                 )}
                             </div>
                         ) : (
-                            <div className="grid grid-cols-3 gap-0.5">
-                                {/* Saved Reels */}
+                            <div className="grid grid-cols-3 gap-0.5 p-0.5">
                                 {savedReels.length === 0 ? (
-                                    <div className="col-span-3 flex flex-col items-center justify-center py-12 text-slate-500">
-                                        <FiBookmark className="w-12 h-12 mb-3 opacity-50" />
-                                        <p className="text-sm">Chưa có reel đã lưu</p>
+                                    <div className="col-span-3 flex flex-col items-center justify-center py-16 text-[#7f7f7f]">
+                                        <Bookmark className="w-12 h-12 mb-3 opacity-30" />
+                                        <p className="text-[12px]">Chưa có reel đã lưu</p>
                                     </div>
                                 ) : (
                                     savedReels.map((reel) => (
                                         <button
                                             key={reel.id}
                                             onClick={() => onReelClick?.(reel.id)}
-                                            className="aspect-[9/16] bg-slate-800 relative overflow-hidden group"
+                                            className="aspect-[9/16] bg-bg-secondary relative overflow-hidden group rounded-[4px]"
                                         >
                                             <img
                                                 src={reel.thumbnail_url}
                                                 alt=""
                                                 className="w-full h-full object-cover"
                                             />
-                                            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors" />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <div className="w-10 h-10 bg-black/40 rounded-full flex items-center justify-center backdrop-blur-sm">
+                                                    <Play className="w-5 h-5 text-white ml-0.5" />
+                                                </div>
+                                            </div>
                                         </button>
                                     ))
                                 )}
@@ -208,21 +216,6 @@ export const MyReelsPanel: React.FC<MyReelsPanelProps> = ({ isOpen, onClose, onR
                     </div>
                 </div>
             </div>
-
-            {/* Animation styles */}
-            <style>{`
-        @keyframes slide-in-right {
-          from {
-            transform: translateX(100%);
-          }
-          to {
-            transform: translateX(0);
-          }
-        }
-        .animate-slide-in-right {
-          animation: slide-in-right 0.3s ease-out;
-        }
-      `}</style>
         </>
     );
 };

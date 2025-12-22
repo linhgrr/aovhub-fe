@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Upload, X, FileVideo, Loader, CheckCircle, AlertCircle } from 'lucide-react';
+import { X, Loader2, CheckCircle, AlertCircle, Play } from 'lucide-react';
 
 interface CreateReelProps {
   onClose: () => void;
@@ -23,14 +23,12 @@ export const CreateReel: React.FC<CreateReelProps> = ({ onClose, onSuccess }) =>
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.type.startsWith('video/')) {
       setError('Vui lòng chọn file video');
       return;
     }
 
-    // Validate file size (max 100MB)
-    const maxSize = 100 * 1024 * 1024; // 100MB
+    const maxSize = 100 * 1024 * 1024;
     if (file.size > maxSize) {
       setError('File video quá lớn. Tối đa 100MB');
       return;
@@ -38,8 +36,6 @@ export const CreateReel: React.FC<CreateReelProps> = ({ onClose, onSuccess }) =>
 
     setVideoFile(file);
     setError('');
-
-    // Create preview URL
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
   };
@@ -56,11 +52,8 @@ export const CreateReel: React.FC<CreateReelProps> = ({ onClose, onSuccess }) =>
 
     try {
       const token = localStorage.getItem('auth_token');
-      if (!token) {
-        throw new Error('Chưa đăng nhập');
-      }
+      if (!token) throw new Error('Chưa đăng nhập');
 
-      // Step 1: Request video upload URL
       setUploadProgress(10);
       const initResponse = await fetch(`${API_URL}/videos/upload-request`, {
         method: 'POST',
@@ -74,37 +67,26 @@ export const CreateReel: React.FC<CreateReelProps> = ({ onClose, onSuccess }) =>
         }),
       });
 
-      if (!initResponse.ok) {
-        throw new Error('Không thể khởi tạo upload');
-      }
+      if (!initResponse.ok) throw new Error('Không thể khởi tạo upload');
 
       const initData = await initResponse.json();
       const { video_id, upload_url } = initData;
 
-      // Step 2: Upload video to S3
       setUploadProgress(30);
       const uploadResponse = await fetch(upload_url, {
         method: 'PUT',
         body: videoFile,
-        headers: {
-          'Content-Type': videoFile.type,
-        },
+        headers: { 'Content-Type': videoFile.type },
       });
 
-      if (!uploadResponse.ok) {
-        throw new Error('Không thể upload video');
-      }
+      if (!uploadResponse.ok) throw new Error('Không thể upload video');
 
-      // Step 3: Mark upload complete
       setUploadProgress(60);
       await fetch(`${API_URL}/videos/${video_id}/complete`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: { 'Authorization': `Bearer ${token}` },
       });
 
-      // Step 4: Create reel
       setUploadProgress(80);
       const reelResponse = await fetch(`${API_URL}/reels`, {
         method: 'POST',
@@ -126,7 +108,6 @@ export const CreateReel: React.FC<CreateReelProps> = ({ onClose, onSuccess }) =>
       setUploadProgress(100);
       setSuccess(true);
 
-      // Close after 2 seconds
       setTimeout(() => {
         onSuccess();
         onClose();
@@ -141,42 +122,48 @@ export const CreateReel: React.FC<CreateReelProps> = ({ onClose, onSuccess }) =>
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
-      <div className="bg-slate-900 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-slate-700 shadow-2xl">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] flex items-center justify-center p-4 animate-in fade-in">
+      <div className="bg-bg-secondary rounded-[20px] max-w-xl w-full max-h-[90vh] overflow-y-auto border border-white/5 shadow-2xl shadow-black/50 animate-in zoom-in-95">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-slate-700">
-          <h2 className="text-2xl font-bold text-gold-400 flex items-center gap-2">
-            <FileVideo className="w-6 h-6" />
-            Tạo Reel Mới
+        <div className="flex items-center justify-between p-5 border-b border-white/5">
+          <h2 className="font-montserrat font-bold text-white text-[16px] flex items-center gap-2">
+            <Play className="w-5 h-5 text-primary" />
+            Tạo Reel mới
           </h2>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white transition"
+            className="w-8 h-8 flex items-center justify-center rounded-[10px] bg-bg-main hover:bg-bg-main/70 transition-colors"
             disabled={isUploading}
           >
-            <X className="w-6 h-6" />
+            <X className="w-4 h-4 text-[#7f7f7f]" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-6">
+        <div className="p-5 space-y-5">
           {/* Video Upload Area */}
           <div>
-            <label className="block text-slate-300 text-sm font-bold mb-3">
-              Video *
+            <label className="block text-white/80 text-[12px] font-semibold mb-2">
+              Video <span className="text-red-400">*</span>
             </label>
 
             {!videoFile ? (
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-slate-600 rounded-xl p-12 text-center cursor-pointer hover:border-gold-500 transition bg-slate-950/30"
+                className="border-2 border-dashed border-white/10 rounded-[16px] p-10 text-center cursor-pointer hover:border-primary/50 transition bg-bg-main/50 group"
               >
-                <Upload className="w-16 h-16 mx-auto mb-4 text-slate-500" />
-                <p className="text-slate-300 font-medium mb-2">
+                <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-[16px] flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                  <svg className="w-8 h-8 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                  </svg>
+                </div>
+                <p className="text-white font-medium text-[13px] mb-1">
                   Click để chọn video
                 </p>
-                <p className="text-slate-500 text-sm">
-                  MP4, MOV, AVI • Tối đa 100MB • Tỷ lệ 9:16 (vertical) tốt nhất
+                <p className="text-[#7f7f7f] text-[11px]">
+                  MP4, MOV, AVI • Tối đa 100MB • Tỷ lệ 9:16 tốt nhất
                 </p>
                 <input
                   ref={fileInputRef}
@@ -187,18 +174,18 @@ export const CreateReel: React.FC<CreateReelProps> = ({ onClose, onSuccess }) =>
                 />
               </div>
             ) : (
-              <div className="relative border border-slate-700 rounded-xl overflow-hidden bg-black">
+              <div className="relative border border-white/10 rounded-[16px] overflow-hidden bg-black">
                 <video
                   src={previewUrl}
                   controls
-                  className="w-full max-h-96 object-contain"
+                  className="w-full max-h-80 object-contain"
                 />
                 <button
                   onClick={() => {
                     setVideoFile(null);
                     setPreviewUrl('');
                   }}
-                  className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-2 transition"
+                  className="absolute top-3 right-3 w-8 h-8 bg-red-500/80 hover:bg-red-500 text-white rounded-[10px] flex items-center justify-center transition-colors"
                   disabled={isUploading}
                 >
                   <X className="w-4 h-4" />
@@ -209,39 +196,33 @@ export const CreateReel: React.FC<CreateReelProps> = ({ onClose, onSuccess }) =>
 
           {/* Caption */}
           <div>
-            <label className="block text-slate-300 text-sm font-bold mb-2">
-              Mô tả (Caption)
+            <label className="block text-white/80 text-[12px] font-semibold mb-2">
+              Mô tả
             </label>
             <textarea
               value={caption}
               onChange={(e) => setCaption(e.target.value)}
               placeholder="Viết mô tả cho reel của bạn..."
-              className="w-full bg-slate-950/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-gold-500 transition resize-none"
+              className="w-full bg-bg-main border border-white/10 rounded-[12px] px-4 py-3 text-white text-[13px] placeholder-[#7f7f7f] focus:outline-none focus:ring-1 focus:ring-primary/50 transition resize-none"
               rows={3}
               maxLength={500}
               disabled={isUploading}
             />
-            <p className="text-slate-500 text-xs mt-1">
+            <p className="text-[#7f7f7f] text-[10px] mt-1.5">
               {caption.length}/500 ký tự
             </p>
           </div>
 
-
-
           {/* Progress Bar */}
           {isUploading && (
-            <div className="bg-slate-950/50 border border-slate-700 rounded-lg p-4">
+            <div className="bg-bg-main border border-white/10 rounded-[12px] p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-slate-300 text-sm font-medium">
-                  Đang upload...
-                </span>
-                <span className="text-gold-400 text-sm font-bold">
-                  {uploadProgress}%
-                </span>
+                <span className="text-white/80 text-[12px] font-medium">Đang upload...</span>
+                <span className="text-primary text-[12px] font-bold">{uploadProgress}%</span>
               </div>
-              <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+              <div className="w-full bg-bg-secondary rounded-full h-1.5 overflow-hidden">
                 <div
-                  className="bg-gradient-to-r from-gold-500 to-amber-500 h-full transition-all duration-300"
+                  className="bg-primary h-full transition-all duration-300"
                   style={{ width: `${uploadProgress}%` }}
                 />
               </div>
@@ -250,9 +231,9 @@ export const CreateReel: React.FC<CreateReelProps> = ({ onClose, onSuccess }) =>
 
           {/* Success Message */}
           {success && (
-            <div className="bg-green-500/10 border border-green-500 rounded-lg p-4 flex items-center gap-3">
-              <CheckCircle className="w-5 h-5 text-green-500" />
-              <p className="text-green-400 font-medium">
+            <div className="bg-green-500/10 border border-green-500/30 rounded-[12px] p-4 flex items-center gap-3">
+              <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+              <p className="text-green-400 text-[12px] font-medium">
                 Upload thành công! Reel của bạn đang được xử lý...
               </p>
             </div>
@@ -260,18 +241,18 @@ export const CreateReel: React.FC<CreateReelProps> = ({ onClose, onSuccess }) =>
 
           {/* Error Message */}
           {error && (
-            <div className="bg-red-500/10 border border-red-500 rounded-lg p-4 flex items-center gap-3">
-              <AlertCircle className="w-5 h-5 text-red-500" />
-              <p className="text-red-400">{error}</p>
+            <div className="bg-red-500/10 border border-red-500/30 rounded-[12px] p-4 flex items-center gap-3">
+              <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+              <p className="text-red-400 text-[12px]">{error}</p>
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-slate-700 flex gap-3 justify-end">
+        <div className="p-5 border-t border-white/5 flex gap-3 justify-end">
           <button
             onClick={onClose}
-            className="px-6 py-3 bg-slate-800 text-white rounded-lg font-bold hover:bg-slate-700 transition"
+            className="px-5 py-2.5 bg-bg-main text-white/80 rounded-[10px] text-[13px] font-medium hover:bg-bg-main/70 transition-colors"
             disabled={isUploading}
           >
             Hủy
@@ -279,21 +260,25 @@ export const CreateReel: React.FC<CreateReelProps> = ({ onClose, onSuccess }) =>
           <button
             onClick={handleSubmit}
             disabled={!videoFile || isUploading || success}
-            className="px-8 py-3 bg-gradient-to-r from-gold-500 to-amber-500 text-black rounded-lg font-bold hover:from-gold-600 hover:to-amber-600 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-6 py-2.5 bg-primary text-white rounded-[10px] text-[13px] font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {isUploading ? (
               <>
-                <Loader className="w-5 h-5 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin" />
                 Đang upload...
               </>
             ) : success ? (
               <>
-                <CheckCircle className="w-5 h-5" />
+                <CheckCircle className="w-4 h-4" />
                 Hoàn thành!
               </>
             ) : (
               <>
-                <Upload className="w-5 h-5" />
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="17 8 12 3 7 8"/>
+                  <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
                 Đăng Reel
               </>
             )}
@@ -303,4 +288,3 @@ export const CreateReel: React.FC<CreateReelProps> = ({ onClose, onSuccess }) =>
     </div>
   );
 };
-

@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Heart, MessageCircle, Share2, CornerUpLeft, Eye, Image, X, Loader2 } from 'lucide-react';
+import { HiOutlineHeart, HiHeart, HiOutlineChatBubbleLeft, HiOutlineShare, HiOutlineArrowUturnLeft, HiOutlineEye, HiOutlinePhoto, HiXMark, HiArrowLeft, HiPaperAirplane } from 'react-icons/hi2';
+import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import {
   ForumThread, ForumComment, ForumCommentsResponse,
-  ThreadStatus, ForumCommentStatus, CreateCommentInput
+  ThreadStatus, ForumCommentStatus
 } from '../types';
 import { API_BASE_URL } from '../constants';
 import { useAuth } from '../contexts/authContext';
@@ -11,7 +12,7 @@ interface ForumThreadPageProps {
   threadId: string;
 }
 
-// Comment component - VOZ forum style layout
+// Comment component with modern design
 const CommentItem: React.FC<{
   comment: ForumComment;
   onReply: (commentId: string, authorUsername: string) => void;
@@ -27,6 +28,18 @@ const CommentItem: React.FC<{
     if (!dateStr) return '';
     const date = new Date(dateStr);
     if (isNaN(date.getTime())) return '';
+    
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMins < 1) return 'Vừa xong';
+    if (diffMins < 60) return `${diffMins} phút trước`;
+    if (diffHours < 24) return `${diffHours} giờ trước`;
+    if (diffDays < 7) return `${diffDays} ngày trước`;
+    
     return date.toLocaleDateString('vi-VN', {
       day: 'numeric',
       month: 'short',
@@ -42,120 +55,138 @@ const CommentItem: React.FC<{
   const replyToUsername = comment.replyToUsername || (comment as any).reply_to_username;
 
   return (
-    <div className="border border-slate-700/50 bg-slate-800/40">
-      {/* Main comment card - VOZ style */}
-      <div className={`flex ${isHidden ? 'opacity-60' : ''}`}>
-        {/* Left column - Avatar & User info */}
-        <div className="w-32 md:w-40 flex-shrink-0 bg-slate-800/60 p-4 border-r border-slate-700/50">
-          <div className="flex flex-col items-center text-center">
-            <img
-              src={comment.author.avatarUrl || (comment.author as any).avatar_url ||
-                `https://ui-avatars.com/api/?name=${comment.author.username}&background=3b82f6&color=fff&size=96`}
-              alt={comment.author.username}
-              className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover border-2 border-slate-600 mb-3 cursor-pointer hover:border-blue-400 transition-colors"
-              onClick={() => window.location.hash = `profile/${comment.author.id}`}
-            />
-            <button
-              onClick={() => window.location.hash = `profile/${comment.author.id}`}
-              className="font-semibold text-blue-400 hover:underline text-sm md:text-base cursor-pointer"
-            >
-              {comment.author.username}
-            </button>
-            {comment.author.rank && (
-              <span className="text-xs text-slate-400 mt-1 px-2 py-0.5 bg-slate-700/50 rounded">
-                {comment.author.rank}
+    <div className={`bg-bg-secondary rounded-[16px] border border-white/5 overflow-hidden 
+                     transition-all hover:border-white/10 ${isHidden ? 'opacity-60' : ''}`}>
+      <div className="p-4 md:p-5">
+        {/* Comment Header */}
+        <div className="flex items-start gap-3 mb-3">
+          <img
+            src={comment.author.avatarUrl || (comment.author as any).avatar_url ||
+              `https://ui-avatars.com/api/?name=${comment.author.username}&background=3b82f6&color=fff&size=96`}
+            alt={comment.author.username}
+            className="w-10 h-10 md:w-11 md:h-11 rounded-full object-cover ring-2 ring-white/5 
+                       cursor-pointer hover:ring-primary/30 transition-all flex-shrink-0"
+            onClick={() => window.location.hash = `profile/${comment.author.id}`}
+          />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                onClick={() => window.location.hash = `profile/${comment.author.id}`}
+                className="font-semibold text-white text-[13px] md:text-[14px] hover:text-primary 
+                           transition-colors"
+              >
+                {comment.author.username}
+              </button>
+              {comment.author.rank && (
+                <span className="text-[10px] px-2 py-0.5 bg-primary/20 text-primary 
+                                 rounded-full font-medium">
+                  {comment.author.rank}
+                </span>
+              )}
+              <span className="text-white/30">•</span>
+              <span className="text-white/40 text-[11px] md:text-[12px]">
+                {formatDate(createdAt)}
               </span>
-            )}
-            <span className="text-[11px] text-slate-500 mt-2">Member</span>
+              {commentNumber && (
+                <span className="text-white/20 text-[11px] ml-auto">#{commentNumber}</span>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Right column - Content */}
-        <div className="flex-1 flex flex-col">
-          {/* Header bar */}
-          <div className="flex items-center justify-between px-4 py-2 bg-slate-700/30 border-b border-slate-700/50">
-            <span className="text-xs text-slate-400">{formatDate(createdAt)}</span>
-            <div className="flex items-center gap-3">
-              <button className="text-slate-500 hover:text-slate-300 transition-colors" title="Chia sẻ">
-                <Share2 className="w-4 h-4" />
-              </button>
-              {commentNumber && (
-                <span className="text-xs text-slate-500">#{commentNumber}</span>
-              )}
+        {/* Quote box for replies */}
+        {replyToUsername && (
+          <div className="bg-black/30 border-l-2 border-primary/50 px-4 py-3 mb-3 
+                          rounded-r-[10px] ml-[52px] md:ml-[56px]">
+            <div className="text-primary/80 text-[12px] font-medium mb-1">
+              Trả lời @{replyToUsername}
             </div>
-          </div>
-
-          {/* Content area */}
-          <div className="flex-1 p-4">
-            {/* Quote box for replies */}
-            {replyToUsername && (
-              <div className="bg-slate-700/40 border-l-4 border-blue-500/60 px-4 py-3 mb-4 rounded-r">
-                <div className="text-blue-400 text-sm font-medium mb-1">
-                  {replyToUsername} đã viết:
-                </div>
-                {quotedContent && (
-                  <div className="text-slate-400 text-sm line-clamp-3">
-                    {quotedContent}
-                  </div>
-                )}
+            {quotedContent && (
+              <div className="text-white/40 text-[12px] line-clamp-2">
+                {quotedContent}
               </div>
             )}
+          </div>
+        )}
 
-            {/* Content */}
-            <div className="text-slate-200 text-sm md:text-base leading-relaxed whitespace-pre-wrap break-words">
-              {comment.content}
-            </div>
+        {/* Content */}
+        <div className="ml-[52px] md:ml-[56px]">
+          <div className="text-white/90 text-[13px] md:text-[14px] leading-relaxed 
+                          whitespace-pre-wrap break-words">
+            {comment.content}
+          </div>
 
-            {/* Media */}
-            {mediaUrls.length > 0 && !isHidden && (
-              <div className="flex flex-wrap gap-3 mt-4">
-                {mediaUrls.map((url: string, i: number) => (
+          {/* Media */}
+          {mediaUrls.length > 0 && !isHidden && (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-3">
+              {mediaUrls.map((url: string, i: number) => (
+                <div key={i} className="relative aspect-video rounded-[10px] overflow-hidden 
+                                         bg-black/20 group">
                   <img
-                    key={i}
                     src={url}
                     alt="Attached"
-                    className="max-w-sm max-h-64 rounded object-cover border border-slate-600"
+                    className="w-full h-full object-cover transition-transform 
+                               group-hover:scale-105"
                   />
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Footer actions */}
-          <div className="flex items-center justify-between px-4 py-2 bg-slate-700/20 border-t border-slate-700/50">
-            <div className="flex items-center gap-1">
-              {/* Like button - matching PostCard style */}
-              <button
-                onClick={() => onLike(comment.id)}
-                disabled={!isAuthenticated}
-                className={`flex items-center gap-1.5 p-1.5 rounded transition-colors group/btn
-                           ${comment.isLiked ? 'text-primary' : 'text-slate-500 hover:text-primary'}
-                           disabled:opacity-50 disabled:cursor-not-allowed`}
-                title="Thích"
-              >
-                <Heart className={`w-4 h-4 group-hover/btn:scale-110 transition-transform ${comment.isLiked ? 'fill-primary' : ''}`} />
-              </button>
-              {comment.likeCount > 0 && (
-                <span className="text-xs text-slate-500 font-bold">{comment.likeCount}</span>
-              )}
+                </div>
+              ))}
             </div>
+          )}
+
+          {/* Actions */}
+          <div className="flex items-center gap-4 mt-3 pt-3 border-t border-white/5">
+            <button
+              onClick={() => onLike(comment.id)}
+              disabled={!isAuthenticated}
+              className={`flex items-center gap-1.5 transition-all group/btn
+                         ${comment.isLiked ? 'text-primary' : 'text-white/40 hover:text-primary'}
+                         disabled:opacity-50 disabled:cursor-not-allowed`}
+            >
+              {comment.isLiked ? (
+                <HiHeart className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
+              ) : (
+                <HiOutlineHeart className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
+              )}
+              {comment.likeCount > 0 && (
+                <span className="text-[12px] font-medium">{comment.likeCount}</span>
+              )}
+            </button>
 
             {isAuthenticated && comment.status === ForumCommentStatus.ACTIVE && (
               <button
                 onClick={() => onReply(comment.id, comment.author.username)}
-                className="flex items-center gap-1.5 px-3 py-1 text-xs text-slate-400 hover:text-blue-400 
-                           hover:bg-blue-400/10 rounded transition-colors group/btn"
+                className="flex items-center gap-1.5 text-white/40 hover:text-blue-400 
+                           transition-all group/btn text-[12px]"
               >
-                <CornerUpLeft className="w-3.5 h-3.5 group-hover/btn:scale-110 transition-transform" />
+                <HiOutlineArrowUturnLeft className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
                 Trả lời
               </button>
             )}
+
+            <button className="flex items-center gap-1.5 text-white/40 hover:text-white/60 
+                               transition-all group/btn ml-auto">
+              <HiOutlineShare className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
+            </button>
           </div>
         </div>
       </div>
     </div>
   );
 };
+
+// Comment Skeleton
+const CommentSkeleton: React.FC = () => (
+  <div className="bg-bg-secondary rounded-[16px] border border-white/5 p-4 md:p-5 animate-pulse">
+    <div className="flex items-start gap-3">
+      <div className="w-10 h-10 md:w-11 md:h-11 bg-white/5 rounded-full flex-shrink-0" />
+      <div className="flex-1">
+        <div className="h-4 bg-white/5 rounded-full w-32 mb-2" />
+        <div className="h-4 bg-white/5 rounded-full w-full mb-2" />
+        <div className="h-4 bg-white/5 rounded-full w-3/4" />
+      </div>
+    </div>
+  </div>
+);
 
 export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) => {
   const { token, isAuthenticated, user } = useAuth();
@@ -176,6 +207,11 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
   const [commentMediaUrls, setCommentMediaUrls] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const commentInputRef = useRef<HTMLInputElement>(null);
+
+  // Infinite scroll
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -283,6 +319,31 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
     loadData();
   }, [threadId]);
 
+  // Infinite scroll for comments
+  const loadMoreComments = useCallback(async () => {
+    if (loadingComments || !hasMore || !nextCursor) return;
+    await fetchComments(nextCursor);
+  }, [loadingComments, hasMore, nextCursor, fetchComments]);
+
+  useEffect(() => {
+    if (observerRef.current) observerRef.current.disconnect();
+    
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loadingComments) {
+          loadMoreComments();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    
+    if (loadMoreRef.current) {
+      observerRef.current.observe(loadMoreRef.current);
+    }
+    
+    return () => observerRef.current?.disconnect();
+  }, [hasMore, loadingComments, loadMoreComments]);
+
   const handleLikeThread = async () => {
     if (!isAuthenticated || !thread) return;
 
@@ -339,7 +400,7 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!commentContent.trim()) return;
+    if (!commentContent.trim() && commentMediaUrls.length === 0) return;
 
     try {
       setSubmitting(true);
@@ -392,16 +453,53 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
 
   const formatDate = (dateStr: string): string => {
     const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMins < 1) return 'Vừa xong';
+    if (diffMins < 60) return `${diffMins} phút trước`;
+    if (diffHours < 24) return `${diffHours} giờ trước`;
+    if (diffDays < 7) return `${diffDays} ngày trước`;
+    
     return date.toLocaleString('vi-VN');
   };
 
+  // Set focus to comment input when replying
+  useEffect(() => {
+    if (replyingTo && commentInputRef.current) {
+      commentInputRef.current.focus();
+    }
+  }, [replyingTo]);
+
   if (loading) {
     return (
-      <div className="p-4 md:p-6 max-w-4xl mx-auto">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-slate-700 rounded w-3/4"></div>
-          <div className="h-4 bg-slate-700 rounded w-1/4"></div>
-          <div className="h-40 bg-slate-700 rounded"></div>
+      <div className="max-w-3xl mx-auto p-4 pb-32 md:pb-28 pt-6 w-full">
+        {/* Thread Skeleton */}
+        <div className="bg-bg-secondary rounded-[16px] border border-white/5 p-4 md:p-6 mb-6 animate-pulse">
+          <div className="h-4 bg-white/5 rounded-full w-24 mb-4" />
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 bg-white/5 rounded-full" />
+            <div className="flex-1">
+              <div className="h-4 bg-white/5 rounded-full w-32 mb-2" />
+              <div className="h-3 bg-white/5 rounded-full w-24" />
+            </div>
+          </div>
+          <div className="h-8 bg-white/5 rounded-full w-3/4 mb-4" />
+          <div className="space-y-2">
+            <div className="h-4 bg-white/5 rounded-full w-full" />
+            <div className="h-4 bg-white/5 rounded-full w-full" />
+            <div className="h-4 bg-white/5 rounded-full w-2/3" />
+          </div>
+        </div>
+
+        {/* Comments Skeleton */}
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <CommentSkeleton key={i} />
+          ))}
         </div>
       </div>
     );
@@ -409,12 +507,14 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
 
   if (error || !thread) {
     return (
-      <div className="p-4 md:p-6 max-w-4xl mx-auto">
-        <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-4 text-red-300">
-          <p>{error || 'Không tìm thấy chủ đề'}</p>
+      <div className="max-w-3xl mx-auto p-4 pb-24 md:pb-20 pt-6 w-full">
+        <div className="bg-red-500/10 border border-red-500/30 rounded-[16px] p-6 text-center">
+          <div className="text-4xl mb-3">😕</div>
+          <p className="text-red-400 mb-4">{error || 'Không tìm thấy chủ đề'}</p>
           <button
             onClick={() => window.location.hash = 'forum'}
-            className="mt-2 text-primary hover:underline"
+            className="px-6 py-2 bg-primary/20 hover:bg-primary/30 text-primary 
+                       rounded-full transition-all font-medium text-[13px]"
           >
             ← Quay lại diễn đàn
           </button>
@@ -424,197 +524,234 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
   }
 
   return (
-    <div className="p-4 md:p-6 max-w-4xl mx-auto pb-32">
-      {/* Back button */}
-      <button
-        onClick={() => window.location.hash = thread.categoryId ? `forum/category/${thread.categoryId}` : 'forum'}
-        className="flex items-center gap-2 text-slate-400 hover:text-primary transition-colors mb-4"
-      >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-        </svg>
-        {thread.categoryName || 'Quay lại'}
-      </button>
-
-      {/* Thread content */}
-      <article className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-4 md:p-6">
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-4">
-          <img
-            src={thread.author.avatarUrl || `https://ui-avatars.com/api/?name=${thread.author.username}&background=random`}
-            alt={thread.author.username}
-            className="w-12 h-12 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
-            onClick={() => window.location.hash = `profile/${thread.authorId}`}
-          />
-          <div>
-            <div className="flex items-center gap-2">
-              <span
-                className="font-semibold text-primary cursor-pointer hover:underline"
-                onClick={() => window.location.hash = `profile/${thread.authorId}`}
-              >
-                @{thread.author.username}
-              </span>
-              {thread.author.rank && (
-                <span className="text-xs px-2 py-0.5 bg-slate-700 text-slate-300 rounded">
-                  {thread.author.rank}
-                </span>
-              )}
-            </div>
-            <div className="text-xs text-slate-500">
-              {formatDate(thread.createdAt)}
-              {thread.status === ThreadStatus.LOCKED && (
-                <span className="ml-2 text-red-400">🔒 Đã khóa</span>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Title */}
-        <h1 className="text-xl md:text-2xl font-bold text-slate-100 mb-4">
-          {thread.title}
-        </h1>
-
-        {/* Content */}
-        <div className="prose prose-invert max-w-none">
-          <p className="text-slate-200 whitespace-pre-wrap">{thread.content}</p>
-        </div>
-
-        {/* Media */}
-        {(thread.mediaUrls?.length > 0) && (
-          <div className="flex flex-wrap gap-3 mt-4">
-            {thread.mediaUrls.map((url, i) => (
-              <img
-                key={i}
-                src={url}
-                alt="Thread media"
-                className="max-w-full max-h-96 rounded-lg object-cover"
-              />
-            ))}
-          </div>
-        )}
-
-        {/* Actions */}
-        <div className="flex items-center gap-4 mt-6 pt-4 border-t border-slate-700/50">
+    <div className="max-w-3xl mx-auto p-4 pb-32 md:pb-28 pt-6 w-full">
+      {/* Thread Content */}
+      <article className="bg-bg-secondary rounded-[16px] border border-white/5 overflow-hidden 
+                          mb-6 animate-in fade-in slide-in-from-top-4 duration-500">
+        <div className="p-4 md:p-6">
+          {/* Back Button */}
           <button
-            onClick={handleLikeThread}
-            disabled={!isAuthenticated}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors group/btn
-                       ${thread.isLiked
-                ? 'bg-primary/20 text-primary'
-                : 'bg-slate-700/50 text-slate-400 hover:bg-primary/20 hover:text-primary'}
-                       disabled:opacity-50 disabled:cursor-not-allowed`}
+            onClick={() => window.location.hash = thread.categoryId ? `forum/category/${thread.categoryId}` : 'forum'}
+            className="flex items-center gap-2 text-white/50 hover:text-primary 
+                       transition-colors mb-4 group"
           >
-            <Heart className={`w-5 h-5 group-hover/btn:scale-110 transition-transform ${thread.isLiked ? 'fill-primary' : ''}`} />
-            <span className="font-bold">{thread.likeCount}</span>
+            <HiArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            <span className="text-[13px]">{thread.categoryName || 'Quay lại'}</span>
           </button>
 
-          <div className="flex items-center gap-2 text-blue-400/70 hover:text-blue-400 transition-colors">
-            <MessageCircle className="w-5 h-5" />
-            <span className="font-bold">{thread.commentCount}</span>
-            <span className="text-slate-500">bình luận</span>
+          {/* Author Header */}
+          <div className="flex items-center gap-3 mb-4">
+            <img
+              src={thread.author.avatarUrl || `https://ui-avatars.com/api/?name=${thread.author.username}&background=random`}
+              alt={thread.author.username}
+              className="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover ring-2 ring-white/5 
+                         cursor-pointer hover:ring-primary/30 transition-all"
+              onClick={() => window.location.hash = `profile/${thread.authorId}`}
+            />
+            <div className="flex-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span
+                  className="font-semibold text-white text-[14px] md:text-[15px] cursor-pointer 
+                             hover:text-primary transition-colors"
+                  onClick={() => window.location.hash = `profile/${thread.authorId}`}
+                >
+                  {thread.author.username}
+                </span>
+                {thread.author.rank && (
+                  <span className="text-[10px] px-2 py-0.5 bg-primary/20 text-primary 
+                                   rounded-full font-medium">
+                    {thread.author.rank}
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-2 text-white/40 text-[12px] mt-0.5">
+                <span>{formatDate(thread.createdAt)}</span>
+                {thread.status === ThreadStatus.LOCKED && (
+                  <>
+                    <span>•</span>
+                    <span className="text-red-400">🔒 Đã khóa</span>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2 text-slate-400 hover:text-slate-300 transition-colors">
-            <Eye className="w-5 h-5" />
-            <span className="font-bold">{thread.viewCount}</span>
-            <span className="text-slate-500">lượt xem</span>
+          {/* Title */}
+          <h1 className="text-white text-[20px] md:text-[24px] font-bold mb-4 leading-tight">
+            {thread.title}
+          </h1>
+
+          {/* Content */}
+          <div className="text-white/80 text-[14px] md:text-[15px] leading-relaxed 
+                          whitespace-pre-wrap break-words">
+            {thread.content}
+          </div>
+
+          {/* Media */}
+          {thread.mediaUrls?.length > 0 && (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-4">
+              {thread.mediaUrls.map((url, i) => (
+                <div key={i} className="relative aspect-video rounded-[12px] overflow-hidden 
+                                         bg-black/20 group">
+                  <img
+                    src={url}
+                    alt="Thread media"
+                    className="w-full h-full object-cover transition-transform 
+                               group-hover:scale-105"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Actions */}
+          <div className="flex items-center gap-4 md:gap-6 mt-6 pt-4 border-t border-white/5">
+            <button
+              onClick={handleLikeThread}
+              disabled={!isAuthenticated}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all group/btn
+                         ${thread.isLiked
+                  ? 'bg-primary/20 text-primary'
+                  : 'bg-white/5 text-white/60 hover:bg-primary/10 hover:text-primary'}
+                         disabled:opacity-50 disabled:cursor-not-allowed`}
+            >
+              {thread.isLiked ? (
+                <HiHeart className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
+              ) : (
+                <HiOutlineHeart className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
+              )}
+              <span className="font-semibold text-[13px]">{thread.likeCount}</span>
+            </button>
+
+            <div className="flex items-center gap-2 text-blue-400/70">
+              <HiOutlineChatBubbleLeft className="w-5 h-5" />
+              <span className="font-semibold text-[13px]">{thread.commentCount}</span>
+              <span className="text-white/40 text-[12px] hidden sm:inline">bình luận</span>
+            </div>
+
+            <div className="flex items-center gap-2 text-white/40">
+              <HiOutlineEye className="w-5 h-5" />
+              <span className="font-semibold text-[13px]">{thread.viewCount}</span>
+              <span className="text-white/40 text-[12px] hidden sm:inline">lượt xem</span>
+            </div>
+
+            <button className="flex items-center gap-2 text-white/40 hover:text-white/60 
+                               transition-all ml-auto group/btn">
+              <HiOutlineShare className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
+            </button>
           </div>
         </div>
       </article>
 
-      {/* Comments section - add pb for fixed comment bar */}
-      <section className="mt-6 pb-24">
-        <h2 className="text-lg font-semibold text-slate-200 mb-4">
-          Bình luận ({thread.commentCount})
-        </h2>
+      {/* Comments Section */}
+      <section className="mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <HiOutlineChatBubbleLeft className="w-5 h-5 text-primary" />
+          <h2 className="text-white text-[16px] md:text-[18px] font-semibold">
+            Bình luận ({thread.commentCount})
+          </h2>
+        </div>
 
-        {/* Comments list */}
+        {/* Comments List */}
         {loadingComments && comments.length === 0 ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="animate-pulse flex gap-3">
-                <div className="w-8 h-8 bg-slate-700 rounded-full"></div>
-                <div className="flex-1">
-                  <div className="h-4 bg-slate-700 rounded w-1/4 mb-2"></div>
-                  <div className="h-4 bg-slate-700 rounded w-3/4"></div>
-                </div>
-              </div>
+              <CommentSkeleton key={i} />
             ))}
           </div>
         ) : comments.length === 0 ? (
-          <div className="text-center py-8 text-slate-500">
-            <p>Chưa có bình luận nào</p>
+          <div className="bg-bg-secondary rounded-[16px] border border-white/5 p-8 text-center">
+            <div className="text-4xl mb-3">💬</div>
+            <p className="text-white/40 text-[14px] mb-1">Chưa có bình luận nào</p>
             {isAuthenticated && (
-              <p className="text-sm mt-1">Hãy là người đầu tiên bình luận!</p>
+              <p className="text-white/30 text-[12px]">Hãy là người đầu tiên bình luận!</p>
             )}
           </div>
         ) : (
-          <div className="space-y-2">
-            {comments.map((comment) => (
-              <CommentItem
+          <div className="space-y-3 md:space-y-4">
+            {comments.map((comment, index) => (
+              <div 
                 key={comment.id}
-                comment={comment}
-                onReply={(id, username) => setReplyingTo({ id, username })}
-                onLike={handleLikeComment}
-                isAuthenticated={isAuthenticated}
-              />
+                className="animate-in fade-in slide-in-from-bottom-2"
+                style={{ animationDelay: `${index * 30}ms` }}
+              >
+                <CommentItem
+                  comment={comment}
+                  onReply={(id, username) => setReplyingTo({ id, username })}
+                  onLike={handleLikeComment}
+                  isAuthenticated={isAuthenticated}
+                  commentNumber={index + 1}
+                />
+              </div>
             ))}
           </div>
         )}
 
-        {/* Load more comments */}
-        {hasMore && (
-          <div className="mt-4 text-center">
-            <button
-              onClick={() => fetchComments(nextCursor || undefined)}
-              className="px-6 py-2 bg-slate-700/50 hover:bg-slate-600/50 text-slate-300 
-                         rounded-lg transition-colors"
-            >
-              Xem thêm bình luận
-            </button>
-          </div>
-        )}
+        {/* Infinite Scroll Trigger */}
+        <div ref={loadMoreRef} className="py-8 flex justify-center">
+          {loadingComments && comments.length > 0 && (
+            <AiOutlineLoading3Quarters className="w-6 h-6 text-primary animate-spin" />
+          )}
+        </div>
       </section>
 
-      {/* Comment form - Fixed at bottom with sidebar offset */}
+      {/* Comment Form - Fixed at bottom */}
       {isAuthenticated && thread.status !== ThreadStatus.LOCKED && (
-        <div className="fixed bottom-0 left-0 md:left-72 right-0 bg-slate-900/95 backdrop-blur border-t border-slate-700/50 p-4 z-40">
-          <form onSubmit={handleSubmitComment} className="max-w-4xl mx-auto">
+        <div className="fixed bottom-0 left-0 md:left-[126px] right-0 bg-bg-main/95 backdrop-blur-lg 
+                        border-t border-white/5 py-4 z-40">
+          <form onSubmit={handleSubmitComment} className="max-w-3xl mx-auto px-4">
+            {/* Replying indicator */}
             {replyingTo && (
-              <div className="flex items-center gap-2 mb-2 text-sm">
-                <div className="flex-1 bg-slate-800/50 border-l-2 border-primary/50 px-3 py-1 rounded-r">
-                  <span className="text-primary">@{replyingTo.username}</span>
-                  <span className="text-slate-500"> đã viết:</span>
+              <div className="flex items-center gap-2 mb-2 animate-in fade-in slide-in-from-bottom-2">
+                <div className="flex-1 bg-primary/10 border-l-2 border-primary px-3 py-2 rounded-r-lg">
+                  <span className="text-primary text-[12px] font-medium">
+                    Trả lời @{replyingTo.username}
+                  </span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setReplyingTo(null)}
-                  className="text-red-400 hover:text-red-300 p-1"
+                  className="p-1.5 hover:bg-white/5 rounded-full text-white/40 hover:text-red-400 
+                             transition-all"
                 >
-                  ✕
+                  <HiXMark className="w-4 h-4" />
                 </button>
               </div>
             )}
 
             {/* Media preview */}
             {commentMediaUrls.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-2">
+              <div className="flex flex-wrap gap-2 mb-3 animate-in fade-in">
                 {commentMediaUrls.map((url, index) => (
                   <div key={index} className="relative">
-                    <img src={url} alt="" className="h-16 w-16 object-cover rounded-lg border border-slate-600" />
+                    <img 
+                      src={url} 
+                      alt="" 
+                      className="h-14 w-14 object-cover rounded-lg border border-white/10" 
+                    />
                     <button
                       type="button"
                       onClick={() => removeMedia(index)}
-                      className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center hover:bg-red-400"
+                      className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 rounded-full 
+                                 flex items-center justify-center hover:bg-red-400 transition-colors"
                     >
-                      <X className="w-3 h-3 text-white" />
+                      <HiXMark className="w-3 h-3 text-white" />
                     </button>
                   </div>
                 ))}
               </div>
             )}
 
-            <div className="flex gap-3">
+            {/* Input row */}
+            <div className="flex items-center gap-3">
+              {/* User avatar */}
+              <img
+                src={user?.avatar_url || '/assets/images/home.svg'}
+                alt=""
+                className="w-9 h-9 md:w-10 md:h-10 rounded-full object-cover ring-2 ring-white/5 
+                           flex-shrink-0"
+              />
+
               {/* Hidden file input */}
               <input
                 ref={fileInputRef}
@@ -630,45 +767,58 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploading}
-                className="px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg
-                           hover:bg-slate-700 hover:border-green-500/50 transition-colors
-                           disabled:opacity-50"
+                className="p-2.5 bg-white/5 hover:bg-white/10 border border-white/10 
+                           rounded-full transition-all disabled:opacity-50 flex-shrink-0"
                 title="Thêm ảnh"
               >
                 {isUploading ? (
-                  <Loader2 className="w-5 h-5 text-green-400 animate-spin" />
+                  <AiOutlineLoading3Quarters className="w-5 h-5 text-green-400 animate-spin" />
                 ) : (
-                  <Image className="w-5 h-5 text-green-400" />
+                  <HiOutlinePhoto className="w-5 h-5 text-green-400" />
                 )}
               </button>
 
+              {/* Text input */}
               <input
+                ref={commentInputRef}
                 type="text"
                 value={commentContent}
                 onChange={(e) => setCommentContent(e.target.value)}
                 placeholder={replyingTo ? `Trả lời @${replyingTo.username}...` : 'Viết bình luận...'}
-                className="flex-1 px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg
-                           focus:outline-none focus:border-primary text-slate-100"
+                className="flex-1 px-4 py-2.5 bg-white/5 border border-white/10 rounded-full
+                           focus:outline-none focus:border-primary/50 text-white text-[13px]
+                           placeholder-white/30 transition-colors"
                 maxLength={5000}
               />
+
+              {/* Submit button */}
               <button
                 type="submit"
                 disabled={submitting || (!commentContent.trim() && commentMediaUrls.length === 0)}
-                className="px-6 py-2 bg-primary hover:bg-primary/90 text-white 
-                           font-semibold rounded-lg transition-all disabled:opacity-50"
+                className="p-2.5 bg-primary hover:bg-primary/90 text-white rounded-full 
+                           transition-all disabled:opacity-50 disabled:cursor-not-allowed
+                           shadow-lg shadow-primary/20 flex-shrink-0"
               >
-                {submitting ? '...' : 'Gửi'}
+                {submitting ? (
+                  <AiOutlineLoading3Quarters className="w-5 h-5 animate-spin" />
+                ) : (
+                  <HiPaperAirplane className="w-5 h-5" />
+                )}
               </button>
             </div>
           </form>
         </div>
       )}
 
-      {/* Show message if thread is locked */}
+      {/* Locked thread message */}
       {thread.status === ThreadStatus.LOCKED && (
-        <div className="fixed bottom-0 left-0 md:left-72 right-0 bg-slate-900/95 backdrop-blur 
-                        border-t border-slate-700/50 p-4 text-center text-slate-400 z-40">
-          🔒 Chủ đề này đã bị khóa, không thể bình luận thêm
+        <div className="fixed bottom-0 left-0 md:left-[126px] right-0 bg-bg-main/95 backdrop-blur-lg 
+                        border-t border-white/5 py-4 text-center z-40">
+          <div className="max-w-3xl mx-auto px-4">
+            <p className="text-white/50 text-[13px]">
+              🔒 Chủ đề này đã bị khóa, không thể bình luận thêm
+            </p>
+          </div>
         </div>
       )}
     </div>

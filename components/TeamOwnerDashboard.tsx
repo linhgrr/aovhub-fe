@@ -184,7 +184,7 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
     if (loading) {
         return (
             <div className="max-w-3xl mx-auto p-4 pt-6 flex items-center justify-center h-64">
-                <div className="w-8 h-8 border-4 border-gold-500 border-t-transparent rounded-full animate-spin" />
+                <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
             </div>
         );
     }
@@ -205,7 +205,7 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
                 <button onClick={onBack} className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
-                    <div className="w-8 h-8 bg-slate-800 border border-slate-600 group-hover:border-gold-500 flex items-center justify-center clip-hex-button transition-colors">
+                    <div className="w-8 h-8 bg-slate-800 border border-slate-600 group-hover:border-primary flex items-center justify-center rounded-lg transition-colors">
                         <ArrowLeft className="w-4 h-4" />
                     </div>
                     <span className="font-bold uppercase tracking-wide text-sm">Quay lại</span>
@@ -213,7 +213,7 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
                 <button
                     onClick={handleDeleteTeam}
                     disabled={deletingTeam}
-                    className="flex items-center gap-2 bg-red-900/20 text-red-500 hover:bg-red-900/40 hover:text-red-400 pr-4 pl-3 py-2 border border-red-900/50 clip-angled transition-all disabled:opacity-50 group"
+                    className="flex items-center gap-2 bg-red-900/20 text-red-500 hover:bg-red-900/40 hover:text-red-400 pr-4 pl-3 py-2 border border-red-900/50 rounded-lg transition-all disabled:opacity-50 group"
                 >
                     <Trash2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
                     <span className="font-bold uppercase tracking-wide text-sm">{deletingTeam ? 'Đang đóng...' : 'Đóng phòng'}</span>
@@ -221,14 +221,14 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
             </div>
 
             {/* Team Info Card */}
-            <div className="bg-slate-900 border border-slate-700 p-6 mb-8 relative overflow-hidden shadow-xl clip-angled">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gold-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-                <div className="absolute top-0 left-0 w-1 h-full bg-gold-500"></div>
+            <div className="bg-slate-800/60 border border-slate-700/50 p-6 mb-8 relative overflow-hidden shadow-xl rounded-xl">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+                <div className="absolute top-0 left-0 w-1 h-full bg-primary rounded-tl-xl rounded-bl-xl"></div>
 
                 <div className="flex flex-col md:flex-row items-start justify-between mb-4 relative z-10">
                     <div>
                         <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xs bg-gold-600/10 text-gold-500 px-2 py-0.5 border border-gold-500/20 uppercase tracking-wider font-bold">
+                            <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 border border-primary/20 uppercase tracking-wider font-bold rounded">
                                 Quản lý phòng
                             </span>
                         </div>
@@ -236,7 +236,7 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
                             {team.name}
                         </h1>
                         <div className="flex items-center gap-4 text-sm font-mono border-t border-slate-800 pt-3">
-                            <span className={`text-gold-400 font-bold flex items-center gap-1.5 ${getRemainingTime(team.expires_at) === 'Đã hết hạn' ? 'text-red-400' : ''}`}>
+                            <span className={`text-primary font-bold flex items-center gap-1.5 ${getRemainingTime(team.expires_at) === 'Đã hết hạn' ? 'text-red-400' : ''}`}>
                                 <Clock className="w-4 h-4" /> Còn {remainingTime}
                             </span>
                             <span className="text-slate-600">|</span>
@@ -246,11 +246,11 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
                         </div>
                     </div>
                     <div className="flex gap-2 mt-4 md:mt-0">
-                        <div className="bg-slate-800 border border-slate-600 p-2 text-center min-w-[100px] clip-angled">
+                        <div className="bg-slate-800 border border-slate-600 p-2 text-center min-w-[100px] rounded-lg">
                             <div className="text-[10px] text-slate-400 uppercase tracking-wider">Chế độ</div>
-                            <div className="text-gold-500 font-bold">{team.game_mode}</div>
+                            <div className="text-primary font-bold">{team.game_mode}</div>
                         </div>
-                        <div className="bg-slate-800 border border-slate-600 p-2 text-center min-w-[100px] clip-angled">
+                        <div className="bg-slate-800 border border-slate-600 p-2 text-center min-w-[100px] rounded-lg">
                             <div className="text-[10px] text-slate-400 uppercase tracking-wider">Rank</div>
                             <div className="text-white font-bold">{translateRank(team.rank)}</div>
                         </div>
@@ -261,14 +261,14 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
                 </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8">
+                <div className="grid md:grid-cols-2 gap-8">
                 {/* Pending Requests */}
-                <div className="bg-slate-900 border border-slate-700 shadow-lg">
+                <div className="bg-slate-800/60 border border-slate-700/50 shadow-lg rounded-xl overflow-hidden">
                     <div className="bg-gradient-to-r from-slate-800 to-slate-900 border-b border-slate-700 p-4 flex items-center justify-between">
                         <h2 className="text-lg font-bold text-white flex items-center gap-2 uppercase tracking-wide">
-                            <div className="w-2 h-2 bg-gold-500 rotate-45"></div>
+                            <div className="w-2 h-2 bg-primary rotate-45"></div>
                             Yêu cầu tham gia
-                            <span className="bg-slate-700 text-gold-500 text-xs px-2 py-0.5 rounded-full">{requests.length}</span>
+                            <span className="bg-slate-700 text-primary text-xs px-2 py-0.5 rounded-full">{requests.length}</span>
                         </h2>
                     </div>
                     <div className="p-4 space-y-3 h-[400px] overflow-y-auto custom-scrollbar">
@@ -280,17 +280,17 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
                         ) : (
                             <div className="space-y-3">
                                 {requests.map((req) => (
-                                    <div key={req.id} className="flex flex-col gap-3 p-4 bg-slate-800/50 border border-slate-700 group hover:border-gold-500/30 transition-all shadow-sm">
+                                    <div key={req.id} className="flex flex-col gap-3 p-4 bg-slate-800/50 border border-slate-700 group hover:border-primary/30 transition-all shadow-sm rounded-lg">
                                         <div className="flex items-center gap-3">
                                             <img
                                                 src={req.user.avatar_url || 'https://via.placeholder.com/40'}
                                                 alt={req.user.username}
-                                                className="w-12 h-12 object-cover bg-slate-800 clip-hex-button border border-slate-600"
+                                                className="w-12 h-12 object-cover bg-slate-800 rounded-lg border border-slate-600"
                                             />
                                             <div className="flex-1 min-w-0">
                                                 <button
                                                     onClick={() => handleNavigateToProfile(req.user.id)}
-                                                    className="text-white font-bold hover:text-gold-400 transition-colors flex items-center gap-1 text-base"
+                                                    className="text-white font-bold hover:text-primary transition-colors flex items-center gap-1 text-base"
                                                 >
                                                     {req.user.username}
                                                     <ExternalLink className="w-3 h-3 text-slate-500" />
@@ -314,14 +314,14 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
                                             <button
                                                 onClick={() => handleApprove(req.id)}
                                                 disabled={processingRequest === req.id || team.current_members >= team.max_members}
-                                                className="flex-1 py-1.5 bg-green-600 hover:bg-green-500 text-white font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all clip-angled text-xs uppercase flex items-center justify-center gap-1"
+                                                className="flex-1 py-1.5 bg-green-600 hover:bg-green-500 text-white font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all rounded-lg text-xs uppercase flex items-center justify-center gap-1"
                                             >
                                                 <Check className="w-3 h-3" /> Duyệt
                                             </button>
                                             <button
                                                 onClick={() => handleReject(req.id)}
                                                 disabled={processingRequest === req.id}
-                                                className="flex-1 py-1.5 bg-red-600 hover:bg-red-500 text-white font-bold disabled:opacity-50 transition-all clip-angled text-xs uppercase flex items-center justify-center gap-1"
+                                                className="flex-1 py-1.5 bg-red-600 hover:bg-red-500 text-white font-bold disabled:opacity-50 transition-all rounded-lg text-xs uppercase flex items-center justify-center gap-1"
                                             >
                                                 <X className="w-3 h-3" /> Từ chối
                                             </button>
@@ -334,7 +334,7 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
                 </div>
 
                 {/* Current Members */}
-                <div className="bg-slate-900 border border-slate-700 shadow-lg">
+                <div className="bg-slate-800/60 border border-slate-700/50 shadow-lg rounded-xl overflow-hidden">
                     <div className="bg-gradient-to-r from-slate-800 to-slate-900 border-b border-slate-700 p-4 flex items-center justify-between">
                         <h2 className="text-lg font-bold text-white flex items-center gap-2 uppercase tracking-wide">
                             <div className="w-2 h-2 bg-blue-500 rotate-45"></div>
@@ -346,31 +346,31 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
                         {team.members.map((member: TeamMemberInfo, index: number) => (
                             <div
                                 key={member.id}
-                                className={`flex items-center gap-3 p-3 bg-slate-800/30 border transition-all group ${index === 0 ? 'border-gold-500/50 bg-gold-500/5' : 'border-slate-700 hover:border-slate-500'}`}
+                                className={`flex items-center gap-3 p-3 bg-slate-800/30 border transition-all group rounded-lg ${index === 0 ? 'border-primary/50 bg-primary/5' : 'border-slate-700 hover:border-slate-500'}`}
                             >
                                 <img
                                     src={member.avatar_url || 'https://via.placeholder.com/40'}
                                     alt={member.username}
-                                    className={`w-10 h-10 object-cover bg-slate-800 clip-hex-button ${index === 0 ? 'border-2 border-gold-500' : 'border border-slate-600'}`}
+                                    className={`w-10 h-10 object-cover bg-slate-800 rounded-lg ${index === 0 ? 'border-2 border-primary' : 'border border-slate-600'}`}
                                 />
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2">
                                         <button
                                             onClick={() => handleNavigateToProfile(member.user_id)}
-                                            className="text-white font-bold hover:text-gold-400 transition-colors flex items-center gap-1 truncate"
+                                            className="text-white font-bold hover:text-primary transition-colors flex items-center gap-1 truncate"
                                         >
                                             {member.username}
                                             <ExternalLink className="w-3 h-3 text-slate-500" />
                                         </button>
                                         {index === 0 && (
-                                            <span className="text-[9px] bg-gold-500 text-black px-1.5 py-0.5 font-bold uppercase tracking-wider skew-x-[-10deg]">
+                                            <span className="text-[9px] bg-primary text-white px-1.5 py-0.5 font-bold uppercase tracking-wider rounded">
                                                 Chủ phòng
                                             </span>
                                         )}
                                     </div>
                                     <div className="flex items-center gap-2 text-xs text-slate-400 mt-1">
                                         <span className="flex items-center gap-1">
-                                            <Trophy className="w-3 h-3 text-gold-500" />
+                                            <Trophy className="w-3 h-3 text-primary" />
                                             {translateRank(member.rank)}
                                         </span>
                                         {member.main_role && (
@@ -399,8 +399,8 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
 
                         {/* Empty Slots */}
                         {Array.from({ length: team.max_members - team.members.length }).map((_, i) => (
-                            <div key={`empty-${i}`} className="p-3 border border-dashed border-slate-700/50 bg-slate-900/20 flex items-center gap-3 opacity-50">
-                                <div className="w-10 h-10 object-cover bg-slate-800/50 clip-hex-button flex items-center justify-center">
+                            <div key={`empty-${i}`} className="p-3 border border-dashed border-slate-700/50 bg-slate-900/20 flex items-center gap-3 opacity-50 rounded-lg">
+                                <div className="w-10 h-10 object-cover bg-slate-800/50 rounded-lg flex items-center justify-center">
                                     <Users className="w-4 h-4 text-slate-600" />
                                 </div>
                                 <span className="text-sm text-slate-500 italic">Còn trống</span>

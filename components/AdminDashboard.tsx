@@ -140,7 +140,12 @@ export const AdminDashboard: React.FC = () => {
 
   // Check admin access
   const userRole = (user as any)?.role;
-  const isAdmin = userRole === 'ADMIN' || userRole === UserRole.ADMIN || (user as any)?.is_superuser;
+  const isAdmin = userRole === 'ADMIN' || 
+                  userRole === 'admin' || 
+                  userRole === 'MODERATOR' || 
+                  userRole === 'moderator' || 
+                  userRole === UserRole.ADMIN || 
+                  (user as any)?.is_superuser === true;
 
   if (!isAdmin) {
     return (

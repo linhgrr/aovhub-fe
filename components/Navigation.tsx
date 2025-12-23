@@ -15,8 +15,6 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab 
     { id: 'lfg', icon: '/assets/images/chart.svg', label: 'Thống kê' },
     { id: 'forum', icon: '/assets/images/activity.svg', label: 'Hoạt động' },
     { id: 'friends', icon: '/assets/images/friends.svg', label: 'Bạn bè' },
-    { id: 'profile', icon: '/assets/images/profile.svg', label: 'Hồ sơ' },
-    { id: 'settings', icon: '/assets/images/setting.svg', label: 'Cài đặt' },
     { id: 'chatbot', icon: '/assets/images/chatbot.svg', label: 'Chatbot' },
 
   ];

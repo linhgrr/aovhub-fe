@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronDown, User as UserIcon, Settings, LogOut, X } from 'lucide-react';
+import { ChevronDown, User as UserIcon, Settings, LogOut, X, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../contexts/authContext';
 import { PostDetailModal } from './PostDetailModal';
 import { Messages } from './Messages';
@@ -334,6 +334,18 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
 
                             {showProfileMenu && (
                                 <div className="absolute right-0 top-full mt-4 w-[200px] bg-bg-secondary border border-white/5 rounded-[20px] shadow-2xl overflow-hidden">
+                                    {(user?.is_superuser || 
+                                      user?.role === 'ADMIN' || 
+                                      user?.role === 'admin' || 
+                                      (user as any)?.role === 'MODERATOR' || 
+                                      (user as any)?.role === 'moderator') && (
+                                        <button
+                                            onClick={() => { onNavigate('admin'); setShowProfileMenu(false); }}
+                                            className="w-full px-6 py-4 flex items-center gap-3 hover:bg-white/5 transition-colors text-white text-sm border-b border-white/5"
+                                        >
+                                            <LayoutDashboard size={16} className="text-primary" /> Quản trị
+                                        </button>
+                                    )}
                                     <button
                                         onClick={() => { onNavigate('profile'); setShowProfileMenu(false); }}
                                         className="w-full px-6 py-4 flex items-center gap-3 hover:bg-white/5 transition-colors text-white text-sm"

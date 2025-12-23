@@ -211,7 +211,7 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
       <div className="mb-4">
         <button
           onClick={() => window.location.hash = 'forum'}
-          className="flex items-center gap-2 text-slate-400 hover:text-amber-400 transition-colors mb-3"
+          className="flex items-center gap-2 text-slate-400 hover:text-primary transition-colors mb-3"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -221,7 +221,7 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
 
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-amber-400">
+            <h1 className="text-2xl md:text-3xl font-bold text-primary">
               {category?.name || 'Đang tải...'}
             </h1>
             {category?.description && (
@@ -232,9 +232,8 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
           {isAuthenticated && (
             <button
               onClick={() => setShowNewThread(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 
-                         hover:from-amber-400 hover:to-orange-400 text-slate-900 font-semibold 
-                         rounded-lg transition-all shadow-lg shadow-amber-500/20"
+              className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-white font-semibold 
+                         rounded-lg transition-all shadow-lg shadow-primary/20"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -257,7 +256,7 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
             onClick={() => setSortBy(tab.key as typeof sortBy)}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors
                        ${sortBy === tab.key
-                ? 'bg-amber-500/20 text-amber-400'
+                ? 'bg-primary/20 text-primary'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'}`}
           >
             {tab.label}
@@ -273,7 +272,7 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
           {isAuthenticated && (
             <button
               onClick={() => setShowNewThread(true)}
-              className="mt-3 text-amber-400 hover:underline"
+              className="mt-3 text-primary hover:underline"
             >
               Tạo chủ đề đầu tiên
             </button>
@@ -286,7 +285,7 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
               key={thread.id}
               onClick={() => handleThreadClick(thread.id)}
               className="w-full bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/50 
-                         hover:border-amber-500/30 rounded-xl p-4 transition-all text-left group"
+                         hover:border-primary/30 rounded-xl p-4 transition-all text-left group"
             >
               <div className="flex items-start gap-3">
                 {/* Author avatar */}
@@ -299,7 +298,7 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
                 <div className="flex-1 min-w-0">
                   {/* Title */}
                   <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-slate-100 group-hover:text-amber-300 
+                    <h3 className="font-semibold text-slate-100 group-hover:text-primary 
                                    transition-colors line-clamp-1">
                       {thread.title}
                     </h3>
@@ -322,7 +321,7 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
                         e.stopPropagation();
                         window.location.hash = `profile/${thread.author.id}`;
                       }}
-                      className="text-amber-400/70 hover:text-amber-300 hover:underline cursor-pointer"
+                      className="text-primary/70 hover:text-primary hover:underline cursor-pointer"
                     >
                       @{thread.author.username}
                     </span>
@@ -336,7 +335,7 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
                       <MessageCircle className="w-3.5 h-3.5" />
                       {thread.commentCount}
                     </span>
-                    <span className="flex items-center gap-1 text-gold-400/70">
+                    <span className="flex items-center gap-1 text-primary/70">
                       <Heart className="w-3.5 h-3.5" />
                       {thread.likeCount}
                     </span>
@@ -367,7 +366,7 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-slate-800 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
             <div className="p-4 border-b border-slate-700 flex items-center justify-between">
-              <h2 className="text-xl font-bold text-amber-400">Tạo chủ đề mới</h2>
+              <h2 className="text-xl font-bold text-primary">Tạo chủ đề mới</h2>
               <button
                 onClick={() => setShowNewThread(false)}
                 className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
@@ -389,7 +388,7 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
                   onChange={(e) => setNewTitle(e.target.value)}
                   placeholder="Nhập tiêu đề chủ đề..."
                   className="w-full px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg
-                             focus:outline-none focus:border-amber-500 text-slate-100"
+                             focus:outline-none focus:border-primary text-slate-100"
                   maxLength={200}
                   required
                 />
@@ -473,8 +472,7 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
                 <button
                   type="submit"
                   disabled={submitting || !newTitle.trim() || !newContent.trim()}
-                  className="px-6 py-2 bg-gradient-to-r from-amber-500 to-orange-500 
-                             hover:from-amber-400 hover:to-orange-400 text-slate-900 
+                  className="px-6 py-2 bg-primary hover:bg-primary/90 text-white 
                              font-semibold rounded-lg transition-all disabled:opacity-50"
                 >
                   {submitting ? 'Đang tạo...' : 'Đăng chủ đề'}

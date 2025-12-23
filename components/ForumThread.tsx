@@ -129,11 +129,11 @@ const CommentItem: React.FC<{
                 onClick={() => onLike(comment.id)}
                 disabled={!isAuthenticated}
                 className={`flex items-center gap-1.5 p-1.5 rounded transition-colors group/btn
-                           ${comment.isLiked ? 'text-gold-400' : 'text-slate-500 hover:text-gold-400'}
+                           ${comment.isLiked ? 'text-primary' : 'text-slate-500 hover:text-primary'}
                            disabled:opacity-50 disabled:cursor-not-allowed`}
                 title="Thích"
               >
-                <Heart className={`w-4 h-4 group-hover/btn:scale-110 transition-transform ${comment.isLiked ? 'fill-gold-400' : ''}`} />
+                <Heart className={`w-4 h-4 group-hover/btn:scale-110 transition-transform ${comment.isLiked ? 'fill-primary' : ''}`} />
               </button>
               {comment.likeCount > 0 && (
                 <span className="text-xs text-slate-500 font-bold">{comment.likeCount}</span>
@@ -414,7 +414,7 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
           <p>{error || 'Không tìm thấy chủ đề'}</p>
           <button
             onClick={() => window.location.hash = 'forum'}
-            className="mt-2 text-amber-400 hover:underline"
+            className="mt-2 text-primary hover:underline"
           >
             ← Quay lại diễn đàn
           </button>
@@ -428,7 +428,7 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
       {/* Back button */}
       <button
         onClick={() => window.location.hash = thread.categoryId ? `forum/category/${thread.categoryId}` : 'forum'}
-        className="flex items-center gap-2 text-slate-400 hover:text-amber-400 transition-colors mb-4"
+        className="flex items-center gap-2 text-slate-400 hover:text-primary transition-colors mb-4"
       >
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -449,7 +449,7 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
           <div>
             <div className="flex items-center gap-2">
               <span
-                className="font-semibold text-amber-400 cursor-pointer hover:underline"
+                className="font-semibold text-primary cursor-pointer hover:underline"
                 onClick={() => window.location.hash = `profile/${thread.authorId}`}
               >
                 @{thread.author.username}
@@ -500,11 +500,11 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
             disabled={!isAuthenticated}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors group/btn
                        ${thread.isLiked
-                ? 'bg-gold-500/20 text-gold-400'
-                : 'bg-slate-700/50 text-slate-400 hover:bg-gold-500/20 hover:text-gold-400'}
+                ? 'bg-primary/20 text-primary'
+                : 'bg-slate-700/50 text-slate-400 hover:bg-primary/20 hover:text-primary'}
                        disabled:opacity-50 disabled:cursor-not-allowed`}
           >
-            <Heart className={`w-5 h-5 group-hover/btn:scale-110 transition-transform ${thread.isLiked ? 'fill-gold-400' : ''}`} />
+            <Heart className={`w-5 h-5 group-hover/btn:scale-110 transition-transform ${thread.isLiked ? 'fill-primary' : ''}`} />
             <span className="font-bold">{thread.likeCount}</span>
           </button>
 
@@ -582,8 +582,8 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
           <form onSubmit={handleSubmitComment} className="max-w-4xl mx-auto">
             {replyingTo && (
               <div className="flex items-center gap-2 mb-2 text-sm">
-                <div className="flex-1 bg-slate-800/50 border-l-2 border-amber-500/50 px-3 py-1 rounded-r">
-                  <span className="text-amber-400">@{replyingTo.username}</span>
+                <div className="flex-1 bg-slate-800/50 border-l-2 border-primary/50 px-3 py-1 rounded-r">
+                  <span className="text-primary">@{replyingTo.username}</span>
                   <span className="text-slate-500"> đã viết:</span>
                 </div>
                 <button
@@ -648,14 +648,13 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
                 onChange={(e) => setCommentContent(e.target.value)}
                 placeholder={replyingTo ? `Trả lời @${replyingTo.username}...` : 'Viết bình luận...'}
                 className="flex-1 px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg
-                           focus:outline-none focus:border-amber-500 text-slate-100"
+                           focus:outline-none focus:border-primary text-slate-100"
                 maxLength={5000}
               />
               <button
                 type="submit"
                 disabled={submitting || (!commentContent.trim() && commentMediaUrls.length === 0)}
-                className="px-6 py-2 bg-gradient-to-r from-amber-500 to-orange-500 
-                           hover:from-amber-400 hover:to-orange-400 text-slate-900 
+                className="px-6 py-2 bg-primary hover:bg-primary/90 text-white 
                            font-semibold rounded-lg transition-all disabled:opacity-50"
               >
                 {submitting ? '...' : 'Gửi'}

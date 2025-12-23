@@ -86,24 +86,30 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab 
       <div className="hidden md:block w-[126px] flex-shrink-0"></div>
 
       {/* Mobile Navigation */}
-      <nav className="fixed bottom-0 left-0 w-full bg-bg-main/95 backdrop-blur-md border-t border-white/5 md:hidden z-50 px-6 py-3">
-        <div className="flex justify-between items-center">
-          {navItems.slice(0, 5).map((item) => {
-            const isActive = activeTab === item.id;
+      <nav className="fixed bottom-0 left-0 w-full bg-bg-main/95 backdrop-blur-md border-t border-white/5 md:hidden z-50 px-4 py-2 safe-area-inset-bottom">
+        <div className="flex justify-around items-center max-w-md mx-auto">
+          {navItems.map((item) => {
+            const isActive = activeTab === item.id ||
+              (item.id === 'forum' && (activeTab === 'forum-category' || activeTab === 'forum-thread'));
             return (
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`p-2 transition-all ${isActive ? 'text-primary' : 'text-white/40'}`}
+                className={`p-1.5 transition-all duration-200 ${isActive ? 'scale-110' : 'opacity-50 hover:opacity-100'}`}
+                title={item.label}
               >
+                {isActive && (
+                  <div className="absolute inset-0 bg-primary/20 blur-md rounded-full"></div>
+                )}
                 <img
                   src={item.icon}
                   alt={item.label}
-                  className={`w-6 h-6 ${item.id === 'chatbot' ? 'rounded-full object-cover' : (isActive ? 'filter-primary' : 'filter-white')}`}
+                  className={`w-5 h-5 relative z-10 ${item.id === 'chatbot' ? 'rounded-full object-cover' : (isActive ? 'filter-primary brightness-150' : 'filter-white')}`}
                 />
               </button>
             );
           })}
+
         </div>
       </nav>
     </>

@@ -1,94 +1,121 @@
 <!DOCTYPE html>
 <html lang="vi">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/png" href="https://i.ibb.co/JRNVKjvX/logoliqi88-removebg-preview-1.png" />
-    <link rel="apple-touch-icon" href="https://i.ibb.co/JRNVKjvX/logoliqi88-removebg-preview-1.png" />
-    <title>ArenaHub - Liên Quân Mobile Social</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Bakbak+One&family=Montserrat:wght@300;400;500;600;700;800&family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;600;800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ['Montserrat', 'Inter', 'sans-serif'],
-              display: ['Bakbak One', 'Rajdhani', 'sans-serif'],
-              bakbak: ['Bakbak One', 'cursive'],
-              montserrat: ['Montserrat', 'sans-serif'],
-              archivo: ['Archivo', 'sans-serif'],
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <link rel="icon" type="image/png" href="https://i.ibb.co/JRNVKjvX/logoliqi88-removebg-preview-1.png" />
+  <link rel="apple-touch-icon" href="https://i.ibb.co/JRNVKjvX/logoliqi88-removebg-preview-1.png" />
+  <title>ArenaHub - Liên Quân Mobile Social</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bakbak+One&family=Montserrat:wght@300;400;500;600;700;800&family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;600;800&family=Archivo:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Montserrat', 'Inter', 'sans-serif'],
+            display: ['Bakbak One', 'Rajdhani', 'sans-serif'],
+            bakbak: ['Bakbak One', 'cursive'],
+            montserrat: ['Montserrat', 'sans-serif'],
+            archivo: ['Archivo', 'sans-serif'],
+          },
+          colors: {
+            primary: '#8c67f6',
+            bg: {
+              main: '#1a1c26',
+              secondary: '#272932',
             },
-            colors: {
-              primary: '#8c67f6',
-              bg: {
-                main: '#1a1c26',
-                secondary: '#272932',
-              },
-              gold: {
-                400: '#fbbf24',
-                500: '#f59e0b',
-                600: '#d97706',
-              },
-              hextech: {
-                900: '#0f172a',
-                800: '#1e293b',
-                700: '#334155',
-              }
+            gold: {
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706',
             },
-            backgroundImage: {
-              'gaming-gradient': 'radial-gradient(circle at 50% 0%, #1e293b 0%, #020617 100%)',
+            hextech: {
+              900: '#0f172a',
+              800: '#1e293b',
+              700: '#334155',
             }
+          },
+          backgroundImage: {
+            'gaming-gradient': 'radial-gradient(circle at 50% 0%, #1e293b 0%, #020617 100%)',
           }
         }
       }
-    </script>
-    <style>
-      body {
-        font-family: 'Montserrat', sans-serif;
-        background-color: #1a1c26;
-        color: #f1f5f9;
-        min-height: 100vh;
-      }
-      
-      /* Custom Scrollbar - Figma Style */
-      ::-webkit-scrollbar {
-        width: 6px;
-      }
-      ::-webkit-scrollbar-track {
-        background: transparent; 
-      }
-      ::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.05); 
-        border-radius: 10px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #8c67f6; 
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #1a1c26;
+      color: #f1f5f9;
+      min-height: 100vh;
+    }
+
+    /* Custom Scrollbar - Figma Style */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #8c67f6;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Image Filters for Icons */
+    .filter-primary {
+      filter: invert(47%) sepia(85%) saturate(2256%) hue-rotate(228deg) brightness(101%) contrast(102%);
+    }
+
+    .filter-white {
+      filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
+    }
+
+    .glow-primary {
+      box-shadow: 0 0 15px rgba(140, 103, 246, 0.3);
+    }
+
+    /* Safe Area for notched devices (iPhone X, etc.) */
+    .safe-area-inset-bottom {
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    /* Mobile navigation responsive adjustments */
+    @media (max-width: 360px) {
+      .mobile-nav-item {
+        padding: 0.25rem;
       }
 
-      .no-scrollbar::-webkit-scrollbar {
-        display: none;
+      .mobile-nav-icon {
+        width: 1rem;
+        height: 1rem;
       }
-      .no-scrollbar {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-      }
+    }
+  </style>
+</head>
 
-      /* Image Filters for Icons */
-      .filter-primary {
-        filter: invert(47%) sepia(85%) saturate(2256%) hue-rotate(228deg) brightness(101%) contrast(102%);
-      }
-      .filter-white {
-        filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
-      }
+<body>
+  <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
 
-      .glow-primary {
-        box-shadow: 0 0 15px rgba(140, 103, 246, 0.3);
-      }
-    </style>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
-  </body>
 </html>

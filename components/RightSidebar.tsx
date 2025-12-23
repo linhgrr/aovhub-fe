@@ -15,6 +15,14 @@ interface SuggestedUser {
     is_following: boolean;
 }
 
+interface OnlineFriend {
+    id: string;
+    username: string;
+    avatar_url: string | null;
+    rank: string | null;
+    level: number | null;
+}
+
 interface ConversationListItem {
     id: string;
     type: 'DIRECT' | 'GROUP';
@@ -49,8 +57,10 @@ export const RightSidebar: React.FC = () => {
     const { user, token } = useAuth();
     const [suggestedUsers, setSuggestedUsers] = useState<SuggestedUser[]>([]);
     const [conversations, setConversations] = useState<ConversationListItem[]>([]);
+    const [onlineFriends, setOnlineFriends] = useState<OnlineFriend[]>([]);
     const [isLoadingUsers, setIsLoadingUsers] = useState(false);
     const [isLoadingChats, setIsLoadingChats] = useState(false);
+    const [isLoadingOnline, setIsLoadingOnline] = useState(false);
     const [showCreateGroup, setShowCreateGroup] = useState(false);
 
     // Chat state
@@ -79,7 +89,15 @@ export const RightSidebar: React.FC = () => {
         if (token) {
             fetchSuggestedUsers();
             fetchConversations();
+            fetchOnlineFriends();
             setupWebSocket();
+            
+            // Refresh online friends every 30 seconds
+            const onlineInterval = setInterval(fetchOnlineFriends, 30000);
+            return () => {
+                clearInterval(onlineInterval);
+                if (wsRef.current) wsRef.current.close();
+            };
         }
         return () => {
             if (wsRef.current) wsRef.current.close();
@@ -152,6 +170,43 @@ export const RightSidebar: React.FC = () => {
             setTimeout(() => {
                 setTypingUsers(prev => prev.filter(u => u !== data.username));
             }, 3000);
+        }
+    };
+
+    const fetchOnlineFriends = async () => {
+        try {
+            setIsLoadingOnline(true);
+            const response = await fetch(`${API_URL}/friends/online`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setOnlineFriends(data.data || []);
+            }
+        } catch (error) {
+            console.error('Failed to fetch online friends:', error);
+        } finally {
+            setIsLoadingOnline(false);
+        }
+    };
+
+    const startChatWithUser = async (userId: string, username: string, avatarUrl: string | null) => {
+        try {
+            const response = await fetch(`${API_URL}/messages/direct/${userId}`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setSelectedConversation({
+                    id: data.data.id,
+                    name: username,
+                    avatar_url: avatarUrl,
+                    type: 'DIRECT',
+                });
+            }
+        } catch (error) {
+            console.error('Failed to start chat:', error);
         }
     };
 
@@ -339,7 +394,7 @@ export const RightSidebar: React.FC = () => {
     // Inline Chat View
     if (selectedConversation) {
         return (
-            <aside className="w-[420px] hidden xl:flex flex-col pt-[150px] pb-10 pr-6 h-screen sticky top-0">
+            <aside className="w-[420px] hidden xl:flex flex-col pt-10 pb-10 pr-6 h-[calc(100vh-110px)] sticky top-[110px] overflow-hidden">
                 <div className="bg-bg-secondary rounded-[20px] shadow-xl flex-1 flex flex-col overflow-hidden">
                     {/* Chat Header */}
                     <div className="flex items-center gap-3 px-5 py-4 border-b border-white/5">
@@ -516,7 +571,7 @@ export const RightSidebar: React.FC = () => {
 
     // Default Sidebar View
     return (
-        <aside className="w-[550px] hidden xl:flex flex-col gap-6 pt-[150px] pb-10 pr-6 h-screen sticky top-0 overflow-y-auto no-scrollbar pb-4 md:pb-10 pr-4 md:pr-20">
+        <aside className="w-[550px] hidden xl:flex flex-col gap-6 pt-10 pb-10 pr-6 h-[calc(100vh-110px)] sticky top-[110px] overflow-y-auto no-scrollbar pb-4 md:pb-10 pr-4 md:pr-20">
             {/* Suggested Section */}
             <div className="bg-bg-secondary rounded-[20px] p-6 shadow-xl">
                 <div className="flex items-center justify-between mb-6">
@@ -565,95 +620,65 @@ export const RightSidebar: React.FC = () => {
                 </div>
             </div>
 
-            {/* Live Chat Section */}
-            <div className="bg-bg-secondary rounded-[20px] p-6 shadow-xl flex-1 min-h-0 flex flex-col">
-                <div className="flex items-center justify-between mb-6">
-                    <h3 className="font-montserrat font-extrabold text-[13px] text-white uppercase tracking-wider">TIN NHẮN</h3>
-                    <button
-                        onClick={() => setShowCreateGroup(true)}
-                        className="text-primary text-[12px] font-semibold border border-primary/30 px-4 py-2 rounded-[8px] hover:bg-primary/10 transition-all active:scale-95"
-                    >
-                        Tạo nhóm
-                    </button>
+            {/* Online Friends Section - Messenger Style */}
+            <div className="bg-bg-secondary rounded-[20px] p-5 shadow-xl flex-1 min-h-0 flex flex-col">
+                <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-montserrat font-semibold text-[14px] text-white/90">
+                        Người liên hệ
+                    </h3>
+                    <div className="flex items-center gap-3">
+                        <Search className="w-4 h-4 text-white/50 cursor-pointer hover:text-white/80 transition-colors" />
+                        <button className="opacity-40 hover:opacity-100 transition-opacity flex gap-[3px]">
+                            <div className="w-1 h-1 bg-white rounded-full"></div>
+                            <div className="w-1 h-1 bg-white rounded-full"></div>
+                            <div className="w-1 h-1 bg-white rounded-full"></div>
+                        </button>
+                    </div>
                 </div>
-                <div className="space-y-4 overflow-y-auto flex-1 no-scrollbar">
-                    {isLoadingChats ? (
-                        <div className="flex items-center justify-center py-4">
+                
+                <div className="space-y-1 overflow-y-auto flex-1 no-scrollbar">
+                    {isLoadingOnline ? (
+                        <div className="flex items-center justify-center py-8">
                             <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
                         </div>
-                    ) : conversations.length === 0 ? (
-                        <div className="text-center py-6 text-[#7f7f7f]">
-                            <MessageCircle className="w-10 h-10 mx-auto mb-2 opacity-40" />
-                            <p className="text-[10px]">Chưa có tin nhắn nào</p>
+                    ) : onlineFriends.length === 0 ? (
+                        <div className="text-center py-8 text-[#7f7f7f]">
+                            <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-white/5 flex items-center justify-center">
+                                <UserIcon className="w-6 h-6 opacity-40" />
+                            </div>
+                            <p className="text-[12px]">Không có ai online</p>
                         </div>
                     ) : (
-                        conversations.map(chat => (
+                        onlineFriends.map((friend) => (
                             <button
-                                key={chat.id}
-                                onClick={() => setSelectedConversation({
-                                    id: chat.id,
-                                    name: chat.name || 'Cuộc trò chuyện',
-                                    avatar_url: chat.avatar_url,
-                                    type: chat.type,
-                                })}
-                                className={`w-full flex items-start gap-3 relative group text-left p-2 -mx-2 rounded-[10px] hover:bg-white/5 transition-colors ${chat.unread_count > 0 ? 'bg-primary/5' : ''
-                                    }`}
+                                key={friend.id}
+                                onClick={() => startChatWithUser(friend.id, friend.username, friend.avatar_url)}
+                                className="w-full flex items-center gap-3 p-2 -mx-2 rounded-lg hover:bg-white/5 transition-colors group"
                             >
                                 <div className="relative flex-shrink-0">
-                                    {chat.avatar_url ? (
-                                        <img src={chat.avatar_url} className="w-[52px] h-[52px] rounded-[12px] object-cover transition-transform group-hover:scale-105" alt="" />
+                                    {friend.avatar_url ? (
+                                        <img
+                                            src={friend.avatar_url}
+                                            alt={friend.username}
+                                            className="w-9 h-9 rounded-full object-cover"
+                                        />
                                     ) : (
-                                        <div className="w-[52px] h-[52px] rounded-[12px] bg-bg-main flex items-center justify-center">
-                                            {chat.type === 'GROUP' ? (
-                                                <Users className="w-6 h-6 text-[#7f7f7f]" />
-                                            ) : (
-                                                <UserIcon className="w-6 h-6 text-[#7f7f7f]" />
-                                            )}
+                                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                                            <UserIcon className="w-4 h-4 text-white" />
                                         </div>
                                     )}
-                                    {/* Online indicator */}
-                                    <div className="absolute -bottom-0.5 -right-0.5 w-[8px] h-[8px] bg-[#22c55e] rounded-full border-2 border-bg-secondary"></div>
+                                    {/* Online indicator - green dot */}
+                                    <div className="absolute bottom-0 right-0 w-[10px] h-[10px] bg-[#31a24c] rounded-full border-2 border-bg-secondary"></div>
                                 </div>
-                                <div className="flex-1 min-w-0">
-                                    <div className="flex items-center justify-between mb-1">
-                                        <p className={`font-montserrat font-medium text-[13px] truncate group-hover:text-primary transition-colors ${chat.unread_count > 0 ? 'text-white' : 'text-white/90'
-                                            }`}>
-                                            {chat.name || 'Cuộc trò chuyện'}
-                                        </p>
-                                        <p className="text-[#7f7f7f] text-[12px] flex-shrink-0 ml-2">{formatTimeAgo(chat.last_message_at)}</p>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <p className={`text-[12px] line-clamp-1 leading-relaxed flex-1 ${chat.unread_count > 0 ? 'text-white/70 font-medium' : 'text-white/50'
-                                            }`}>
-                                            {chat.last_message_content || 'Bắt đầu trò chuyện...'}
-                                        </p>
-                                        {chat.unread_count > 0 && (
-                                            <span className="flex-shrink-0 inline-flex items-center justify-center min-w-[16px] h-[16px] px-1 text-[9px] font-bold text-white bg-primary rounded-full">
-                                                {chat.unread_count > 99 ? '99+' : chat.unread_count}
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
+                                <span className="font-medium text-[14px] text-white/90 group-hover:text-white transition-colors truncate">
+                                    {friend.username}
+                                </span>
                             </button>
                         ))
                     )}
                 </div>
             </div>
 
-            {/* Create Group Modal */}
-            <CreateGroupModal
-                isOpen={showCreateGroup}
-                onClose={() => setShowCreateGroup(false)}
-                onGroupCreated={(groupId, groupName) => {
-                    setSelectedConversation({
-                        id: groupId,
-                        name: groupName,
-                        avatar_url: null,
-                        type: 'GROUP',
-                    });
-                    fetchConversations();
-                }}
-            />
         </aside>
     );
 };

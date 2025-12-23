@@ -122,8 +122,8 @@ const AppContent: React.FC = () => {
   const showHeader = showNavigation && currentRoute !== 'reels';
 
   return (
-    <div className="min-h-screen bg-bg-main text-white font-montserrat selection:bg-primary/30 overflow-x-hidden">
-      <div className="flex">
+    <div className="min-h-screen bg-bg-main text-white font-montserrat selection:bg-primary/30">
+      <div className="flex items-start">
         {/* Sidebar Navigation - Fixed width, not floating */}
         {showNavigation && <Navigation activeTab={currentRoute} setActiveTab={handleTabChange} />}
 

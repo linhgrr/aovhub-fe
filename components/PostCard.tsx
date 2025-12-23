@@ -97,8 +97,8 @@ export const PostCard: React.FC<PostCardProps> = ({
   
       </div>
 
-      {/* Share caption (if this is a shared post) */}
-      {post.shared_post && post.content && (
+      {/* Caption - shown before media for both regular and shared posts */}
+      {post.content && (
         <div className="px-4 md:px-6 pb-3">
           <p className="text-white/90 text-[11px] md:text-[12px] leading-relaxed">
             {post.content}
@@ -281,12 +281,6 @@ export const PostCard: React.FC<PostCardProps> = ({
           </button>
         )}
 
-        {/* Only show content here if NOT a shared post (shared posts show caption above) */}
-        {!post.shared_post && post.content && (
-          <p className="text-white/90 text-[11px] md:text-[12px] leading-relaxed mb-3 md:mb-4">
-              {post.content}
-          </p>
-        )}
 
         {/* Post Comment Input - Click opens comment modal - Responsive */}
         <div 

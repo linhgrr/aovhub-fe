@@ -103,20 +103,20 @@ export const Forum: React.FC<ForumProps> = ({ onNavigate }) => {
               key={category.id}
               onClick={() => handleCategoryClick(category.id)}
               className="w-full bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/50 
-                         hover:border-amber-500/30 rounded-xl p-4 transition-all duration-200
+                         hover:border-primary/30 rounded-xl p-4 transition-all duration-200
                          text-left group"
             >
               <div className="flex items-center gap-4">
                 {/* Icon */}
-                <div className="w-12 h-12 bg-gradient-to-br from-amber-500/20 to-orange-500/20 
+                <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-primary/30 
                                 rounded-lg flex items-center justify-center text-2xl
-                                group-hover:from-amber-500/30 group-hover:to-orange-500/30 transition-colors">
+                                group-hover:from-primary/30 group-hover:to-primary/40 transition-colors">
                   {getCategoryIcon(category.icon)}
                 </div>
                 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-slate-100 group-hover:text-amber-300 
+                  <h3 className="font-semibold text-slate-100 group-hover:text-primary 
                                  transition-colors truncate">
                     {category.name}
                   </h3>
@@ -129,7 +129,7 @@ export const Forum: React.FC<ForumProps> = ({ onNavigate }) => {
                 
                 {/* Thread Count */}
                 <div className="text-right flex-shrink-0">
-                  <div className="text-lg font-bold text-amber-400">
+                  <div className="text-lg font-bold text-primary">
                     {category.threadCount}
                   </div>
                   <div className="text-xs text-slate-500">chủ đề</div>
@@ -137,7 +137,7 @@ export const Forum: React.FC<ForumProps> = ({ onNavigate }) => {
                 
                 {/* Arrow */}
                 <svg 
-                  className="w-5 h-5 text-slate-500 group-hover:text-amber-400 
+                  className="w-5 h-5 text-slate-500 group-hover:text-primary 
                              group-hover:translate-x-1 transition-all"
                   fill="none" 
                   viewBox="0 0 24 24" 
@@ -152,12 +152,12 @@ export const Forum: React.FC<ForumProps> = ({ onNavigate }) => {
       )}
 
       {/* Info Section */}
-      <div className="mt-6 bg-gradient-to-r from-amber-500/10 to-orange-500/10 
-                      border border-amber-500/20 rounded-xl p-4">
+      <div className="mt-6 bg-gradient-to-r from-primary/10 to-primary/20 
+                      border border-primary/20 rounded-xl p-4">
         <div className="flex items-start gap-3">
           <div className="text-2xl">💡</div>
           <div>
-            <h4 className="font-semibold text-amber-300 mb-1">
+            <h4 className="font-semibold text-primary mb-1">
               Quy định diễn đàn
             </h4>
             <ul className="text-sm text-slate-400 space-y-1">

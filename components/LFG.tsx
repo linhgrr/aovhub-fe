@@ -272,7 +272,7 @@ export const LFG: React.FC = () => {
                ) : (
                   <button
                      onClick={() => setShowCreateModal(true)}
-                     className="flex-1 md:flex-none bg-gold-600 hover:bg-gold-500 text-slate-900 font-bold py-2 px-8 clip-hex-button shadow-[0_0_15px_rgba(245,158,11,0.3)] transition-all hover:scale-105 flex items-center justify-center gap-2"
+                     className="flex-1 md:flex-none bg-primary hover:bg-primary/90 text-white font-bold py-2 px-8 clip-hex-button shadow-[0_0_15px_rgba(140,103,246,0.3)] transition-all hover:scale-105 flex items-center justify-center gap-2"
                   >
                      <Plus className="w-4 h-4" />
                      TẠO PHÒNG
@@ -284,7 +284,7 @@ export const LFG: React.FC = () => {
          {/* Filters */}
          <div className="flex items-center gap-4 mb-6 bg-slate-900/50 p-2 rounded border border-slate-800 backdrop-blur-sm">
             <div className="flex items-center gap-2 px-2">
-               <Filter className="w-4 h-4 text-gold-500" />
+               <Filter className="w-4 h-4 text-primary" />
                <span className="text-sm font-bold text-slate-400 uppercase mr-2">Bộ lọc:</span>
                <select
                   value={rankFilter}

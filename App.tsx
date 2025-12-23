@@ -16,12 +16,13 @@ import { Reels } from './components/Reels';
 import { SearchResults } from './components/SearchResults';
 import { RightSidebar } from './components/RightSidebar';
 import { Chatbot } from './components/Chatbot';
+import LandingPage from './components/LandingPage';
 import { AuthProvider, useAuth } from './contexts/authContext';
 
-type Route = 'feed' | 'reels' | 'lfg' | 'friends' | 'profile' | 'settings' | 'register' | 'login' | 'forum' | 'forum-category' | 'forum-thread' | 'admin' | 'search' | 'chatbot';
+type Route = 'landing' | 'feed' | 'reels' | 'lfg' | 'friends' | 'profile' | 'settings' | 'register' | 'login' | 'forum' | 'forum-category' | 'forum-thread' | 'admin' | 'search' | 'chatbot';
 
 const AppContent: React.FC = () => {
-  const [currentRoute, setCurrentRoute] = useState<Route>('feed');
+  const [currentRoute, setCurrentRoute] = useState<Route>('landing');
   const [profileUserId, setProfileUserId] = useState<string | undefined>(undefined);
   const [forumCategoryId, setForumCategoryId] = useState<string | undefined>(undefined);
   const [forumThreadId, setForumThreadId] = useState<string | undefined>(undefined);
@@ -31,7 +32,7 @@ const AppContent: React.FC = () => {
   // Simple hash-based routing
   useEffect(() => {
     const handleHashChange = () => {
-      const hash = window.location.hash.slice(1) || 'feed';
+      const hash = window.location.hash.slice(1) || (isAuthenticated ? 'feed' : 'landing');
 
       // Check for profile/:userId pattern
       if (hash.startsWith('profile/')) {
@@ -76,13 +77,13 @@ const AppContent: React.FC = () => {
     return () => {
       window.removeEventListener('hashchange', handleHashChange);
     };
-  }, []);
+  }, [isAuthenticated]);
 
-  // Redirect to login if not authenticated (except for public routes)
+  // Redirect to landing if not authenticated (except for public routes)
   useEffect(() => {
-    const publicRoutes: Route[] = ['login', 'register', 'forum', 'forum-category', 'forum-thread'];
+    const publicRoutes: Route[] = ['landing', 'login', 'register', 'forum', 'forum-category', 'forum-thread'];
     if (!isLoading && !isAuthenticated && !publicRoutes.includes(currentRoute)) {
-      window.location.hash = 'login';
+      window.location.hash = 'landing';
     }
   }, [isLoading, isAuthenticated, currentRoute]);
 
@@ -100,6 +101,7 @@ const AppContent: React.FC = () => {
     }
 
     switch (currentRoute) {
+      case 'landing': return <LandingPage />;
       case 'register': return <Register />;
       case 'login': return <Login />;
       case 'feed': return <Feed />;
@@ -114,13 +116,13 @@ const AppContent: React.FC = () => {
       case 'admin': return <AdminDashboard />;
       case 'search': return <SearchResults query={searchQuery} onNavigate={handleTabChange} />;
       case 'chatbot': return <Chatbot />;
-      default: return <Feed />;
+      default: return isAuthenticated ? <Feed /> : <LandingPage />;
     }
   };
 
-  // Hide navigation only on auth pages
-  const showNavigation = currentRoute !== 'register' && currentRoute !== 'login';
-  // Hide header on reels page
+  // Hide navigation only on landing and auth pages
+  const showNavigation = currentRoute !== 'landing' && currentRoute !== 'register' && currentRoute !== 'login';
+  // Hide header on reels and landing page
   const showHeader = showNavigation && currentRoute !== 'reels';
 
   return (

@@ -59,6 +59,21 @@ export interface ChatMessage {
   timestamp: number;
 }
 
+// ============== CHATBOT TYPES ==============
+
+export interface ChampionSuggestion {
+  ten_tuong: string;
+  ly_do: string;
+  cach_choi_tom_tat?: string;
+}
+
+export interface ChatbotMessage {
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: string;
+  suggestions?: ChampionSuggestion[];
+}
+
 // ============== FORUM TYPES ==============
 
 export enum ThreadStatus {

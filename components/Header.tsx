@@ -227,7 +227,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
     return (
         <>
             {/* Responsive Header - full width on mobile, offset on desktop */}
-            <header className="fixed top-0 left-0 md:left-[126px] right-0 h-[70px] md:h-[110px] bg-bg-main z-40 pl-4 md:pl-10 pr-4 md:pr-20 flex items-center border-b border-white/5 md:border-0">
+            <header className="fixed top-0 left-0 md:left-[126px] right-0 h-[70px] md:h-[110px] bg-bg-main z-40 pl-4 md:pl-20 pr-4 md:pr-20 flex items-center border-b border-white/5 md:border-0">
                 <div className="w-full flex items-center justify-between gap-3 md:gap-8">
 
                     {/* Mobile Logo */}
@@ -253,7 +253,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
                                 type="text"
                                 value={searchValue}
                                 onChange={(e) => setSearchValue(e.target.value)}
-                                placeholder="Search"
+                                placeholder="Tìm kiếm"
                                 className="w-full bg-bg-secondary h-[44px] md:h-[62px] rounded-[12px] md:rounded-[20px] pl-[44px] md:pl-[66px] pr-4 md:pr-6 text-white placeholder-[#8f8f8f] text-[14px] md:text-[18px] focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all"
                             />
                         </form>
@@ -278,12 +278,12 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
                             {showNotifications && (
                                 <div className="absolute right-0 top-full mt-4 w-[350px] bg-bg-secondary border border-white/5 rounded-[20px] shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
                                     <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
-                                        <h3 className="font-montserrat font-bold text-white text-sm">NOTIFICATIONS</h3>
-                                        <button onClick={markAllAsRead} className="text-[10px] text-primary hover:underline">Mark all as read</button>
+                                        <h3 className="font-montserrat font-bold text-white text-sm">THÔNG BÁO</h3>
+                                        <button onClick={markAllAsRead} className="text-[10px] text-primary hover:underline">Đánh dấu đã đọc</button>
                                     </div>
                                     <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
                                         {notifications.length === 0 ? (
-                                            <div className="p-10 text-center text-[#7f7f7f] text-xs">No notifications yet</div>
+                                            <div className="p-10 text-center text-[#7f7f7f] text-xs">Chưa có thông báo</div>
                                         ) : (
                                             notifications.map(n => (
                                                 <div
@@ -338,19 +338,19 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
                                         onClick={() => { onNavigate('profile'); setShowProfileMenu(false); }}
                                         className="w-full px-6 py-4 flex items-center gap-3 hover:bg-white/5 transition-colors text-white text-sm"
                                     >
-                                        <UserIcon size={16} /> Profile
+                                        <UserIcon size={16} /> Hồ sơ
                                     </button>
                                     <button
                                         onClick={() => { onNavigate('settings'); setShowProfileMenu(false); }}
                                         className="w-full px-6 py-4 flex items-center gap-3 hover:bg-white/5 transition-colors text-white text-sm"
                                     >
-                                        <Settings size={16} /> Settings
+                                        <Settings size={16} /> Cài đặt
                                     </button>
                                     <button
                                         onClick={() => logout()}
                                         className="w-full px-6 py-4 flex items-center gap-3 hover:bg-red-500/10 transition-colors text-red-400 text-sm"
                                     >
-                                        <LogOut size={16} /> Logout
+                                        <LogOut size={16} /> Đăng xuất
                                     </button>
                                 </div>
                             )}

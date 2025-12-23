@@ -149,12 +149,12 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated, apiUrl })
     <div className="bg-bg-secondary rounded-[16px] border border-white/5 transition-all duration-300 overflow-hidden shadow-lg">
       {/* Header Section */}
       <div className="p-4 md:p-6 pb-3">
-        <span className="text-primary text-[13px] font-medium tracking-wide">Newsfeed</span>
+        <span className="text-primary text-[13px] font-medium tracking-wide">Bảng Tin Chiến Trường</span>
         <h2 className="text-white text-[22px] md:text-[26px] font-bold mt-1 tracking-tight">
-          Check What Your Friends Up To!
+          Đoán xem bạn bè đang làm gì!
         </h2>
         <p className="text-white/40 text-[13px] md:text-[14px] mt-1 leading-relaxed">
-          Stay updated with every legendary moment, new achievement, and live stream from your closest gaming circle.
+          Cập nhật khoảnh khắc huyền thoại, thành tích leo rank và highlight mãn nhãn từ chiến hữu của bạn!
         </p>
       </div>
 
@@ -171,7 +171,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated, apiUrl })
           className="flex-1 rounded-full px-3 py-1.5 cursor-text"
         >
           <span className="text-white/40 text-[13px]">
-            {user?.username ? `What's on your mind, ${user.username}?` : "What's on your mind?"}
+            {user?.username ? `Có gì hot không, ${user.username}?` : "Có gì hot không?"}
           </span>
         </div>
 
@@ -196,7 +196,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated, apiUrl })
           onClick={() => setIsExpanded(true)}
           className="bg-primary hover:bg-primary/90 text-white px-4 py-1.5 rounded-full text-[13px] font-semibold shadow-lg shadow-primary/20 transition-all active:scale-95"
         >
-          Create
+          Tạo
         </button>
       </div>
 
@@ -217,7 +217,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated, apiUrl })
           <div className="relative w-full max-w-[600px] bg-bg-secondary rounded-[20px] border border-white/10 shadow-2xl animate-in fade-in zoom-in-95 duration-300">
             {/* Modal Header */}
             <div className="flex items-center justify-between p-4 border-b border-white/5">
-              <h3 className="text-white text-[18px] font-semibold">Create Post</h3>
+              <h3 className="text-white text-[18px] font-semibold">Tạo bài viết</h3>
               <button
                 onClick={() => {
                   setIsExpanded(false);
@@ -241,7 +241,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated, apiUrl })
                 />
                 <div>
                   <p className="text-white font-semibold">{user?.username || 'User'}</p>
-                  <p className="text-white/40 text-[13px]">Posting publicly</p>
+                  <p className="text-white/40 text-[13px]">Đăng công khai</p>
                 </div>
               </div>
 
@@ -251,7 +251,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated, apiUrl })
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 autoFocus
-                placeholder="What's on your mind?"
+                placeholder="Bạn đang nghĩ gì?"
                 className="w-full bg-transparent border-none focus:outline-none text-white placeholder-white/40 text-[16px] resize-none min-h-[120px]"
                 rows={4}
               />
@@ -284,7 +284,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated, apiUrl })
                       {item.isUploading && (
                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/20 z-10">
                           <Loader2 size={24} className="text-primary animate-spin mb-1" />
-                          <span className="text-[10px] text-white font-medium">Uploading...</span>
+                          <span className="text-[10px] text-white font-medium">Đang tải lên...</span>
                         </div>
                       )}
 
@@ -303,19 +303,20 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated, apiUrl })
             </div>
 
             {/* Modal Footer */}
+            {/* Chân hộp thoại */}
             <div className="flex items-center justify-between p-4 border-t border-white/5">
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   className="p-2.5 hover:bg-white/5 rounded-full text-white/60 hover:text-primary transition-all"
-                  title="Add Image"
+                  title="Thêm ảnh"
                 >
                   <Image size={22} />
                 </button>
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   className="p-2.5 hover:bg-white/5 rounded-full text-white/60 hover:text-blue-400 transition-all"
-                  title="Add Video"
+                  title="Thêm video"
                 >
                   <Film size={22} />
                 </button>
@@ -326,7 +327,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated, apiUrl })
                 disabled={(!content.trim() && mediaItems.length === 0) || isPosting || isUploading}
                 className="bg-primary hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed text-white px-8 py-2.5 rounded-full text-[15px] font-semibold shadow-lg shadow-primary/20 transition-all active:scale-95"
               >
-                {isPosting ? <Loader2 size={18} className="animate-spin" /> : 'Post'}
+                {isPosting ? <Loader2 size={18} className="animate-spin" /> : 'Đăng'}
               </button>
             </div>
           </div>

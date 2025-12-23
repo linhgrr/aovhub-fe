@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LogOut, ChevronRight, X, AlertTriangle } from 'lucide-react';
+import { LogOut, ChevronRight, X, AlertTriangle, KeyRound } from 'lucide-react';
 import { useAuth } from '../contexts/authContext';
 
 export const Settings: React.FC = () => {
@@ -9,6 +9,11 @@ export const Settings: React.FC = () => {
   const handleLogout = () => {
     logout();
     setShowLogoutModal(false);
+  };
+
+  const handleChangePassword = () => {
+    // TODO: Implement change password functionality
+    console.log('Change password clicked - Feature coming soon');
   };
 
   return (
@@ -51,6 +56,21 @@ export const Settings: React.FC = () => {
           {/* Settings List */}
           <div className="bg-slate-800/50 rounded-xl border border-slate-700/50 overflow-hidden">
             <div className="divide-y divide-slate-700/50">
+              {/* Change Password Button */}
+              <button
+                onClick={handleChangePassword}
+                className="w-full flex items-center gap-4 p-4 hover:bg-slate-700/30 transition-colors group"
+              >
+                <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                  <KeyRound className="w-5 h-5 text-amber-400" />
+                </div>
+                <div className="flex-1 text-left">
+                  <p className="text-white font-medium">Đổi mật khẩu</p>
+                  <p className="text-slate-500 text-sm">Thay đổi mật khẩu tài khoản của bạn</p>
+                </div>
+                <ChevronRight className="w-5 h-5 text-slate-500 group-hover:text-slate-400 transition-colors" />
+              </button>
+
               {/* Logout Button */}
               <button
                 onClick={() => setShowLogoutModal(true)}

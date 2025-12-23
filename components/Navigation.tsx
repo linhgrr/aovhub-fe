@@ -10,12 +10,12 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab 
   const { logout } = useAuth();
 
   const navItems = [
-    { id: 'feed', icon: '/assets/images/home.svg', label: 'Home' },
-    { id: 'reels', icon: '/assets/images/game.svg', label: 'Games' },
-    { id: 'lfg', icon: '/assets/images/chart.svg', label: 'Stats' },
-    { id: 'forum', icon: '/assets/images/activity.svg', label: 'Activity' },
-    { id: 'profile', icon: '/assets/images/profile.svg', label: 'Profile' },
-    { id: 'settings', icon: '/assets/images/setting.svg', label: 'Settings' },
+    { id: 'feed', icon: '/assets/images/home.svg', label: 'Trang chủ' },
+    { id: 'reels', icon: '/assets/images/game.svg', label: 'Trò chơi' },
+    { id: 'lfg', icon: '/assets/images/chart.svg', label: 'Thống kê' },
+    { id: 'forum', icon: '/assets/images/activity.svg', label: 'Hoạt động' },
+    { id: 'profile', icon: '/assets/images/profile.svg', label: 'Hồ sơ' },
+    { id: 'settings', icon: '/assets/images/setting.svg', label: 'Cài đặt' },
   ];
 
   return (

@@ -65,201 +65,197 @@ export const PostCard: React.FC<PostCardProps> = ({
 
   return (
     <>
-    <LikesModal 
-      postId={post.id}
-      isOpen={showLikesModal}
-      onClose={() => setShowLikesModal(false)}
-      totalCount={post.like_count}
-    />
-    <div className="bg-bg-secondary rounded-[10px] md:rounded-[12px] overflow-hidden mb-4 md:mb-6 border border-white/5">
-      {/* Header - Responsive */}
-      <div className="p-4 md:p-6 flex items-center justify-between">
-        <div className="flex items-center gap-2 md:gap-3">
+      <LikesModal
+        postId={post.id}
+        isOpen={showLikesModal}
+        onClose={() => setShowLikesModal(false)}
+        totalCount={post.like_count}
+      />
+      <div className="bg-bg-secondary rounded-[10px] md:rounded-[12px] overflow-hidden mb-4 md:mb-6 border border-white/5">
+        {/* Header - Responsive */}
+        <div className="p-4 md:p-6 flex items-center justify-between">
+          <div className="flex items-center gap-2 md:gap-3">
             <a href={`#profile/${post.author.id}`}>
-                <img 
-                    src={post.author.avatar_url || '/assets/images/home.svg'} 
-                    alt="" 
-                    className="w-[32px] h-[32px] md:w-[38px] md:h-[38px] rounded-[8px] md:rounded-[10px] object-cover"
-                />
-            </a>
-            <div>
-                <div className="flex items-center gap-1.5">
-                  <a href={`#profile/${post.author.id}`} className="font-montserrat font-semibold text-white text-[12px] md:text-[14px] hover:text-primary transition-colors">
-                      {post.author.username}
-                  </a>
-                  {post.shared_post && (
-                    <span className="text-[#7f7f7f] text-[10px] md:text-[11px]">shared a post</span>
-                  )}
-                </div>
-                <span className="text-[#7f7f7f] text-[9px] md:text-[10px] uppercase">Public</span>
-            </div>
-        </div>
-  
-      </div>
-
-      {/* Caption - shown before media for both regular and shared posts */}
-      {post.content && (
-        <div className="px-4 md:px-6 pb-3">
-          <p className="text-white/90 text-[11px] md:text-[12px] leading-relaxed">
-            {post.content}
-          </p>
-        </div>
-      )}
-
-      {/* Shared Post Content */}
-      {post.shared_post && (
-        <div className="mx-4 md:mx-6 mb-3 md:mb-4 border border-white/10 rounded-[10px] md:rounded-[12px] overflow-hidden bg-bg-main/30">
-          {/* Shared Post Header */}
-          <div className="p-3 md:p-4 flex items-center gap-2 md:gap-3">
-            <a href={`#profile/${post.shared_post.author.id}`}>
-              <img 
-                src={post.shared_post.author.avatar_url || '/assets/images/home.svg'} 
-                alt="" 
-                className="w-[28px] h-[28px] md:w-[32px] md:h-[32px] rounded-[6px] md:rounded-[8px] object-cover"
+              <img
+                src={post.author.avatar_url || '/assets/images/home.svg'}
+                alt=""
+                className="w-[32px] h-[32px] md:w-[38px] md:h-[38px] rounded-[8px] md:rounded-[10px] object-cover"
               />
             </a>
             <div>
-              <a href={`#profile/${post.shared_post.author.id}`} className="font-montserrat font-semibold text-white text-[11px] md:text-[12px] block hover:text-primary transition-colors">
-                {post.shared_post.author.username}
-              </a>
-              <span className="text-[#7f7f7f] text-[8px] md:text-[9px]">
-                {new Date(post.shared_post.created_at).toLocaleDateString('vi-VN')}
-              </span>
+              <div className="flex items-center gap-1.5">
+                <a href={`#profile/${post.author.id}`} className="font-montserrat font-semibold text-white text-[12px] md:text-[14px] hover:text-primary transition-colors">
+                  {post.author.username}
+                </a>
+                {post.shared_post && (
+                  <span className="text-[#7f7f7f] text-[10px] md:text-[11px]">đã chia sẻ bài viết</span>
+                )}
+              </div>
+              <span className="text-[#7f7f7f] text-[9px] md:text-[10px] uppercase">Công khai</span>
             </div>
           </div>
 
-          {/* Shared Post Media */}
-          {post.shared_post.media && post.shared_post.media.length > 0 && (
-            <div className="px-3 md:px-4 pb-3 md:pb-4">
-              <div className={`grid gap-1.5 ${
-                post.shared_post.media.length === 1 ? 'grid-cols-1' : 
-                post.shared_post.media.length === 2 ? 'grid-cols-2' : 
-                'grid-cols-2 md:grid-cols-3'
-              }`}>
-                {post.shared_post.media.map((item, index) => (
-                    <div 
-                      key={index} 
-                      className={`relative rounded-[8px] md:rounded-[10px] overflow-hidden group bg-black/20 ${
-                        post.shared_post!.media.length === 1 ? 'aspect-auto' : 'aspect-square'
-                      }`}
+        </div>
+
+        {/* Caption - shown before media for both regular and shared posts */}
+        {post.content && (
+          <div className="px-4 md:px-6 pb-3">
+            <p className="text-white/90 text-[11px] md:text-[12px] leading-relaxed">
+              {post.content}
+            </p>
+          </div>
+        )}
+
+        {/* Shared Post Content */}
+        {post.shared_post && (
+          <div className="mx-4 md:mx-6 mb-3 md:mb-4 border border-white/10 rounded-[10px] md:rounded-[12px] overflow-hidden bg-bg-main/30">
+            {/* Shared Post Header */}
+            <div className="p-3 md:p-4 flex items-center gap-2 md:gap-3">
+              <a href={`#profile/${post.shared_post.author.id}`}>
+                <img
+                  src={post.shared_post.author.avatar_url || '/assets/images/home.svg'}
+                  alt=""
+                  className="w-[28px] h-[28px] md:w-[32px] md:h-[32px] rounded-[6px] md:rounded-[8px] object-cover"
+                />
+              </a>
+              <div>
+                <a href={`#profile/${post.shared_post.author.id}`} className="font-montserrat font-semibold text-white text-[11px] md:text-[12px] block hover:text-primary transition-colors">
+                  {post.shared_post.author.username}
+                </a>
+                <span className="text-[#7f7f7f] text-[8px] md:text-[9px]">
+                  {new Date(post.shared_post.created_at).toLocaleDateString('vi-VN')}
+                </span>
+              </div>
+            </div>
+
+            {/* Shared Post Media */}
+            {post.shared_post.media && post.shared_post.media.length > 0 && (
+              <div className="px-3 md:px-4 pb-3 md:pb-4">
+                <div className={`grid gap-1.5 ${post.shared_post.media.length === 1 ? 'grid-cols-1' :
+                    post.shared_post.media.length === 2 ? 'grid-cols-2' :
+                      'grid-cols-2 md:grid-cols-3'
+                  }`}>
+                  {post.shared_post.media.map((item, index) => (
+                    <div
+                      key={index}
+                      className={`relative rounded-[8px] md:rounded-[10px] overflow-hidden group bg-black/20 ${post.shared_post!.media.length === 1 ? 'aspect-auto' : 'aspect-square'
+                        }`}
                     >
                       {item.type === 'image' ? (
-                        <img 
-                          src={item.url} 
-                          alt="Shared content" 
+                        <img
+                          src={item.url}
+                          alt="Shared content"
                           className="w-full h-full object-cover cursor-pointer"
                           onClick={() => onOpenComments(post)}
                         />
                       ) : (
-                        <VideoPlayer 
-                          src={item.url} 
+                        <VideoPlayer
+                          src={item.url}
                           poster={item.thumbnail_url}
                           className="w-full h-full object-cover"
                         />
                       )}
                     </div>
                   ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Shared Post Content */}
-          {post.shared_post.content && (
-            <div className="px-3 md:px-4 pb-3 md:pb-4">
-              <p className="text-white/70 text-[10px] md:text-[11px] leading-relaxed line-clamp-3">
-                {post.shared_post.content}
-              </p>
-            </div>
-          )}
-        </div>
-      )}
+            {/* Shared Post Content */}
+            {post.shared_post.content && (
+              <div className="px-3 md:px-4 pb-3 md:pb-4">
+                <p className="text-white/70 text-[10px] md:text-[11px] leading-relaxed line-clamp-3">
+                  {post.shared_post.content}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
 
-      {/* Original Media Content (only show if NOT a shared post) */}
-      {!post.shared_post && post.media && post.media.length > 0 && (
-        <div className="px-4 md:px-6 pb-3 md:pb-4">
-          <div className={`grid gap-2 ${
-            post.media.length === 1 ? 'grid-cols-1' : 
-            post.media.length === 2 ? 'grid-cols-2' : 
-            'grid-cols-2 md:grid-cols-3'
-          }`}>
-            {post.media.map((item, index) => (
-                <div 
-                  key={index} 
-                  className={`relative rounded-[10px] md:rounded-[12px] overflow-hidden group bg-black/20 ${
-                    post.media.length === 1 ? 'aspect-auto' : 'aspect-square'
-                  }`}
+        {/* Original Media Content (only show if NOT a shared post) */}
+        {!post.shared_post && post.media && post.media.length > 0 && (
+          <div className="px-4 md:px-6 pb-3 md:pb-4">
+            <div className={`grid gap-2 ${post.media.length === 1 ? 'grid-cols-1' :
+                post.media.length === 2 ? 'grid-cols-2' :
+                  'grid-cols-2 md:grid-cols-3'
+              }`}>
+              {post.media.map((item, index) => (
+                <div
+                  key={index}
+                  className={`relative rounded-[10px] md:rounded-[12px] overflow-hidden group bg-black/20 ${post.media.length === 1 ? 'aspect-auto' : 'aspect-square'
+                    }`}
                 >
                   {item.type === 'image' ? (
-                    <img 
-                      src={item.url} 
-                      alt={`Content ${index + 1}`} 
+                    <img
+                      src={item.url}
+                      alt={`Content ${index + 1}`}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 cursor-pointer"
                       onClick={() => onOpenComments(post)}
                     />
                   ) : (
-                    <VideoPlayer 
-                      src={item.url} 
+                    <VideoPlayer
+                      src={item.url}
                       poster={item.thumbnail_url}
                       className="w-full h-full object-cover"
                     />
                   )}
                 </div>
               ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Interactions - Responsive */}
-      <div className="px-4 md:px-6 pb-3 md:pb-4 flex items-center justify-between">
-        <div className="flex items-center gap-4 md:gap-5">
-            <button 
-                onClick={() => onLike(post.id, post.is_liked)}
-                className={`transition-all hover:scale-110 ${post.is_liked ? '' : 'opacity-60 hover:opacity-100'}`}
+        {/* Interactions - Responsive */}
+        <div className="px-4 md:px-6 pb-3 md:pb-4 flex items-center justify-between">
+          <div className="flex items-center gap-4 md:gap-5">
+            <button
+              onClick={() => onLike(post.id, post.is_liked)}
+              className={`transition-all hover:scale-110 ${post.is_liked ? '' : 'opacity-60 hover:opacity-100'}`}
             >
-                <svg className={`w-[18px] h-[18px] md:w-5 md:h-5 ${post.is_liked ? 'text-primary fill-primary' : 'text-white'}`} viewBox="0 0 24 24" fill={post.is_liked ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                </svg>
+              <svg className={`w-[18px] h-[18px] md:w-5 md:h-5 ${post.is_liked ? 'text-primary fill-primary' : 'text-white'}`} viewBox="0 0 24 24" fill={post.is_liked ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+              </svg>
             </button>
-            <button 
-                onClick={() => onOpenComments(post)}
-                className="opacity-60 hover:opacity-100 transition-all hover:scale-110"
+            <button
+              onClick={() => onOpenComments(post)}
+              className="opacity-60 hover:opacity-100 transition-all hover:scale-110"
             >
-                <svg className="w-[18px] h-[18px] md:w-5 md:h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
-                </svg>
+              <svg className="w-[18px] h-[18px] md:w-5 md:h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+              </svg>
             </button>
-            <button 
-                onClick={() => onShare?.(post)}
-                className="opacity-60 hover:opacity-100 transition-all hover:scale-110"
+            <button
+              onClick={() => onShare?.(post)}
+              className="opacity-60 hover:opacity-100 transition-all hover:scale-110"
             >
-                <svg className="w-[18px] h-[18px] md:w-5 md:h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
-                </svg>
+              <svg className="w-[18px] h-[18px] md:w-5 md:h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
+              </svg>
             </button>
-        </div>
+          </div>
 
-        <button className="opacity-60 hover:opacity-100 transition-all">
+          <button className="opacity-60 hover:opacity-100 transition-all">
             <svg className="w-[18px] h-[18px] md:w-5 md:h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
             </svg>
-        </button>
-      </div>
+          </button>
+        </div>
 
-      {/* Stats and Content - Responsive */}
-      <div className="px-4 md:px-6 pb-4 md:pb-6">
-        {/* Clickable Likes Section - Only show if there are likes */}
-        {post.like_count > 0 && (
-          <button 
-            onClick={() => setShowLikesModal(true)}
-            className="flex items-center gap-2 mb-2 md:mb-3 hover:opacity-80 transition-opacity cursor-pointer"
-          >
+        {/* Stats and Content - Responsive */}
+        <div className="px-4 md:px-6 pb-4 md:pb-6">
+          {/* Clickable Likes Section - Only show if there are likes */}
+          {post.like_count > 0 && (
+            <button
+              onClick={() => setShowLikesModal(true)}
+              className="flex items-center gap-2 mb-2 md:mb-3 hover:opacity-80 transition-opacity cursor-pointer"
+            >
               {/* Show real avatars of recent likers */}
               {post.recent_likers && post.recent_likers.length > 0 && (
                 <div className="flex -space-x-2">
                   {post.recent_likers.slice(0, 3).map((liker) => (
-                    <img 
+                    <img
                       key={liker.id}
-                      src={liker.avatar_url || '/assets/images/home.svg'} 
+                      src={liker.avatar_url || '/assets/images/home.svg'}
                       alt={liker.username}
                       className="w-5 h-5 md:w-6 md:h-6 rounded-full border-2 border-bg-secondary object-cover"
                     />
@@ -269,40 +265,40 @@ export const PostCard: React.FC<PostCardProps> = ({
               <p className="text-white/80 text-[11px] md:text-[13px] text-left">
                 {post.recent_likers && post.recent_likers.length > 0 ? (
                   <>
-                    Liked by <span className="font-semibold">{post.recent_likers[0].username}</span>
+                    <span className="font-semibold">{post.recent_likers[0].username}</span> đã thích
                     {post.like_count > 1 && (
-                      <> and <span className="font-semibold">{post.like_count - 1} {post.like_count === 2 ? 'other' : 'others'}</span></>
+                      <> cùng <span className="font-semibold">{post.like_count - 1} người khác</span></>
                     )}
                   </>
                 ) : (
-                  <>Liked by <span className="font-semibold">{post.like_count}</span> {post.like_count === 1 ? 'person' : 'people'}</>
+                  <><span className="font-semibold">{post.like_count}</span> người thích</>
                 )}
               </p>
-          </button>
-        )}
+            </button>
+          )}
 
 
-        {/* Post Comment Input - Click opens comment modal - Responsive */}
-        <div 
+          {/* Post Comment Input - Click opens comment modal - Responsive */}
+          <div
             className="flex items-center gap-2 md:gap-3 pt-3 md:pt-4 border-t border-white/5 cursor-pointer group"
             onClick={() => onOpenComments(post)}
-        >
-            <img 
-                src={post.author.avatar_url || '/assets/images/home.svg'} 
-                alt="" 
-                className="w-8 h-8 md:w-10 md:h-10 rounded-[8px] md:rounded-[10px] object-cover"
+          >
+            <img
+              src={post.author.avatar_url || '/assets/images/home.svg'}
+              alt=""
+              className="w-8 h-8 md:w-10 md:h-10 rounded-[8px] md:rounded-[10px] object-cover"
             />
             <div className="flex-1 relative">
-                <div className="w-full bg-bg-main/50 h-9 md:h-10 rounded-[8px] md:rounded-[10px] px-3 md:px-4 text-[10px] md:text-[11px] text-[#a5a5a5] flex items-center group-hover:bg-bg-main/70 transition-colors">
-                    Post a comment..
-                </div>
-                <div className="absolute right-1 md:right-1.5 top-1 md:top-1.5 h-6 md:h-7 px-3 md:px-4 rounded-[6px] text-[10px] md:text-[11px] font-semibold bg-primary/20 text-white/40 flex items-center">
-                    Post
-                </div>
+              <div className="w-full bg-bg-main/50 h-9 md:h-10 rounded-[8px] md:rounded-[10px] px-3 md:px-4 text-[10px] md:text-[11px] text-[#a5a5a5] flex items-center group-hover:bg-bg-main/70 transition-colors">
+                Viết bình luận..
+              </div>
+              <div className="absolute right-1 md:right-1.5 top-1 md:top-1.5 h-6 md:h-7 px-3 md:px-4 rounded-[6px] text-[10px] md:text-[11px] font-semibold bg-primary/20 text-white/40 flex items-center">
+                Đăng
+              </div>
             </div>
+          </div>
         </div>
       </div>
-    </div>
     </>
   );
 };

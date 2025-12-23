@@ -14,6 +14,7 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab 
     { id: 'reels', icon: '/assets/images/game.svg', label: 'Games' },
     { id: 'lfg', icon: '/assets/images/chart.svg', label: 'Stats' },
     { id: 'forum', icon: '/assets/images/activity.svg', label: 'Activity' },
+    { id: 'chatbot', icon: '/assets/images/chatbot.svg', label: 'Chatbot' },
     { id: 'profile', icon: '/assets/images/profile.svg', label: 'Profile' },
     { id: 'settings', icon: '/assets/images/setting.svg', label: 'Settings' },
   ];

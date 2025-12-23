@@ -1,0 +1,8 @@
+<svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Friends">
+<circle cx="9" cy="7" r="4" fill="var(--fill-0, #8F8F8F)"/>
+<path d="M17 19C17 16.2386 14.7614 14 12 14H6C3.23858 14 1 16.2386 1 19V21C1 21.5523 1.44772 22 2 22H16C16.5523 22 17 21.5523 17 21V19Z" fill="var(--fill-0, #8F8F8F)"/>
+<circle cx="16" cy="7" r="3" fill="var(--fill-0, #8F8F8F)"/>
+<path d="M23 19C23 17.3431 21.6569 16 20 16H18C17.6494 16 17.3128 16.0602 17 16.1707V21C17 21.5523 17.4477 22 18 22H22C22.5523 22 23 21.5523 23 21V19Z" fill="var(--fill-0, #8F8F8F)"/>
+</g>
+</svg>

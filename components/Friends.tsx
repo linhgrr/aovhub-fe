@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/authContext';
-import { UserPlus, Users, Check, X, Loader, User, Crown, ChevronRight } from 'lucide-react';
+import { UserPlus, Users, Check, X, Loader, User, Crown, ChevronRight, Trash2, MessageCircle } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
@@ -37,6 +37,8 @@ export const Friends: React.FC = () => {
   const [isLoadingFriends, setIsLoadingFriends] = useState(true);
   const [isLoadingPending, setIsLoadingPending] = useState(true);
   const [respondingTo, setRespondingTo] = useState<string | null>(null);
+  const [removingFriend, setRemovingFriend] = useState<string | null>(null);
+  const [friendToRemove, setFriendToRemove] = useState<FriendData | null>(null);
 
   // Fetch friends list
   useEffect(() => {
@@ -119,6 +121,34 @@ export const Friends: React.FC = () => {
     window.location.hash = `profile/${userId}`;
   };
 
+  const handleRemoveFriend = async (userId: string) => {
+    if (!token) return;
+    setRemovingFriend(userId);
+    
+    try {
+      const response = await fetch(`${API_URL}/friends/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        // Remove from friends list
+        setFriends(prev => prev.filter(f => f.id !== userId));
+        setFriendToRemove(null);
+      }
+    } catch (error) {
+      console.error('Failed to remove friend:', error);
+    } finally {
+      setRemovingFriend(null);
+    }
+  };
+
+  const handleMessageFriend = (userId: string) => {
+    window.location.hash = `messages?user=${userId}`;
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -144,7 +174,7 @@ export const Friends: React.FC = () => {
           <Users className="w-8 h-8 text-primary" />
           BẠN BÈ
         </h1>
-        <p className="text-[#7f7f7f] mt-2 font-montserrat text-sm uppercase tracking-widest">Quản lý danh sách bạn bè và lời mời kết bạn</p>
+        <p className="text-[#7f7f7f] mt-2 font-montserrat text-sm uppercase tracking-widest">Danh sách bạn bè và lời mời kết bạn</p>
       </div>
 
       {/* Pending Friend Requests Section */}
@@ -262,11 +292,13 @@ export const Friends: React.FC = () => {
               {friends.map((friend) => (
                 <div 
                   key={friend.id} 
-                  className="p-6 flex items-center gap-4 hover:bg-white/5 transition-colors cursor-pointer group"
-                  onClick={() => handleViewProfile(friend.id)}
+                  className="p-6 flex items-center gap-4 hover:bg-white/5 transition-colors group"
                 >
                   {/* Avatar */}
-                  <div className="w-14 h-14 rounded-[15px] overflow-hidden border-2 border-white/5 group-hover:border-primary transition-colors flex-shrink-0">
+                  <div 
+                    className="w-14 h-14 rounded-[15px] overflow-hidden border-2 border-white/5 group-hover:border-primary transition-colors flex-shrink-0 cursor-pointer"
+                    onClick={() => handleViewProfile(friend.id)}
+                  >
                     <img 
                       src={friend.avatar_url || '/assets/images/home.svg'} 
                       alt={friend.username}
@@ -275,7 +307,10 @@ export const Friends: React.FC = () => {
                   </div>
 
                   {/* Info */}
-                  <div className="flex-1 min-w-0">
+                  <div 
+                    className="flex-1 min-w-0 cursor-pointer"
+                    onClick={() => handleViewProfile(friend.id)}
+                  >
                     <div className="font-montserrat font-bold text-white text-[15px] truncate group-hover:text-primary transition-colors">
                       {friend.username}
                     </div>
@@ -292,9 +327,28 @@ export const Friends: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Arrow */}
-                  <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all group-hover:translate-x-1">
-                    <ChevronRight className="w-4 h-4 text-primary" />
+                  {/* Action Buttons */}
+                  <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMessageFriend(friend.id);
+                      }}
+                      className="w-9 h-9 rounded-lg bg-primary/20 text-primary hover:bg-primary hover:text-white transition-all flex items-center justify-center"
+                      title="Nhắn tin"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setFriendToRemove(friend);
+                      }}
+                      className="w-9 h-9 rounded-lg bg-white/5 text-slate-400 hover:bg-red-500/20 hover:text-red-400 transition-all flex items-center justify-center"
+                      title="Xóa bạn"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
               ))}
@@ -302,6 +356,86 @@ export const Friends: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Remove Friend Confirmation Modal */}
+      {friendToRemove && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            onClick={() => setFriendToRemove(null)}
+          />
+
+          {/* Modal */}
+          <div className="relative bg-slate-800/95 backdrop-blur-md border border-slate-700/50 w-full max-w-md shadow-2xl rounded-xl p-6">
+            <div className="text-center">
+              {/* Icon */}
+              <div className="w-16 h-16 rounded-full bg-red-500/20 mx-auto mb-4 flex items-center justify-center">
+                <Trash2 className="w-8 h-8 text-red-400" />
+              </div>
+
+              {/* Title */}
+              <h3 className="text-xl font-bold text-white mb-2">
+                Xóa bạn bè?
+              </h3>
+
+              {/* Description */}
+              <p className="text-slate-400 mb-6">
+                Bạn có chắc chắn muốn xóa <span className="text-white font-bold">{friendToRemove.username}</span> khỏi danh sách bạn bè?
+              </p>
+
+              {/* Friend Info */}
+              <div className="bg-slate-900/50 rounded-lg p-4 mb-6 flex items-center gap-3">
+                <div className="w-12 h-12 rounded-lg overflow-hidden border border-slate-700">
+                  <img 
+                    src={friendToRemove.avatar_url || '/assets/images/home.svg'} 
+                    alt={friendToRemove.username}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex-1 text-left">
+                  <div className="font-bold text-white">
+                    {friendToRemove.username}
+                  </div>
+                  <div className="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
+                    {friendToRemove.rank && (
+                      <span className="flex items-center gap-1 text-primary/80">
+                        <Crown className="w-3 h-3" />
+                        {RANK_DISPLAY[friendToRemove.rank]}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setFriendToRemove(null)}
+                  disabled={removingFriend === friendToRemove.id}
+                  className="flex-1 bg-slate-800/60 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-lg border border-slate-700/50 hover:border-slate-600 transition-colors disabled:opacity-50"
+                >
+                  Hủy
+                </button>
+                <button
+                  onClick={() => handleRemoveFriend(friendToRemove.id)}
+                  disabled={removingFriend === friendToRemove.id}
+                  className="flex-1 bg-red-500 hover:bg-red-600 disabled:bg-slate-700 disabled:text-slate-500 text-white font-bold py-3 rounded-lg transition-all shadow-lg shadow-red-500/20 hover:shadow-red-500/30 flex items-center justify-center gap-2"
+                >
+                  {removingFriend === friendToRemove.id ? (
+                    <>
+                      <Loader className="w-4 h-4 animate-spin" />
+                      Đang xóa...
+                    </>
+                  ) : (
+                    'Xóa bạn'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

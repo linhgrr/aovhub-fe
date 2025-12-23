@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Users, Clock, Trophy, ChevronLeft, ChevronRight, Filter, Settings, Plus, Eye } from 'lucide-react';
+import { Users, Clock, Trophy, ChevronLeft, ChevronRight, Filter, Settings, Plus, Eye, MessageSquare } from 'lucide-react';
 import { API_BASE_URL } from '../constants';
 import { useAuth } from '../contexts/authContext';
 import { TeamListItem, TeamDetail, TeamsResponse, CreateTeamInput, GameMode } from '../types';
 import { TeamDetailModal } from './TeamDetailModal';
 import { CreateTeamModal } from './CreateTeamModal';
 import { TeamOwnerDashboard } from './TeamOwnerDashboard';
+import { TeamMemberDashboard } from './TeamMemberDashboard';
 
 // Helper to translate rank
 const translateRank = (rank?: string): string => {
@@ -75,6 +76,10 @@ export const LFG: React.FC = () => {
    // My team state
    const [myTeam, setMyTeam] = useState<TeamDetail | null>(null);
    const [showMyTeamDashboard, setShowMyTeamDashboard] = useState(false);
+   
+   // Joined team state (when user is a member but not owner)
+   const [joinedTeam, setJoinedTeam] = useState<TeamDetail | null>(null);
+   const [showJoinedTeamDashboard, setShowJoinedTeamDashboard] = useState(false);
 
    // Countdown refresh
    const [, setTick] = useState(0);
@@ -107,7 +112,7 @@ export const LFG: React.FC = () => {
       }
    }, [token, page, rankFilter]);
 
-   // Fetch my team
+   // Fetch my team (as owner)
    const fetchMyTeam = useCallback(async () => {
       if (!token) return;
 
@@ -127,10 +132,31 @@ export const LFG: React.FC = () => {
       }
    }, [token]);
 
+   // Fetch joined team (as member, not owner)
+   const fetchJoinedTeam = useCallback(async () => {
+      if (!token) return;
+
+      try {
+         const res = await fetch(`${API_BASE_URL}/teams/joined`, {
+            headers: { Authorization: `Bearer ${token}` },
+         });
+
+         if (res.ok) {
+            const data = await res.json();
+            setJoinedTeam(data);
+         } else {
+            setJoinedTeam(null);
+         }
+      } catch (err) {
+         console.error('Error fetching joined team:', err);
+      }
+   }, [token]);
+
    useEffect(() => {
       fetchTeams();
       fetchMyTeam();
-   }, [fetchTeams, fetchMyTeam]);
+      fetchJoinedTeam();
+   }, [fetchTeams, fetchMyTeam, fetchJoinedTeam]);
 
    // Update countdown every second
    useEffect(() => {
@@ -244,6 +270,22 @@ export const LFG: React.FC = () => {
                setShowMyTeamDashboard(false);
                fetchTeams();
                fetchMyTeam();
+               fetchJoinedTeam();
+            }}
+         />
+      );
+   }
+
+   // Show member dashboard if requested
+   if (showJoinedTeamDashboard && joinedTeam) {
+      return (
+         <TeamMemberDashboard
+            teamId={joinedTeam.id}
+            onBack={() => {
+               setShowJoinedTeamDashboard(false);
+               fetchTeams();
+               fetchMyTeam();
+               fetchJoinedTeam();
             }}
          />
       );
@@ -268,6 +310,14 @@ export const LFG: React.FC = () => {
                   >
                      <Settings className="w-4 h-4" />
                      Phòng của tôi
+                  </button>
+               ) : joinedTeam ? (
+                  <button
+                     onClick={() => setShowJoinedTeamDashboard(true)}
+                     className="flex-1 md:flex-none bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-6 rounded-lg transition-all flex items-center justify-center gap-2 border border-blue-500 hover:border-blue-400"
+                  >
+                     <MessageSquare className="w-4 h-4" />
+                     Phòng đã tham gia
                   </button>
                ) : (
                   <button

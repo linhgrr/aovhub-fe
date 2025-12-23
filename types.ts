@@ -251,6 +251,7 @@ export interface TeamDetail extends TeamListItem {
   is_owner: boolean;
   is_member: boolean;
   has_requested: boolean;
+  conversation_id?: string;  // Group chat conversation ID for team members
 }
 
 export interface TeamJoinRequest {

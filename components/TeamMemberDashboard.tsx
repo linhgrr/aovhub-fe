@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ArrowLeft, Users, Clock, Trophy, Target, Check, X, Trash2, ExternalLink, MessageSquare } from 'lucide-react';
+import { ArrowLeft, Users, Clock, Trophy, Target, LogOut, ExternalLink } from 'lucide-react';
 import { API_BASE_URL } from '../constants';
 import { useAuth } from '../contexts/authContext';
-import { TeamDetail, TeamJoinRequest, TeamMemberInfo } from '../types';
+import { TeamDetail, TeamMemberInfo } from '../types';
 import { TeamChat } from './TeamChat';
 
-interface TeamOwnerDashboardProps {
+interface TeamMemberDashboardProps {
     teamId: string;
     onBack: () => void;
 }
@@ -51,22 +51,18 @@ const getRemainingTime = (expiresAt: string): string => {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 };
 
-export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, onBack }) => {
+export const TeamMemberDashboard: React.FC<TeamMemberDashboardProps> = ({ teamId, onBack }) => {
     const { token } = useAuth();
     const [team, setTeam] = useState<TeamDetail | null>(null);
-    const [requests, setRequests] = useState<TeamJoinRequest[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [processingRequest, setProcessingRequest] = useState<string | null>(null);
-    const [removingMember, setRemovingMember] = useState<string | null>(null);
-    const [deletingTeam, setDeletingTeam] = useState(false);
+    const [isLeaving, setIsLeaving] = useState(false);
     const [remainingTime, setRemainingTime] = useState('');
 
     const fetchTeamData = useCallback(async () => {
         if (!token) return;
 
         try {
-            // Fetch team details
             const teamRes = await fetch(`${API_BASE_URL}/teams/${teamId}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -74,15 +70,6 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
             const teamData = await teamRes.json();
             setTeam(teamData);
             setRemainingTime(getRemainingTime(teamData.expires_at));
-
-            // Fetch pending requests
-            const reqRes = await fetch(`${API_BASE_URL}/teams/${teamId}/requests`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            if (reqRes.ok) {
-                const reqData = await reqRes.json();
-                setRequests(reqData.data || []);
-            }
         } catch (err) {
             setError('Không thể tải thông tin team');
             console.error(err);
@@ -104,77 +91,23 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
         return () => clearInterval(interval);
     }, [team]);
 
-    const handleApprove = async (requestId: string) => {
-        if (!token) return;
-        setProcessingRequest(requestId);
+    const handleLeaveTeam = async () => {
+        if (!token || !confirm('Bạn có chắc muốn rời khỏi phòng này?')) return;
+        setIsLeaving(true);
 
         try {
-            const res = await fetch(`${API_BASE_URL}/teams/${teamId}/requests/${requestId}/approve`, {
+            const res = await fetch(`${API_BASE_URL}/teams/${teamId}/leave`, {
                 method: 'POST',
                 headers: { Authorization: `Bearer ${token}` },
             });
             if (!res.ok) {
                 const data = await res.json();
-                throw new Error(data.detail || 'Failed to approve');
+                throw new Error(data.detail || 'Failed to leave');
             }
-            await fetchTeamData();
-        } catch (err: any) {
-            alert(err.message || 'Không thể duyệt yêu cầu');
-        } finally {
-            setProcessingRequest(null);
-        }
-    };
-
-    const handleReject = async (requestId: string) => {
-        if (!token) return;
-        setProcessingRequest(requestId);
-
-        try {
-            const res = await fetch(`${API_BASE_URL}/teams/${teamId}/requests/${requestId}/reject`, {
-                method: 'POST',
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            if (!res.ok) throw new Error('Failed to reject');
-            await fetchTeamData();
-        } catch (err) {
-            alert('Không thể từ chối yêu cầu');
-        } finally {
-            setProcessingRequest(null);
-        }
-    };
-
-    const handleRemoveMember = async (userId: string) => {
-        if (!token || !confirm('Bạn có chắc muốn xóa thành viên này?')) return;
-        setRemovingMember(userId);
-
-        try {
-            const res = await fetch(`${API_BASE_URL}/teams/${teamId}/members/${userId}`, {
-                method: 'DELETE',
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            if (!res.ok) throw new Error('Failed to remove');
-            await fetchTeamData();
-        } catch (err) {
-            alert('Không thể xóa thành viên');
-        } finally {
-            setRemovingMember(null);
-        }
-    };
-
-    const handleDeleteTeam = async () => {
-        if (!token || !confirm('Bạn có chắc muốn đóng phòng này? Thao tác này không thể hoàn tác.')) return;
-        setDeletingTeam(true);
-
-        try {
-            const res = await fetch(`${API_BASE_URL}/teams/${teamId}`, {
-                method: 'DELETE',
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            if (!res.ok) throw new Error('Failed to delete');
             onBack();
-        } catch (err) {
-            alert('Không thể đóng phòng');
-            setDeletingTeam(false);
+        } catch (err: any) {
+            alert(err.message || 'Không thể rời phòng');
+            setIsLeaving(false);
         }
     };
 
@@ -212,25 +145,25 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
                     <span className="font-bold uppercase tracking-wide text-sm">Quay lại</span>
                 </button>
                 <button
-                    onClick={handleDeleteTeam}
-                    disabled={deletingTeam}
-                    className="flex items-center gap-2 bg-red-900/20 text-red-500 hover:bg-red-900/40 hover:text-red-400 pr-4 pl-3 py-2 border border-red-900/50 rounded-lg transition-all disabled:opacity-50 group"
+                    onClick={handleLeaveTeam}
+                    disabled={isLeaving}
+                    className="flex items-center gap-2 bg-slate-700/50 text-slate-400 hover:bg-red-900/40 hover:text-red-400 pr-4 pl-3 py-2 border border-slate-600 hover:border-red-900/50 rounded-lg transition-all disabled:opacity-50 group"
                 >
-                    <Trash2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                    <span className="font-bold uppercase tracking-wide text-sm">{deletingTeam ? 'Đang đóng...' : 'Đóng phòng'}</span>
+                    <LogOut className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                    <span className="font-bold uppercase tracking-wide text-sm">{isLeaving ? 'Đang rời...' : 'Rời phòng'}</span>
                 </button>
             </div>
 
             {/* Team Info Card */}
             <div className="bg-slate-800/60 border border-slate-700/50 p-6 mb-8 relative overflow-hidden shadow-xl rounded-xl">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-                <div className="absolute top-0 left-0 w-1 h-full bg-primary rounded-tl-xl rounded-bl-xl"></div>
+                <div className="absolute top-0 left-0 w-1 h-full bg-blue-500 rounded-tl-xl rounded-bl-xl"></div>
 
                 <div className="flex flex-col md:flex-row items-start justify-between mb-4 relative z-10">
                     <div>
                         <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 border border-primary/20 uppercase tracking-wider font-bold rounded">
-                                Quản lý phòng
+                            <span className="text-xs bg-blue-500/10 text-blue-400 px-2 py-0.5 border border-blue-500/20 uppercase tracking-wider font-bold rounded">
+                                Thành viên
                             </span>
                         </div>
                         <h1 className="text-3xl font-display font-bold text-white uppercase tracking-wide glow-text mb-2">
@@ -262,78 +195,7 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
                 </p>
             </div>
 
-                <div className="grid md:grid-cols-2 gap-8">
-                {/* Pending Requests */}
-                <div className="bg-slate-800/60 border border-slate-700/50 shadow-lg rounded-xl overflow-hidden">
-                    <div className="bg-gradient-to-r from-slate-800 to-slate-900 border-b border-slate-700 p-4 flex items-center justify-between">
-                        <h2 className="text-lg font-bold text-white flex items-center gap-2 uppercase tracking-wide">
-                            <div className="w-2 h-2 bg-primary rotate-45"></div>
-                            Yêu cầu tham gia
-                            <span className="bg-slate-700 text-primary text-xs px-2 py-0.5 rounded-full">{requests.length}</span>
-                        </h2>
-                    </div>
-                    <div className="p-4 space-y-3 h-[400px] overflow-y-auto custom-scrollbar">
-                        {requests.length === 0 ? (
-                            <div className="h-full flex flex-col items-center justify-center text-slate-500 space-y-3">
-                                <Users className="w-12 h-12 opacity-20" />
-                                <p className="font-mono text-sm">Chưa có yêu cầu mới</p>
-                            </div>
-                        ) : (
-                            <div className="space-y-3">
-                                {requests.map((req) => (
-                                    <div key={req.id} className="flex flex-col gap-3 p-4 bg-slate-800/50 border border-slate-700 group hover:border-primary/30 transition-all shadow-sm rounded-lg">
-                                        <div className="flex items-center gap-3">
-                                            <img
-                                                src={req.user.avatar_url || 'https://via.placeholder.com/40'}
-                                                alt={req.user.username}
-                                                className="w-12 h-12 object-cover bg-slate-800 rounded-lg border border-slate-600"
-                                            />
-                                            <div className="flex-1 min-w-0">
-                                                <button
-                                                    onClick={() => handleNavigateToProfile(req.user.id)}
-                                                    className="text-white font-bold hover:text-primary transition-colors flex items-center gap-1 text-base"
-                                                >
-                                                    {req.user.username}
-                                                    <ExternalLink className="w-3 h-3 text-slate-500" />
-                                                </button>
-                                                <div className="flex items-center gap-2 text-xs text-slate-400 font-mono mt-1">
-                                                    <span className="bg-slate-900 px-1.5 py-0.5 border border-slate-700">{translateRank(req.user.rank)}</span>
-                                                    {req.user.win_rate && (
-                                                        <span className="text-green-400 font-bold">WR: {req.user.win_rate.toFixed(1)}%</span>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {req.message && (
-                                            <div className="bg-slate-900/50 p-2 text-xs text-slate-300 italic border-l-2 border-slate-600">
-                                                "{req.message}"
-                                            </div>
-                                        )}
-
-                                        <div className="flex gap-2 mt-1">
-                                            <button
-                                                onClick={() => handleApprove(req.id)}
-                                                disabled={processingRequest === req.id || team.current_members >= team.max_members}
-                                                className="flex-1 py-1.5 bg-green-600 hover:bg-green-500 text-white font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all rounded-lg text-xs uppercase flex items-center justify-center gap-1"
-                                            >
-                                                <Check className="w-3 h-3" /> Duyệt
-                                            </button>
-                                            <button
-                                                onClick={() => handleReject(req.id)}
-                                                disabled={processingRequest === req.id}
-                                                className="flex-1 py-1.5 bg-red-600 hover:bg-red-500 text-white font-bold disabled:opacity-50 transition-all rounded-lg text-xs uppercase flex items-center justify-center gap-1"
-                                            >
-                                                <X className="w-3 h-3" /> Từ chối
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                </div>
-
+            <div className="grid md:grid-cols-2 gap-8">
                 {/* Current Members */}
                 <div className="bg-slate-800/60 border border-slate-700/50 shadow-lg rounded-xl overflow-hidden">
                     <div className="bg-gradient-to-r from-slate-800 to-slate-900 border-b border-slate-700 p-4 flex items-center justify-between">
@@ -343,7 +205,7 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
                             <span className="bg-slate-700 text-blue-400 text-xs px-2 py-0.5 rounded-full">{team.members.length}/{team.max_members}</span>
                         </h2>
                     </div>
-                    <div className="p-4 space-y-2 h-[400px] overflow-y-auto custom-scrollbar">
+                    <div className="p-4 space-y-2 max-h-[400px] overflow-y-auto custom-scrollbar">
                         {team.members.map((member: TeamMemberInfo, index: number) => (
                             <div
                                 key={member.id}
@@ -385,16 +247,6 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
                                         )}
                                     </div>
                                 </div>
-                                {index > 0 && (
-                                    <button
-                                        onClick={() => handleRemoveMember(member.user_id)}
-                                        disabled={removingMember === member.user_id}
-                                        className="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-red-500 hover:bg-red-500/10 rounded transition-all"
-                                        title="Xóa thành viên"
-                                    >
-                                        <X className="w-5 h-5" />
-                                    </button>
-                                )}
                             </div>
                         ))}
 
@@ -409,18 +261,17 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
                         ))}
                     </div>
                 </div>
-            </div>
 
-            {/* Team Chat Section */}
-            {team.conversation_id && (
-                <div className="mt-8">
+                {/* Team Chat */}
+                {team.conversation_id && (
                     <TeamChat
                         conversationId={team.conversation_id}
                         teamName={team.name}
                         className="h-[500px]"
                     />
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 };
+

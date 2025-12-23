@@ -14,6 +14,7 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab 
     { id: 'reels', icon: '/assets/images/game.svg', label: 'Trò chơi' },
     { id: 'lfg', icon: '/assets/images/chart.svg', label: 'Thống kê' },
     { id: 'forum', icon: '/assets/images/activity.svg', label: 'Hoạt động' },
+    { id: 'friends', icon: '/assets/images/friends.svg', label: 'Bạn bè' },
     { id: 'profile', icon: '/assets/images/profile.svg', label: 'Hồ sơ' },
     { id: 'settings', icon: '/assets/images/setting.svg', label: 'Cài đặt' },
   ];
@@ -87,7 +88,7 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab 
       {/* Mobile Navigation */}
       <nav className="fixed bottom-0 left-0 w-full bg-bg-main/95 backdrop-blur-md border-t border-white/5 md:hidden z-50 px-6 py-3">
         <div className="flex justify-between items-center">
-          {navItems.slice(0, 4).map((item) => {
+          {navItems.slice(0, 5).map((item) => {
             const isActive = activeTab === item.id;
             return (
               <button

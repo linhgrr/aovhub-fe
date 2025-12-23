@@ -623,7 +623,7 @@ export const RightSidebar: React.FC = () => {
             {/* Online Friends Section - Messenger Style */}
             <div className="bg-bg-secondary rounded-[20px] p-5 shadow-xl flex-1 min-h-0 flex flex-col">
                 <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-montserrat font-semibold text-[14px] text-white/90">
+                    <h3 className="font-montserrat font-extrabold text-[13px] text-white uppercase tracking-wider">
                         Người liên hệ
                     </h3>
                     <div className="flex items-center gap-3">

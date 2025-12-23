@@ -20,14 +20,17 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(muted);
+  const [volume, setVolume] = useState(muted ? 0 : 0.5);
+  const [prevVolume, setPrevVolume] = useState(0.5);
+  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [showControls, setShowControls] = useState(true);
   const [quality, setQuality] = useState(-1); // -1 = auto
-  const [availableQualities, setAvailableQualities] = useState<{height: number; index: number}[]>([]);
+  const [availableQualities, setAvailableQualities] = useState<{ height: number; index: number }[]>([]);
   const [showQualityMenu, setShowQualityMenu] = useState(false);
 
   useEffect(() => {
@@ -42,10 +45,10 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
             enableWorker: true,
             lowLatencyMode: true,
           });
-          
+
           hls.loadSource(src);
           hls.attachMedia(video);
-          
+
           hls.on(Hls.Events.MANIFEST_PARSED, () => {
             // Get available quality levels
             const levels = hls.levels.map((level, index) => ({
@@ -53,31 +56,31 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
               index,
             }));
             setAvailableQualities(levels);
-            
+
             if (autoPlay) {
-              video.play().catch(() => {});
+              video.play().catch(() => { });
             }
           });
-          
+
           hls.on(Hls.Events.ERROR, (event, data) => {
             if (data.fatal) {
               console.error('HLS fatal error:', data);
             }
           });
-          
+
           hlsRef.current = hls;
         } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
           // Safari native HLS support
           video.src = src;
           if (autoPlay) {
-            video.play().catch(() => {});
+            video.play().catch(() => { });
           }
         }
       } else {
         // Regular video file
         video.src = src;
         if (autoPlay) {
-          video.play().catch(() => {});
+          video.play().catch(() => { });
         }
       }
     };
@@ -129,8 +132,39 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     const video = videoRef.current;
     if (!video) return;
 
-    video.muted = !isMuted;
-    setIsMuted(!isMuted);
+    if (isMuted) {
+      // Unmute: restore previous volume
+      const newVolume = prevVolume > 0 ? prevVolume : 0.5;
+      video.volume = newVolume;
+      video.muted = false;
+      setVolume(newVolume);
+      setIsMuted(false);
+    } else {
+      // Mute: save current volume and set to 0
+      setPrevVolume(volume);
+      video.volume = 0;
+      video.muted = true;
+      setVolume(0);
+      setIsMuted(true);
+    }
+  };
+
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const newVolume = Number(e.target.value);
+    video.volume = newVolume;
+    setVolume(newVolume);
+
+    if (newVolume === 0) {
+      video.muted = true;
+      setIsMuted(true);
+    } else {
+      video.muted = false;
+      setIsMuted(false);
+      setPrevVolume(newVolume);
+    }
   };
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -168,7 +202,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   };
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className={`relative bg-black group ${className}`}
       onMouseEnter={() => setShowControls(true)}
@@ -185,7 +219,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
       {/* Play overlay for initial state */}
       {!isPlaying && (
-        <div 
+        <div
           className="absolute inset-0 flex items-center justify-center cursor-pointer"
           onClick={togglePlay}
         >
@@ -196,10 +230,9 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
       )}
 
       {/* Controls bar */}
-      <div 
-        className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 transition-opacity ${
-          showControls || !isPlaying ? 'opacity-100' : 'opacity-0'
-        }`}
+      <div
+        className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 transition-opacity ${showControls || !isPlaying ? 'opacity-100' : 'opacity-0'
+          }`}
       >
         {/* Progress bar */}
         <input
@@ -223,10 +256,34 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
               {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
             </button>
 
-            {/* Volume */}
-            <button onClick={toggleMute} className="text-white hover:text-gold-400 transition-colors">
-              {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-            </button>
+            {/* Volume Control */}
+            <div
+              className="relative flex items-center gap-2"
+              onMouseEnter={() => setShowVolumeSlider(true)}
+              onMouseLeave={() => setShowVolumeSlider(false)}
+            >
+              <button onClick={toggleMute} className="text-white hover:text-gold-400 transition-colors">
+                {isMuted || volume === 0 ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+              </button>
+
+              {/* Volume Slider */}
+              <div className={`flex items-center transition-all duration-200 overflow-hidden ${showVolumeSlider ? 'w-20 opacity-100' : 'w-0 opacity-0'}`}>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  value={volume}
+                  onChange={handleVolumeChange}
+                  className="w-full h-1 bg-white/30 rounded-lg appearance-none cursor-pointer
+                    [&::-webkit-slider-thumb]:appearance-none
+                    [&::-webkit-slider-thumb]:w-3
+                    [&::-webkit-slider-thumb]:h-3
+                    [&::-webkit-slider-thumb]:rounded-full
+                    [&::-webkit-slider-thumb]:bg-gold-500"
+                />
+              </div>
+            </div>
 
             {/* Time */}
             <span className="text-white text-sm">
@@ -238,7 +295,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
             {/* Quality selector */}
             {availableQualities.length > 0 && (
               <div className="relative">
-                <button 
+                <button
                   onClick={() => setShowQualityMenu(!showQualityMenu)}
                   className="text-white hover:text-gold-400 transition-colors flex items-center gap-1"
                 >
@@ -252,9 +309,8 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   <div className="absolute bottom-full right-0 mb-2 bg-slate-900 border border-slate-700 rounded-lg overflow-hidden">
                     <button
                       onClick={() => handleQualityChange(-1)}
-                      className={`block w-full px-4 py-2 text-left text-sm hover:bg-slate-800 ${
-                        quality === -1 ? 'text-gold-400' : 'text-white'
-                      }`}
+                      className={`block w-full px-4 py-2 text-left text-sm hover:bg-slate-800 ${quality === -1 ? 'text-gold-400' : 'text-white'
+                        }`}
                     >
                       Auto
                     </button>
@@ -262,9 +318,8 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                       <button
                         key={q.index}
                         onClick={() => handleQualityChange(q.index)}
-                        className={`block w-full px-4 py-2 text-left text-sm hover:bg-slate-800 ${
-                          quality === q.index ? 'text-gold-400' : 'text-white'
-                        }`}
+                        className={`block w-full px-4 py-2 text-left text-sm hover:bg-slate-800 ${quality === q.index ? 'text-gold-400' : 'text-white'
+                          }`}
                       >
                         {q.height}p
                       </button>

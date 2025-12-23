@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Loader2, AlertCircle, Plus, Volume2, VolumeX, Play, Pause, MessageCircle, Share2, Bookmark, ChevronUp, ChevronDown } from 'lucide-react';
 import { CreateReel } from './CreateReel';
 import { MyReelsPanel } from './MyReelsPanel';
+import { ReelCommentsPanel } from './ReelCommentsPanel';
 
 interface ReelData {
   id: string;
@@ -43,9 +44,13 @@ export const Reels: React.FC = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showMyReelsPanel, setShowMyReelsPanel] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
+  const [volume, setVolume] = useState(0.5);
+  const [prevVolume, setPrevVolume] = useState(0.5);
+  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showHeartAnimation, setShowHeartAnimation] = useState(false);
+  const [showCommentsPanel, setShowCommentsPanel] = useState(false);
 
   const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
   const containerRef = useRef<HTMLDivElement>(null);
@@ -70,6 +75,7 @@ export const Reels: React.FC = () => {
       if (video) {
         if (index === currentIndex) {
           video.muted = isMuted;
+          video.volume = isMuted ? 0 : volume;
           if (!isPaused) {
             video.play().catch(err => console.error('Play error:', err));
           }
@@ -79,7 +85,7 @@ export const Reels: React.FC = () => {
         }
       }
     });
-  }, [currentIndex, reels, isMuted, isPaused]);
+  }, [currentIndex, reels, isMuted, isPaused, volume]);
 
   // Progress bar update
   useEffect(() => {
@@ -363,7 +369,7 @@ export const Reels: React.FC = () => {
       >
         {/* Progress Bar */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-white/10 z-30">
-          <div 
+          <div
             className="h-full bg-primary transition-all duration-100"
             style={{ width: `${progress}%` }}
           />
@@ -381,13 +387,12 @@ export const Reels: React.FC = () => {
           {reels.map((reel, index) => (
             <div
               key={reel.id}
-              className={`absolute inset-0 transition-all duration-400 ease-out ${
-                index === currentIndex 
-                  ? 'opacity-100 scale-100 z-10' 
-                  : index < currentIndex 
-                    ? 'opacity-0 -translate-y-full z-0' 
-                    : 'opacity-0 translate-y-full z-0'
-              }`}
+              className={`absolute inset-0 transition-all duration-400 ease-out ${index === currentIndex
+                ? 'opacity-100 scale-100 z-10'
+                : index < currentIndex
+                  ? 'opacity-0 -translate-y-full z-0'
+                  : 'opacity-0 translate-y-full z-0'
+                }`}
               onClick={handleVideoClick}
             >
               <video
@@ -409,12 +414,12 @@ export const Reels: React.FC = () => {
         {/* Heart Animation (Double Tap) */}
         {showHeartAnimation && (
           <div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none">
-            <svg 
+            <svg
               className="w-24 h-24 text-red-500 animate-ping"
-              viewBox="0 0 24 24" 
+              viewBox="0 0 24 24"
               fill="currentColor"
             >
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
             </svg>
           </div>
         )}
@@ -436,7 +441,7 @@ export const Reels: React.FC = () => {
             className="w-10 h-10 bg-bg-secondary/80 backdrop-blur-md rounded-[12px] flex items-center justify-center hover:bg-bg-secondary transition-all"
           >
             <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
             </svg>
           </button>
 
@@ -452,7 +457,7 @@ export const Reels: React.FC = () => {
         {/* Right Side Actions */}
         <div className="absolute right-4 bottom-32 flex flex-col items-center gap-6 z-20">
           {/* User Avatar */}
-          <a 
+          <a
             href={`#profile/${currentReel.user_id}`}
             className="relative"
           >
@@ -477,24 +482,26 @@ export const Reels: React.FC = () => {
             onClick={() => handleLike(currentReel.id)}
             className="flex flex-col items-center gap-1 group"
           >
-            <div className={`w-12 h-12 rounded-[14px] flex items-center justify-center transition-all ${
-              currentReel.is_liked ? 'bg-red-500/20' : 'bg-white/10 group-hover:bg-white/20'
-            }`}>
-              <svg 
+            <div className={`w-12 h-12 rounded-[14px] flex items-center justify-center transition-all ${currentReel.is_liked ? 'bg-red-500/20' : 'bg-white/10 group-hover:bg-white/20'
+              }`}>
+              <svg
                 className={`w-6 h-6 transition-all ${currentReel.is_liked ? 'text-red-500 scale-110' : 'text-white'}`}
-                viewBox="0 0 24 24" 
-                fill={currentReel.is_liked ? "currentColor" : "none"} 
-                stroke="currentColor" 
+                viewBox="0 0 24 24"
+                fill={currentReel.is_liked ? "currentColor" : "none"}
+                stroke="currentColor"
                 strokeWidth="2"
               >
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
               </svg>
             </div>
             <span className="text-white text-[11px] font-semibold">{formatNumber(currentReel.likes_count)}</span>
           </button>
 
           {/* Comment Button */}
-          <button className="flex flex-col items-center gap-1 group">
+          <button
+            onClick={() => setShowCommentsPanel(true)}
+            className="flex flex-col items-center gap-1 group"
+          >
             <div className="w-12 h-12 rounded-[14px] bg-white/10 group-hover:bg-white/20 flex items-center justify-center transition-all">
               <MessageCircle className="w-6 h-6 text-white" />
             </div>
@@ -535,13 +542,59 @@ export const Reels: React.FC = () => {
 
           {/* Audio & Controls */}
           <div className="flex items-center gap-4">
-            <button 
-              onClick={() => setIsMuted(!isMuted)}
-              className="flex items-center gap-2 text-white/70 hover:text-white transition-colors"
+            {/* Volume Control */}
+            <div
+              className="relative flex items-center gap-2"
+              onMouseEnter={() => setShowVolumeSlider(true)}
+              onMouseLeave={() => setShowVolumeSlider(false)}
             >
-              {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-              <span className="text-[11px]">Âm thanh gốc</span>
-            </button>
+              <button
+                onClick={() => {
+                  if (isMuted) {
+                    // Unmute: restore previous volume
+                    const newVol = prevVolume > 0 ? prevVolume : 0.5;
+                    setVolume(newVol);
+                    setIsMuted(false);
+                  } else {
+                    // Mute: save current and set to 0
+                    setPrevVolume(volume);
+                    setVolume(0);
+                    setIsMuted(true);
+                  }
+                }}
+                className="flex items-center gap-2 text-white/70 hover:text-white transition-colors"
+              >
+                {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                <span className="text-[11px]">Âm thanh gốc</span>
+              </button>
+
+              {/* Volume Slider */}
+              <div className={`flex items-center transition-all duration-200 overflow-hidden ${showVolumeSlider ? 'w-20 opacity-100' : 'w-0 opacity-0'}`}>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  value={isMuted ? 0 : volume}
+                  onChange={(e) => {
+                    const newVol = Number(e.target.value);
+                    setVolume(newVol);
+                    if (newVol === 0) {
+                      setIsMuted(true);
+                    } else {
+                      setIsMuted(false);
+                      setPrevVolume(newVol);
+                    }
+                  }}
+                  className="w-full h-1 bg-white/30 rounded-lg appearance-none cursor-pointer
+                    [&::-webkit-slider-thumb]:appearance-none
+                    [&::-webkit-slider-thumb]:w-3
+                    [&::-webkit-slider-thumb]:h-3
+                    [&::-webkit-slider-thumb]:rounded-full
+                    [&::-webkit-slider-thumb]:bg-primary"
+                />
+              </div>
+            </div>
 
             <button
               onClick={togglePlayPause}
@@ -578,6 +631,18 @@ export const Reels: React.FC = () => {
           <span className="text-white/30 text-[10px]">Vuốt lên/xuống để xem thêm</span>
         </div>
       </div>
+
+      {/* Comments Panel */}
+      <ReelCommentsPanel
+        reelId={currentReel.id}
+        isOpen={showCommentsPanel}
+        onClose={() => setShowCommentsPanel(false)}
+        onCommentCountUpdate={(count) => {
+          setReels(prev => prev.map(r =>
+            r.id === currentReel.id ? { ...r, comments_count: count } : r
+          ));
+        }}
+      />
     </>
   );
 };

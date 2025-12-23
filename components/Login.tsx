@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, Mail, Lock, Sword, AlertCircle, Loader } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, AlertCircle, Loader } from 'lucide-react';
 import { useAuth } from '../contexts/authContext';
 
 interface LoginFormData {
@@ -103,14 +103,12 @@ export const Login: React.FC = () => {
       <div className="max-w-md w-full">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="relative">
-              <div className="absolute inset-0 bg-primary blur-md opacity-30"></div>
-              <Sword className="text-primary w-10 h-10 relative z-10 rotate-45" strokeWidth={2.5} />
-            </div>
-            <h1 className="text-4xl font-bakbak font-bold text-white tracking-wider uppercase">
-              ARENA<span className="text-primary glow-primary">HUB</span>
-            </h1>
+          <div className="flex items-center justify-center mb-4">
+            <img 
+              src="https://i.ibb.co/sd1N0NYW/image-removebg-preview-removebg-preview-1.png" 
+              alt="Arena Hub Logo" 
+              className="h-20 w-auto object-contain"
+            />
           </div>
           <h2 className="text-2xl font-montserrat font-bold text-white mb-2">ĐĂNG NHẬP</h2>
           <p className="text-[#7f7f7f] text-sm font-montserrat">Chào mừng trở lại, chiến binh!</p>

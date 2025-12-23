@@ -15,9 +15,10 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { Reels } from './components/Reels';
 import { SearchResults } from './components/SearchResults';
 import { RightSidebar } from './components/RightSidebar';
+import { Chatbot } from './components/Chatbot';
 import { AuthProvider, useAuth } from './contexts/authContext';
 
-type Route = 'feed' | 'reels' | 'lfg' | 'friends' | 'profile' | 'settings' | 'register' | 'login' | 'forum' | 'forum-category' | 'forum-thread' | 'admin' | 'search';
+type Route = 'feed' | 'reels' | 'lfg' | 'friends' | 'profile' | 'settings' | 'register' | 'login' | 'forum' | 'forum-category' | 'forum-thread' | 'admin' | 'search' | 'chatbot';
 
 const AppContent: React.FC = () => {
   const [currentRoute, setCurrentRoute] = useState<Route>('feed');
@@ -112,6 +113,7 @@ const AppContent: React.FC = () => {
       case 'forum-thread': return <ForumThreadPage threadId={forumThreadId || ''} />;
       case 'admin': return <AdminDashboard />;
       case 'search': return <SearchResults query={searchQuery} onNavigate={handleTabChange} />;
+      case 'chatbot': return <Chatbot />;
       default: return <Feed />;
     }
   };

@@ -294,52 +294,55 @@ export const LFG: React.FC = () => {
    return (
       <div className="max-w-3xl mx-auto p-4 pb-24 md:pb-8 w-full pt-6">
          {/* Header */}
-         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-            <div>
-               <h2 className="text-3xl font-display font-bold text-white uppercase tracking-wider">Sảnh Chờ</h2>
-               <div className="flex items-center gap-2 mt-1">
-                  <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_5px_#22c55e]"></span>
-                  <p className="text-slate-400 text-sm font-mono tracking-wide">{total} phòng đang mở</p>
+         <header className="bg-bg-secondary rounded-[16px] border border-white/5 p-4 md:p-6 mb-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+               <div>
+                  <span className="text-primary text-[13px] font-medium tracking-wide">Tìm Đồng Đội</span>
+                  <h2 className="text-white text-[22px] md:text-[28px] font-bold mt-1 tracking-tight">Sảnh Chờ 🎮</h2>
+                  <div className="flex items-center gap-2 mt-2">
+                     <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                     <p className="text-white/40 text-[13px]">{total} phòng đang mở</p>
+                  </div>
                </div>
-            </div>
-            <div className="flex gap-2 w-full md:w-auto">
-               {myTeam ? (
-                  <button
-                     onClick={() => setShowMyTeamDashboard(true)}
-                     className="flex-1 md:flex-none bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 px-6 rounded-lg transition-all flex items-center justify-center gap-2 border border-slate-600 hover:border-slate-500"
-                  >
-                     <Settings className="w-4 h-4" />
-                     Phòng của tôi
-                  </button>
-               ) : joinedTeam ? (
-                  <button
-                     onClick={() => setShowJoinedTeamDashboard(true)}
-                     className="flex-1 md:flex-none bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-6 rounded-lg transition-all flex items-center justify-center gap-2 border border-blue-500 hover:border-blue-400"
-                  >
-                     <MessageSquare className="w-4 h-4" />
-                     Phòng đã tham gia
-                  </button>
-               ) : (
-                  <button
-                     onClick={() => setShowCreateModal(true)}
-                     className="flex-1 md:flex-none bg-primary hover:bg-primary/90 text-white font-bold py-2.5 px-8 rounded-lg shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all hover:scale-105 flex items-center justify-center gap-2"
-                  >
-                     <Plus className="w-4 h-4" />
-                     TẠO PHÒNG
-                  </button>
-               )}
+               <div className="flex gap-2 w-full md:w-auto">
+                  {myTeam ? (
+                     <button
+                        onClick={() => setShowMyTeamDashboard(true)}
+                        className="flex-1 md:flex-none bg-white/5 hover:bg-white/10 text-white font-semibold py-2.5 px-6 rounded-full transition-all flex items-center justify-center gap-2 border border-white/10 hover:border-white/20 text-[13px]"
+                     >
+                        <Settings className="w-4 h-4" />
+                        Phòng của tôi
+                     </button>
+                  ) : joinedTeam ? (
+                     <button
+                        onClick={() => setShowJoinedTeamDashboard(true)}
+                        className="flex-1 md:flex-none bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-semibold py-2.5 px-6 rounded-full transition-all flex items-center justify-center gap-2 border border-blue-500/30 text-[13px]"
+                     >
+                        <MessageSquare className="w-4 h-4" />
+                        Phòng đã tham gia
+                     </button>
+                  ) : (
+                     <button
+                        onClick={() => setShowCreateModal(true)}
+                        className="flex-1 md:flex-none bg-primary hover:bg-primary/90 text-white font-semibold py-2.5 px-6 rounded-full shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 text-[13px]"
+                     >
+                        <Plus className="w-4 h-4" />
+                        Tạo phòng
+                     </button>
+                  )}
+               </div>
             </div>
          </header>
 
          {/* Filters */}
-         <div className="flex items-center gap-4 mb-6 bg-slate-800/60 p-3 rounded-xl border border-slate-700/50 backdrop-blur-sm">
+         <div className="flex items-center gap-4 mb-6 bg-bg-secondary p-3 rounded-[12px] border border-white/5">
             <div className="flex items-center gap-2 px-2">
                <Filter className="w-4 h-4 text-primary" />
-               <span className="text-sm font-bold text-slate-400 uppercase mr-2">Bộ lọc:</span>
+               <span className="text-[13px] font-medium text-white/40 mr-2">Bộ lọc:</span>
                <select
                   value={rankFilter}
                   onChange={handleRankFilterChange}
-                  className="bg-slate-800 border border-slate-600 text-white px-3 py-1.5 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all font-mono rounded-lg"
+                  className="bg-black/30 border border-white/10 text-white px-3 py-1.5 text-[13px] focus:border-primary/50 focus:outline-none transition-all rounded-lg"
                >
                   {RANK_OPTIONS.map(opt => (
                      <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -352,54 +355,50 @@ export const LFG: React.FC = () => {
          {loading ? (
             <div className="flex items-center justify-center h-64">
                <div className="relative">
-                  <div className="w-12 h-12 border-4 border-slate-700 rounded-full"></div>
+                  <div className="w-12 h-12 border-4 border-white/10 rounded-full"></div>
                   <div className="absolute top-0 left-0 w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
                </div>
             </div>
          ) : teams.length === 0 ? (
-            <div className="border border-dashed border-slate-700/50 p-12 text-center bg-slate-800/60 backdrop-blur-sm rounded-xl">
-               <div className="w-20 h-20 bg-slate-800/50 rounded-full mx-auto flex items-center justify-center mb-6 border border-slate-700">
-                  <Users className="w-10 h-10 text-slate-500" />
+            <div className="bg-bg-secondary rounded-[16px] border border-white/5 p-12 text-center">
+               <div className="w-20 h-20 bg-white/5 rounded-full mx-auto flex items-center justify-center mb-6">
+                  <Users className="w-10 h-10 text-white/20" />
                </div>
-               <h3 className="text-xl font-bold font-display text-white mb-2 uppercase tracking-wide">Không tìm thấy phòng</h3>
-               <p className="text-slate-400">
+               <h3 className="text-lg font-semibold text-white mb-2">Không tìm thấy phòng</h3>
+               <p className="text-white/40 text-[13px]">
                   {rankFilter ? 'Thử thay đổi bộ lọc hoặc ' : ''}Hãy tạo phòng mới để tìm đồng đội!
                </p>
             </div>
          ) : (
-            <div className="grid gap-4">
+            <div className="space-y-4">
                {teams.map(team => {
                   const remaining = getRemainingTime(team.expires_at);
                   return (
-                     <div key={team.id} className="bg-slate-800/60 relative border border-slate-700/50 hover:border-primary/30 rounded-xl transition-all duration-200 group overflow-hidden shadow-lg">
-                        {/* Background accent */}
-                        <div className="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-slate-800/80 to-transparent skew-x-12 translate-x-12 group-hover:translate-x-6 transition-transform duration-500"></div>
-                        <div className="absolute left-0 bottom-0 w-1 h-0 bg-primary group-hover:h-full transition-all duration-300"></div>
-
-                        <div className="p-5 relative z-10 flex flex-col md:flex-row gap-6">
+                     <div key={team.id} className="bg-bg-secondary relative border border-white/5 hover:border-primary/30 rounded-[16px] transition-all duration-300 group overflow-hidden">
+                        <div className="p-4 md:p-5 relative z-10 flex flex-col md:flex-row gap-4 md:gap-6">
                            {/* Left: Owner Info */}
-                           <div className="flex flex-row md:flex-col items-center md:items-start gap-4 md:w-1/5 md:min-w-[150px] border-b md:border-b-0 md:border-r border-slate-800 pb-4 md:pb-0 md:pr-4">
+                           <div className="flex flex-row md:flex-col items-center md:items-start gap-4 md:w-1/5 md:min-w-[140px] border-b md:border-b-0 md:border-r border-white/5 pb-4 md:pb-0 md:pr-4">
                               <div className="relative group-hover:scale-105 transition-transform">
                                  <img
                                     src={team.owner.avatar_url || 'https://via.placeholder.com/56'}
                                     alt={team.owner.username}
-                                    className="w-16 h-16 object-cover bg-slate-800 rounded-lg border-2 border-slate-600 group-hover:border-primary transition-colors"
+                                    className="w-14 h-14 object-cover rounded-full ring-2 ring-white/5 group-hover:ring-primary/30 transition-colors"
                                  />
-                                 <div className="absolute -bottom-1 -right-2 bg-primary/20 text-[10px] text-primary border border-primary/50 px-1.5 py-0.5 font-bold uppercase tracking-wider rounded backdrop-blur-sm">
-                                    Chủ phòng
+                                 <div className="absolute -bottom-1 -right-1 bg-primary/20 text-[9px] text-primary px-1.5 py-0.5 font-medium rounded-full">
+                                    Host
                                  </div>
                               </div>
                               <div>
-                                 <h3 className="font-display font-bold text-white text-lg leading-tight truncate max-w-[150px]">{team.owner.username}</h3>
+                                 <h3 className="font-semibold text-white text-[14px] leading-tight truncate max-w-[120px]">{team.owner.username}</h3>
                                  {team.owner.win_rate && (
-                                    <div className="text-xs font-mono text-slate-400 mt-1">
-                                       WR: <span className="text-green-400 font-bold">{team.owner.win_rate.toFixed(1)}%</span>
+                                    <div className="text-[11px] text-white/40 mt-1">
+                                       WR: <span className="text-green-400 font-semibold">{team.owner.win_rate.toFixed(1)}%</span>
                                     </div>
                                  )}
-                                 <div className="mt-2 text-center">
-                                    <span className={`inline-block text-[10px] px-2 py-0.5 border rounded uppercase font-bold tracking-wider ${team.rank === 'DIAMOND' || team.rank === 'MASTER' || team.rank === 'CONQUEROR'
-                                       ? 'bg-purple-900/30 text-purple-400 border-purple-500/50'
-                                       : 'bg-slate-800 text-slate-300 border-slate-600'
+                                 <div className="mt-2">
+                                    <span className={`inline-block text-[10px] px-2 py-0.5 rounded-full font-medium ${team.rank === 'DIAMOND' || team.rank === 'MASTER' || team.rank === 'CONQUEROR'
+                                       ? 'bg-purple-500/20 text-purple-400'
+                                       : 'bg-white/5 text-white/60'
                                        }`}>
                                        {translateRank(team.rank)}
                                     </span>
@@ -408,49 +407,46 @@ export const LFG: React.FC = () => {
                            </div>
 
                            {/* Middle: Team Info */}
-                           <div className="flex-1 flex flex-col justify-between py-1">
+                           <div className="flex-1 flex flex-col justify-between">
                               <div>
                                  <div className="flex items-center gap-2 mb-2">
                                     <Trophy className="w-4 h-4 text-primary" />
-                                    <span className="text-xs font-bold text-primary uppercase tracking-widest">{team.game_mode}</span>
+                                    <span className="text-[11px] font-semibold text-primary">{team.game_mode}</span>
                                     {remaining.urgent && (
-                                       <span className="text-[10px] bg-red-500/10 text-red-500 border border-red-500/20 px-1 ml-auto animate-pulse font-bold">SẮP HẾT HẠN</span>
+                                       <span className="text-[10px] bg-red-500/10 text-red-400 px-2 py-0.5 rounded-full ml-auto animate-pulse font-medium">Sắp hết hạn</span>
                                     )}
                                  </div>
-                                 <h4 className="text-white font-bold text-xl mb-2 font-display tracking-wide">{team.name}</h4>
-                                 <div className="relative pl-4 py-1">
-                                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary/30"></div>
-                                    <p className="text-slate-300 text-sm italic line-clamp-2 leading-relaxed">
-                                       "{team.description}"
-                                    </p>
-                                 </div>
+                                 <h4 className="text-white font-semibold text-[16px] md:text-[18px] mb-2">{team.name}</h4>
+                                 <p className="text-white/40 text-[13px] line-clamp-2 leading-relaxed">
+                                    {team.description}
+                                 </p>
                               </div>
 
-                              <div className="flex gap-6 mt-4 text-xs font-mono border-t border-slate-800/50 pt-3">
-                                 <span className={`flex items-center gap-1.5 font-bold ${remaining.urgent ? 'text-red-400' : 'text-slate-400'}`}>
+                              <div className="flex gap-4 mt-4 text-[12px] border-t border-white/5 pt-3">
+                                 <span className={`flex items-center gap-1.5 font-medium ${remaining.urgent ? 'text-red-400' : 'text-white/40'}`}>
                                     <Clock className="w-3.5 h-3.5" />
                                     {remaining.text}
                                  </span>
-                                 <span className="flex items-center gap-1.5 text-blue-400 font-bold">
+                                 <span className="flex items-center gap-1.5 text-blue-400 font-medium">
                                     <Users className="w-3.5 h-3.5" />
-                                    {team.current_members}/{team.max_members} SLOTS
+                                    {team.current_members}/{team.max_members}
                                  </span>
                               </div>
                            </div>
 
                            {/* Right: Actions */}
-                           <div className="flex flex-row md:flex-col justify-end md:justify-center items-center gap-2 min-w-[140px]">
+                           <div className="flex flex-row md:flex-col justify-end md:justify-center items-center gap-2">
                               <button
                                  onClick={() => handleViewDetail(team.id)}
                                  disabled={loadingTeamDetail === team.id}
-                                 className="flex-1 md:w-full bg-slate-700/60 hover:bg-slate-700 border border-slate-600/50 hover:border-primary/30 text-white font-bold py-3 px-4 rounded-lg transition-all text-sm flex items-center justify-center gap-2 uppercase tracking-wider"
+                                 className="flex-1 md:w-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary/30 text-white font-medium py-2.5 px-4 rounded-full transition-all text-[13px] flex items-center justify-center gap-2"
                               >
                                  {loadingTeamDetail === team.id ? (
-                                    <div className="w-4 h-4 border-2 border-slate-400 border-t-white rounded-full animate-spin" />
+                                    <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
                                  ) : (
                                     <>
                                        <Eye className="w-4 h-4" />
-                                       CHI TIẾT
+                                       Chi tiết
                                     </>
                                  )}
                               </button>
@@ -468,17 +464,17 @@ export const LFG: React.FC = () => {
                <button
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="w-10 h-10 flex items-center justify-center bg-slate-800 border border-slate-700 text-slate-400 hover:text-white hover:border-primary/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all rounded-lg"
+                  className="w-10 h-10 flex items-center justify-center bg-bg-secondary border border-white/5 text-white/40 hover:text-white hover:border-primary/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all rounded-full"
                >
                   <ChevronLeft className="w-5 h-5" />
                </button>
-               <span className="text-slate-400 font-mono text-sm bg-slate-800/60 px-4 py-1.5 rounded-lg border border-slate-700/50">
-                  TRANG <span className="text-white font-bold">{page}</span> / {totalPages}
+               <span className="text-white/40 text-[13px] bg-bg-secondary px-4 py-2 rounded-full border border-white/5">
+                  Trang <span className="text-white font-semibold">{page}</span> / {totalPages}
                </span>
                <button
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                   disabled={!hasMore}
-                  className="w-10 h-10 flex items-center justify-center bg-slate-800 border border-slate-700 text-slate-400 hover:text-white hover:border-primary/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all rounded-lg"
+                  className="w-10 h-10 flex items-center justify-center bg-bg-secondary border border-white/5 text-white/40 hover:text-white hover:border-primary/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all rounded-full"
                >
                   <ChevronRight className="w-5 h-5" />
                </button>
@@ -487,12 +483,12 @@ export const LFG: React.FC = () => {
 
          {/* Empty State for Create */}
          {!loading && teams.length > 0 && (
-            <div className="border border-dashed border-slate-700 rounded-none p-6 text-center opacity-50 hover:opacity-100 transition-opacity cursor-pointer bg-slate-900/30 mt-6" onClick={() => !myTeam && setShowCreateModal(true)}>
-               <div className="w-12 h-12 bg-slate-800 rounded-full mx-auto flex items-center justify-center mb-3">
-                  <Users className="w-6 h-6 text-slate-500" />
+            <div className="border border-dashed border-white/10 rounded-[16px] p-6 text-center opacity-60 hover:opacity-100 transition-opacity cursor-pointer bg-bg-secondary mt-6" onClick={() => !myTeam && setShowCreateModal(true)}>
+               <div className="w-12 h-12 bg-white/5 rounded-full mx-auto flex items-center justify-center mb-3">
+                  <Users className="w-6 h-6 text-white/30" />
                </div>
-               <h3 className="text-white font-bold mb-1">Không tìm thấy phòng phù hợp?</h3>
-               <p className="text-slate-400 text-sm">
+               <h3 className="text-white font-semibold mb-1 text-[14px]">Không tìm thấy phòng phù hợp?</h3>
+               <p className="text-white/40 text-[13px]">
                   {myTeam ? 'Bạn đang có phòng hoạt động' : 'Tự tạo phòng và rủ rê bạn bè ngay'}
                </p>
             </div>

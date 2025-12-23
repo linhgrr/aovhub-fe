@@ -99,53 +99,26 @@ export const Chatbot: React.FC = () => {
 
     return (
         <div className="chatbot-container">
-            {/* Header */}
-            <div className="chatbot-header">
-                <div className="chatbot-header-content">
-                    <div className="chatbot-header-left">
-                        <div className="chatbot-icon-wrapper">
-                            <img src="/assets/images/chatbot.svg" alt="Chatbot" className="chatbot-header-icon" />
-                        </div>
-                        <div>
-                            <h1 className="chatbot-title">AI Trợ Lý Liên Quân</h1>
-                            <p className="chatbot-subtitle">Gợi ý tướng và cách chơi dựa trên AI</p>
-                        </div>
-                    </div>
-                    {messages.length > 0 && (
-                        <button onClick={handleDeleteConversation} className="chatbot-delete-btn" title="Xóa lịch sử">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <polyline points="3 6 5 6 21 6"></polyline>
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                            </svg>
-                        </button>
-                    )}
-                </div>
-            </div>
-
             {/* Messages Area */}
             <div className="chatbot-messages">
                 {messages.length === 0 ? (
                     <div className="chatbot-welcome">
                         <div className="chatbot-welcome-icon">
-                            <img src="/assets/images/chatbot.svg" alt="Chatbot" />
+                            <img src="https://i.ibb.co/20KhSst0/image.png" alt="Chatbot" />
                         </div>
                         <h2>Xin chào! 👋</h2>
-                        <p>Tôi là AI Trợ Lý Liên Quân. Tôi có thể giúp bạn:</p>
+                        <p>Tôi là AI Trợ Lý Liên Quân: Chuối nho nhỏ. Tôi có thể giúp bạn:</p>
                         <div className="chatbot-suggestions-grid">
                             <div className="chatbot-suggestion-card" onClick={() => setInputValue('Gợi ý tướng đi rừng cho rank Kim Cương')}>
-                                <span className="chatbot-suggestion-icon">🎯</span>
                                 <span>Gợi ý tướng phù hợp</span>
                             </div>
                             <div className="chatbot-suggestion-card" onClick={() => setInputValue('Cách chơi Nakroth hiệu quả')}>
-                                <span className="chatbot-suggestion-icon">📚</span>
                                 <span>Hướng dẫn cách chơi</span>
                             </div>
                             <div className="chatbot-suggestion-card" onClick={() => setInputValue('Meta tướng mạnh hiện tại')}>
-                                <span className="chatbot-suggestion-icon">📊</span>
                                 <span>Phân tích meta</span>
                             </div>
                             <div className="chatbot-suggestion-card" onClick={() => setInputValue('Lên đồ Florentino như thế nào?')}>
-                                <span className="chatbot-suggestion-icon">⚔️</span>
                                 <span>Build trang bị</span>
                             </div>
                         </div>

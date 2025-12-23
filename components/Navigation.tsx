@@ -15,7 +15,7 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab 
     { id: 'lfg', icon: '/assets/images/chart.svg', label: 'Thống kê' },
     { id: 'forum', icon: '/assets/images/activity.svg', label: 'Hoạt động' },
     { id: 'friends', icon: '/assets/images/friends.svg', label: 'Bạn bè' },
-    { id: 'chatbot', icon: '/assets/images/chatbot.svg', label: 'Chatbot' },
+    { id: 'chatbot', icon: 'https://i.ibb.co/20KhSst0/image.png', label: 'Chatbot' },
 
   ];
 
@@ -56,7 +56,7 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab 
                     <img
                       src={item.icon}
                       alt={item.label}
-                      className={`w-6 h-6 relative z-10 transition-all ${isActive ? 'filter-primary brightness-150' : 'filter-white'}`}
+                      className={`w-6 h-6 relative z-10 transition-all ${item.id === 'chatbot' ? 'rounded-full object-cover' : (isActive ? 'filter-primary brightness-150' : 'filter-white')}`}
                     />
                   </button>
                 );
@@ -99,7 +99,7 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab 
                 <img
                   src={item.icon}
                   alt={item.label}
-                  className={`w-6 h-6 ${isActive ? 'filter-primary' : 'filter-white'}`}
+                  className={`w-6 h-6 ${item.id === 'chatbot' ? 'rounded-full object-cover' : (isActive ? 'filter-primary' : 'filter-white')}`}
                 />
               </button>
             );

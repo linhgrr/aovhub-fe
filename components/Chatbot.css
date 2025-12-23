@@ -39,9 +39,10 @@
 }
 
 .chatbot-header-icon {
-  width: 32px;
-  height: 32px;
-  filter: brightness(0) invert(1);
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 12px;
 }
 
 .chatbot-title {
@@ -142,9 +143,10 @@
 }
 
 .chatbot-welcome-icon img {
-  width: 64px;
-  height: 64px;
-  filter: brightness(0) invert(1);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 30px;
 }
 
 .chatbot-welcome h2 {
@@ -288,6 +290,15 @@
 .chatbot-message-text p {
   margin: 8px 0;
   white-space: pre-wrap;
+}
+
+.chatbot-message-text img {
+  max-width: 200px;
+  max-height: 200px;
+  border-radius: 8px;
+  margin: 8px 0;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .chatbot-message-text strong {

@@ -264,7 +264,7 @@ export const LFG: React.FC = () => {
                {myTeam ? (
                   <button
                      onClick={() => setShowMyTeamDashboard(true)}
-                     className="flex-1 md:flex-none bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-6 clip-angled transition-all flex items-center justify-center gap-2 border-b-2 border-slate-500 hover:border-slate-400"
+                     className="flex-1 md:flex-none bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 px-6 rounded-lg transition-all flex items-center justify-center gap-2 border border-slate-600 hover:border-slate-500"
                   >
                      <Settings className="w-4 h-4" />
                      Phòng của tôi
@@ -272,7 +272,7 @@ export const LFG: React.FC = () => {
                ) : (
                   <button
                      onClick={() => setShowCreateModal(true)}
-                     className="flex-1 md:flex-none bg-primary hover:bg-primary/90 text-white font-bold py-2 px-8 clip-hex-button shadow-[0_0_15px_rgba(140,103,246,0.3)] transition-all hover:scale-105 flex items-center justify-center gap-2"
+                     className="flex-1 md:flex-none bg-primary hover:bg-primary/90 text-white font-bold py-2.5 px-8 rounded-lg shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all hover:scale-105 flex items-center justify-center gap-2"
                   >
                      <Plus className="w-4 h-4" />
                      TẠO PHÒNG
@@ -282,14 +282,14 @@ export const LFG: React.FC = () => {
          </header>
 
          {/* Filters */}
-         <div className="flex items-center gap-4 mb-6 bg-slate-900/50 p-2 rounded border border-slate-800 backdrop-blur-sm">
+         <div className="flex items-center gap-4 mb-6 bg-slate-800/60 p-3 rounded-xl border border-slate-700/50 backdrop-blur-sm">
             <div className="flex items-center gap-2 px-2">
                <Filter className="w-4 h-4 text-primary" />
                <span className="text-sm font-bold text-slate-400 uppercase mr-2">Bộ lọc:</span>
                <select
                   value={rankFilter}
                   onChange={handleRankFilterChange}
-                  className="bg-slate-800 border border-slate-600 text-white px-3 py-1 text-sm focus:border-gold-500 focus:outline-none focus:ring-1 focus:ring-gold-500/50 transition-all font-mono"
+                  className="bg-slate-800 border border-slate-600 text-white px-3 py-1.5 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all font-mono rounded-lg"
                >
                   {RANK_OPTIONS.map(opt => (
                      <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -303,11 +303,11 @@ export const LFG: React.FC = () => {
             <div className="flex items-center justify-center h-64">
                <div className="relative">
                   <div className="w-12 h-12 border-4 border-slate-700 rounded-full"></div>
-                  <div className="absolute top-0 left-0 w-12 h-12 border-4 border-gold-500 border-t-transparent rounded-full animate-spin"></div>
+                  <div className="absolute top-0 left-0 w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
                </div>
             </div>
          ) : teams.length === 0 ? (
-            <div className="border border-dashed border-slate-700 p-12 text-center bg-slate-900/30 backdrop-blur-sm">
+            <div className="border border-dashed border-slate-700/50 p-12 text-center bg-slate-800/60 backdrop-blur-sm rounded-xl">
                <div className="w-20 h-20 bg-slate-800/50 rounded-full mx-auto flex items-center justify-center mb-6 border border-slate-700">
                   <Users className="w-10 h-10 text-slate-500" />
                </div>
@@ -321,10 +321,10 @@ export const LFG: React.FC = () => {
                {teams.map(team => {
                   const remaining = getRemainingTime(team.expires_at);
                   return (
-                     <div key={team.id} className="bg-slate-900 relative border border-slate-700 hover:border-gold-500/50 transition-all group overflow-hidden shadow-lg">
+                     <div key={team.id} className="bg-slate-800/60 relative border border-slate-700/50 hover:border-primary/30 rounded-xl transition-all duration-200 group overflow-hidden shadow-lg">
                         {/* Background accent */}
                         <div className="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-slate-800/80 to-transparent skew-x-12 translate-x-12 group-hover:translate-x-6 transition-transform duration-500"></div>
-                        <div className="absolute left-0 bottom-0 w-1 h-0 bg-gold-500 group-hover:h-full transition-all duration-300"></div>
+                        <div className="absolute left-0 bottom-0 w-1 h-0 bg-primary group-hover:h-full transition-all duration-300"></div>
 
                         <div className="p-5 relative z-10 flex flex-col md:flex-row gap-6">
                            {/* Left: Owner Info */}
@@ -333,9 +333,9 @@ export const LFG: React.FC = () => {
                                  <img
                                     src={team.owner.avatar_url || 'https://via.placeholder.com/56'}
                                     alt={team.owner.username}
-                                    className="w-16 h-16 object-cover bg-slate-800 clip-hex-button border-2 border-slate-600 group-hover:border-gold-500 transition-colors"
+                                    className="w-16 h-16 object-cover bg-slate-800 rounded-lg border-2 border-slate-600 group-hover:border-primary transition-colors"
                                  />
-                                 <div className="absolute -bottom-1 -right-2 bg-slate-900 text-[10px] text-gold-500 border border-gold-500 px-1.5 py-0.5 font-bold uppercase tracking-wider transform skew-x-[-10deg]">
+                                 <div className="absolute -bottom-1 -right-2 bg-primary/20 text-[10px] text-primary border border-primary/50 px-1.5 py-0.5 font-bold uppercase tracking-wider rounded backdrop-blur-sm">
                                     Chủ phòng
                                  </div>
                               </div>
@@ -347,7 +347,7 @@ export const LFG: React.FC = () => {
                                     </div>
                                  )}
                                  <div className="mt-2 text-center">
-                                    <span className={`inline-block text-[10px] px-2 py-0.5 border uppercase font-bold tracking-wider ${team.rank === 'DIAMOND' || team.rank === 'MASTER' || team.rank === 'CONQUEROR'
+                                    <span className={`inline-block text-[10px] px-2 py-0.5 border rounded uppercase font-bold tracking-wider ${team.rank === 'DIAMOND' || team.rank === 'MASTER' || team.rank === 'CONQUEROR'
                                        ? 'bg-purple-900/30 text-purple-400 border-purple-500/50'
                                        : 'bg-slate-800 text-slate-300 border-slate-600'
                                        }`}>
@@ -361,15 +361,15 @@ export const LFG: React.FC = () => {
                            <div className="flex-1 flex flex-col justify-between py-1">
                               <div>
                                  <div className="flex items-center gap-2 mb-2">
-                                    <Trophy className="w-4 h-4 text-gold-500" />
-                                    <span className="text-xs font-bold text-gold-500 uppercase tracking-widest">{team.game_mode}</span>
+                                    <Trophy className="w-4 h-4 text-primary" />
+                                    <span className="text-xs font-bold text-primary uppercase tracking-widest">{team.game_mode}</span>
                                     {remaining.urgent && (
                                        <span className="text-[10px] bg-red-500/10 text-red-500 border border-red-500/20 px-1 ml-auto animate-pulse font-bold">SẮP HẾT HẠN</span>
                                     )}
                                  </div>
                                  <h4 className="text-white font-bold text-xl mb-2 font-display tracking-wide">{team.name}</h4>
                                  <div className="relative pl-4 py-1">
-                                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-gold-500/30"></div>
+                                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary/30"></div>
                                     <p className="text-slate-300 text-sm italic line-clamp-2 leading-relaxed">
                                        "{team.description}"
                                     </p>
@@ -393,7 +393,7 @@ export const LFG: React.FC = () => {
                               <button
                                  onClick={() => handleViewDetail(team.id)}
                                  disabled={loadingTeamDetail === team.id}
-                                 className="flex-1 md:w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 hover:border-slate-500 text-white font-bold py-3 px-4 clip-angled transition-all text-sm flex items-center justify-center gap-2 uppercase tracking-wider group-hover:bg-slate-700"
+                                 className="flex-1 md:w-full bg-slate-700/60 hover:bg-slate-700 border border-slate-600/50 hover:border-primary/30 text-white font-bold py-3 px-4 rounded-lg transition-all text-sm flex items-center justify-center gap-2 uppercase tracking-wider"
                               >
                                  {loadingTeamDetail === team.id ? (
                                     <div className="w-4 h-4 border-2 border-slate-400 border-t-white rounded-full animate-spin" />
@@ -418,17 +418,17 @@ export const LFG: React.FC = () => {
                <button
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="w-10 h-10 flex items-center justify-center bg-slate-800 border border-slate-700 text-slate-400 hover:text-white hover:border-gold-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all clip-hex-button"
+                  className="w-10 h-10 flex items-center justify-center bg-slate-800 border border-slate-700 text-slate-400 hover:text-white hover:border-primary/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all rounded-lg"
                >
                   <ChevronLeft className="w-5 h-5" />
                </button>
-               <span className="text-slate-400 font-mono text-sm bg-slate-900 px-4 py-1 rounded border border-slate-800">
+               <span className="text-slate-400 font-mono text-sm bg-slate-800/60 px-4 py-1.5 rounded-lg border border-slate-700/50">
                   TRANG <span className="text-white font-bold">{page}</span> / {totalPages}
                </span>
                <button
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                   disabled={!hasMore}
-                  className="w-10 h-10 flex items-center justify-center bg-slate-800 border border-slate-700 text-slate-400 hover:text-white hover:border-gold-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all clip-hex-button"
+                  className="w-10 h-10 flex items-center justify-center bg-slate-800 border border-slate-700 text-slate-400 hover:text-white hover:border-primary/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all rounded-lg"
                >
                   <ChevronRight className="w-5 h-5" />
                </button>

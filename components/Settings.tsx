@@ -30,8 +30,8 @@ export const Settings: React.FC = () => {
             <div className="bg-slate-800/50 rounded-xl border border-slate-700/50 p-4 mb-6 flex items-center gap-4">
               <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gold-500 to-amber-600 flex items-center justify-center">
                 {user.avatar_url ? (
-                  <img 
-                    src={user.avatar_url} 
+                  <img
+                    src={user.avatar_url}
                     alt={user.username}
                     className="w-full h-full rounded-full object-cover"
                   />
@@ -81,11 +81,11 @@ export const Settings: React.FC = () => {
       {showLogoutModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           {/* Backdrop */}
-          <div 
+          <div
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setShowLogoutModal(false)}
           />
-          
+
           {/* Modal */}
           <div className="relative bg-slate-800 rounded-2xl border border-slate-700 shadow-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
             {/* Close button */}

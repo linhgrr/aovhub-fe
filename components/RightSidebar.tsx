@@ -339,7 +339,7 @@ export const RightSidebar: React.FC = () => {
     // Inline Chat View
     if (selectedConversation) {
         return (
-            <aside className="w-[374px] hidden xl:flex flex-col pt-[150px] pb-10 pr-6 h-screen sticky top-0">
+            <aside className="w-[420px] hidden xl:flex flex-col pt-[150px] pb-10 pr-6 h-screen sticky top-0">
                 <div className="bg-bg-secondary rounded-[20px] shadow-xl flex-1 flex flex-col overflow-hidden">
                     {/* Chat Header */}
                     <div className="flex items-center gap-3 px-5 py-4 border-b border-white/5">
@@ -418,11 +418,10 @@ export const RightSidebar: React.FC = () => {
                                             <p className="text-[9px] text-[#7f7f7f] mb-0.5 ml-1">{message.sender_username}</p>
                                         )}
 
-                                        <div className={`rounded-[10px] px-3 py-2 ${
-                                            isOwnMessage(message)
-                                                ? 'bg-primary text-white rounded-br-[3px]'
-                                                : 'bg-bg-main text-white/90 rounded-bl-[3px]'
-                                        }`}>
+                                        <div className={`rounded-[10px] px-3 py-2 ${isOwnMessage(message)
+                                            ? 'bg-primary text-white rounded-br-[3px]'
+                                            : 'bg-bg-main text-white/90 rounded-bl-[3px]'
+                                            }`}>
                                             {message.content && (
                                                 <p className="text-[11px] whitespace-pre-wrap break-words leading-relaxed">
                                                     {message.content}
@@ -517,11 +516,11 @@ export const RightSidebar: React.FC = () => {
 
     // Default Sidebar View
     return (
-        <aside className="w-[374px] hidden xl:flex flex-col gap-6 pt-[150px] pb-10 pr-6 h-screen sticky top-0 overflow-y-auto no-scrollbar">
+        <aside className="w-[550px] hidden xl:flex flex-col gap-6 pt-[150px] pb-10 pr-6 h-screen sticky top-0 overflow-y-auto no-scrollbar pb-4 md:pb-10 pr-4 md:pr-20">
             {/* Suggested Section */}
             <div className="bg-bg-secondary rounded-[20px] p-6 shadow-xl">
                 <div className="flex items-center justify-between mb-6">
-                    <h3 className="font-montserrat font-extrabold text-[11px] text-white uppercase tracking-wider">GỢI Ý CHO BẠN</h3>
+                    <h3 className="font-montserrat font-extrabold text-[13px] text-white uppercase tracking-wider">GỢI Ý CHO BẠN</h3>
                     <button className="opacity-40 hover:opacity-100 transition-opacity flex gap-[3px]">
                         <div className="w-[3px] h-[3px] bg-white rounded-full"></div>
                         <div className="w-[3px] h-[3px] bg-white rounded-full"></div>
@@ -540,24 +539,23 @@ export const RightSidebar: React.FC = () => {
                             <div key={user.id} className="flex items-center justify-between group">
                                 <a href={`#profile/${user.id}`} className="flex items-center gap-3 flex-1 min-w-0">
                                     {user.avatar_url ? (
-                                        <img src={user.avatar_url} className="w-[43px] h-[43px] rounded-[10px] object-cover transition-transform group-hover:scale-105" alt="" />
+                                        <img src={user.avatar_url} className="w-[52px] h-[52px] rounded-[12px] object-cover transition-transform group-hover:scale-105" alt="" />
                                     ) : (
-                                        <div className="w-[43px] h-[43px] rounded-[10px] bg-bg-main flex items-center justify-center">
-                                            <UserIcon className="w-5 h-5 text-[#7f7f7f]" />
+                                        <div className="w-[52px] h-[52px] rounded-[12px] bg-bg-main flex items-center justify-center">
+                                            <UserIcon className="w-6 h-6 text-[#7f7f7f]" />
                                         </div>
                                     )}
                                     <div className="min-w-0">
-                                        <p className="font-montserrat font-medium text-[11px] text-white truncate group-hover:text-primary transition-colors">{user.username}</p>
-                                        <p className="text-[#7f7f7f] text-[9px] mt-0.5">Gợi ý cho bạn</p>
+                                        <p className="font-montserrat font-medium text-[13px] text-white truncate group-hover:text-primary transition-colors">{user.username}</p>
+                                        <p className="text-[#7f7f7f] text-[11px] mt-0.5">Gợi ý cho bạn</p>
                                     </div>
                                 </a>
                                 <button
                                     onClick={() => handleFollow(user.id, user.is_following)}
-                                    className={`px-4 py-1.5 rounded-[6px] text-[10px] font-semibold transition-all hover:scale-105 ${
-                                        user.is_following
-                                            ? 'bg-white/10 text-white hover:bg-white/20'
-                                            : 'bg-primary text-white hover:bg-primary/90'
-                                    }`}
+                                    className={`px-5 py-2 rounded-[8px] text-[12px] font-semibold transition-all hover:scale-105 ${user.is_following
+                                        ? 'bg-white/10 text-white hover:bg-white/20'
+                                        : 'bg-primary text-white hover:bg-primary/90'
+                                        }`}
                                 >
                                     {user.is_following ? 'Đang theo dõi' : 'Theo dõi'}
                                 </button>
@@ -570,10 +568,10 @@ export const RightSidebar: React.FC = () => {
             {/* Live Chat Section */}
             <div className="bg-bg-secondary rounded-[20px] p-6 shadow-xl flex-1 min-h-0 flex flex-col">
                 <div className="flex items-center justify-between mb-6">
-                    <h3 className="font-montserrat font-extrabold text-[11px] text-white uppercase tracking-wider">TIN NHẮN</h3>
+                    <h3 className="font-montserrat font-extrabold text-[13px] text-white uppercase tracking-wider">TIN NHẮN</h3>
                     <button
                         onClick={() => setShowCreateGroup(true)}
-                        className="text-primary text-[10px] font-semibold border border-primary/30 px-3 py-1.5 rounded-[6px] hover:bg-primary/10 transition-all active:scale-95"
+                        className="text-primary text-[12px] font-semibold border border-primary/30 px-4 py-2 rounded-[8px] hover:bg-primary/10 transition-all active:scale-95"
                     >
                         Tạo nhóm
                     </button>
@@ -598,19 +596,18 @@ export const RightSidebar: React.FC = () => {
                                     avatar_url: chat.avatar_url,
                                     type: chat.type,
                                 })}
-                                className={`w-full flex items-start gap-3 relative group text-left p-2 -mx-2 rounded-[10px] hover:bg-white/5 transition-colors ${
-                                    chat.unread_count > 0 ? 'bg-primary/5' : ''
-                                }`}
+                                className={`w-full flex items-start gap-3 relative group text-left p-2 -mx-2 rounded-[10px] hover:bg-white/5 transition-colors ${chat.unread_count > 0 ? 'bg-primary/5' : ''
+                                    }`}
                             >
                                 <div className="relative flex-shrink-0">
                                     {chat.avatar_url ? (
-                                        <img src={chat.avatar_url} className="w-[43px] h-[43px] rounded-[10px] object-cover transition-transform group-hover:scale-105" alt="" />
+                                        <img src={chat.avatar_url} className="w-[52px] h-[52px] rounded-[12px] object-cover transition-transform group-hover:scale-105" alt="" />
                                     ) : (
-                                        <div className="w-[43px] h-[43px] rounded-[10px] bg-bg-main flex items-center justify-center">
+                                        <div className="w-[52px] h-[52px] rounded-[12px] bg-bg-main flex items-center justify-center">
                                             {chat.type === 'GROUP' ? (
-                                                <Users className="w-5 h-5 text-[#7f7f7f]" />
+                                                <Users className="w-6 h-6 text-[#7f7f7f]" />
                                             ) : (
-                                                <UserIcon className="w-5 h-5 text-[#7f7f7f]" />
+                                                <UserIcon className="w-6 h-6 text-[#7f7f7f]" />
                                             )}
                                         </div>
                                     )}
@@ -619,17 +616,15 @@ export const RightSidebar: React.FC = () => {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center justify-between mb-1">
-                                        <p className={`font-montserrat font-medium text-[11px] truncate group-hover:text-primary transition-colors ${
-                                            chat.unread_count > 0 ? 'text-white' : 'text-white/90'
-                                        }`}>
+                                        <p className={`font-montserrat font-medium text-[13px] truncate group-hover:text-primary transition-colors ${chat.unread_count > 0 ? 'text-white' : 'text-white/90'
+                                            }`}>
                                             {chat.name || 'Cuộc trò chuyện'}
                                         </p>
-                                        <p className="text-[#7f7f7f] text-[10px] flex-shrink-0 ml-2">{formatTimeAgo(chat.last_message_at)}</p>
+                                        <p className="text-[#7f7f7f] text-[12px] flex-shrink-0 ml-2">{formatTimeAgo(chat.last_message_at)}</p>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <p className={`text-[10px] line-clamp-1 leading-relaxed flex-1 ${
-                                            chat.unread_count > 0 ? 'text-white/70 font-medium' : 'text-white/50'
-                                        }`}>
+                                        <p className={`text-[12px] line-clamp-1 leading-relaxed flex-1 ${chat.unread_count > 0 ? 'text-white/70 font-medium' : 'text-white/50'
+                                            }`}>
                                             {chat.last_message_content || 'Bắt đầu trò chuyện...'}
                                         </p>
                                         {chat.unread_count > 0 && (

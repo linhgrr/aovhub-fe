@@ -108,7 +108,7 @@ export const Feed: React.FC = () => {
   }
 
   return (
-    <div className="w-full max-w-[760px] mx-auto pb-24 md:pb-20 pt-6 md:pt-10 px-4 md:px-0">
+    <div className="w-full max-w-[1200px] pb-24 md:pb-20 pt-6 md:pt-10 px-4 md:px-10">
 
       <div className="mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
         <CreatePost 

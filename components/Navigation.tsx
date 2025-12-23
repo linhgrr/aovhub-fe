@@ -25,37 +25,36 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab 
         <div className="relative h-full w-full flex flex-col">
           {/* Sidebar Background */}
           <div className="absolute inset-0 bg-bg-secondary border-r border-white/5"></div>
-          
+
           {/* Content */}
           <div className="relative z-10 flex flex-col items-center h-full py-12">
             {/* Logo */}
             <div className="mb-24">
-               <button onClick={() => setActiveTab('feed')} className="font-bakbak text-[22px] text-white uppercase tracking-wider">
-                  LOGO
-               </button>
+              <button onClick={() => setActiveTab('feed')} className="flex items-center justify-center">
+                <img src="/public/assets/images/logoliqi88.png" alt="Logo" className="w-[80px] h-auto object-contain" />
+              </button>
             </div>
 
             {/* Nav Items */}
             <div className="flex flex-col gap-10 items-center w-full">
               {navItems.map((item) => {
-                const isActive = activeTab === item.id || 
+                const isActive = activeTab === item.id ||
                   (item.id === 'forum' && (activeTab === 'forum-category' || activeTab === 'forum-thread'));
-                
+
                 return (
                   <button
                     key={item.id}
                     onClick={() => setActiveTab(item.id)}
-                    className={`group relative p-2 transition-all duration-300 ${
-                      isActive ? 'scale-110' : 'opacity-40 hover:opacity-100 hover:scale-105'
-                    }`}
+                    className={`group relative p-2 transition-all duration-300 ${isActive ? 'scale-110' : 'opacity-40 hover:opacity-100 hover:scale-105'
+                      }`}
                     title={item.label}
                   >
-                     {isActive && (
-                        <div className="absolute inset-0 bg-primary/30 blur-lg rounded-full animate-pulse"></div>
-                     )}
-                     <img 
-                      src={item.icon} 
-                      alt={item.label} 
+                    {isActive && (
+                      <div className="absolute inset-0 bg-primary/30 blur-lg rounded-full animate-pulse"></div>
+                    )}
+                    <img
+                      src={item.icon}
+                      alt={item.label}
                       className={`w-6 h-6 relative z-10 transition-all ${isActive ? 'filter-primary brightness-150' : 'filter-white'}`}
                     />
                   </button>
@@ -71,9 +70,9 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab 
                 className="group opacity-40 hover:opacity-100 transition-all hover:scale-110"
                 title="Đăng xuất"
               >
-                <img 
-                  src="/assets/images/logout.svg" 
-                  alt="Logout" 
+                <img
+                  src="/assets/images/logout.svg"
+                  alt="Logout"
                   className="w-6 h-6 filter-white"
                 />
               </button>
@@ -96,9 +95,9 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab 
                 onClick={() => setActiveTab(item.id)}
                 className={`p-2 transition-all ${isActive ? 'text-primary' : 'text-white/40'}`}
               >
-                <img 
-                  src={item.icon} 
-                  alt={item.label} 
+                <img
+                  src={item.icon}
+                  alt={item.label}
                   className={`w-6 h-6 ${isActive ? 'filter-primary' : 'filter-white'}`}
                 />
               </button>

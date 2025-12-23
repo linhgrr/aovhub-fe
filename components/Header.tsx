@@ -140,7 +140,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
         try {
             if (!cursor) setIsLoadingNotifications(true);
             else setIsLoadingMore(true);
-            
+
             const token = localStorage.getItem('auth_token');
             if (!token) return;
 
@@ -227,15 +227,15 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
     return (
         <>
             {/* Responsive Header - full width on mobile, offset on desktop */}
-            <header className="fixed top-0 left-0 md:left-[126px] right-0 h-[70px] md:h-[110px] bg-bg-main z-40 px-4 md:px-10 flex items-center border-b border-white/5 md:border-0">
+            <header className="fixed top-0 left-0 md:left-[126px] right-0 h-[70px] md:h-[110px] bg-bg-main z-40 pl-4 md:pl-10 pr-4 md:pr-20 flex items-center border-b border-white/5 md:border-0">
                 <div className="w-full flex items-center justify-between gap-3 md:gap-8">
-                    
+
                     {/* Mobile Logo */}
-                    <button 
+                    <button
                         onClick={() => window.location.hash = 'feed'}
-                        className="md:hidden font-bakbak text-[18px] text-white uppercase tracking-wider flex-shrink-0"
+                        className="md:hidden flex-shrink-0"
                     >
-                        LOGO
+                        <img src="/public/assets/images/logoliqi88.png" alt="Logo" className="h-[40px] w-auto object-contain" />
                     </button>
 
                     {/* Search Bar - Responsive */}
@@ -261,7 +261,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
 
                     {/* Action Icons - Responsive */}
                     <div className="flex items-center gap-2 md:gap-6">
-                        
+
                         {/* Notifications - First per Figma design */}
                         <div className="relative" ref={notificationRef}>
                             <button
@@ -286,8 +286,8 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
                                             <div className="p-10 text-center text-[#7f7f7f] text-xs">No notifications yet</div>
                                         ) : (
                                             notifications.map(n => (
-                                                <div 
-                                                    key={n.id} 
+                                                <div
+                                                    key={n.id}
                                                     onClick={() => handleNotificationItemClick(n)}
                                                     className="px-6 py-4 hover:bg-white/5 cursor-pointer transition-colors border-b border-white/5 last:border-0"
                                                 >
@@ -334,19 +334,19 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
 
                             {showProfileMenu && (
                                 <div className="absolute right-0 top-full mt-4 w-[200px] bg-bg-secondary border border-white/5 rounded-[20px] shadow-2xl overflow-hidden">
-                                    <button 
+                                    <button
                                         onClick={() => { onNavigate('profile'); setShowProfileMenu(false); }}
                                         className="w-full px-6 py-4 flex items-center gap-3 hover:bg-white/5 transition-colors text-white text-sm"
                                     >
                                         <UserIcon size={16} /> Profile
                                     </button>
-                                    <button 
+                                    <button
                                         onClick={() => { onNavigate('settings'); setShowProfileMenu(false); }}
                                         className="w-full px-6 py-4 flex items-center gap-3 hover:bg-white/5 transition-colors text-white text-sm"
                                     >
                                         <Settings size={16} /> Settings
                                     </button>
-                                    <button 
+                                    <button
                                         onClick={() => logout()}
                                         className="w-full px-6 py-4 flex items-center gap-3 hover:bg-red-500/10 transition-colors text-red-400 text-sm"
                                     >

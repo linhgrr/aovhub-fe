@@ -148,7 +148,7 @@ export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
                 {/* Header */}
                 <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800 flex-shrink-0">
                     <div className="flex items-center gap-3">
-                        <Users className="w-5 h-5 text-gold-500" />
+                        <Users className="w-5 h-5 text-primary" />
                         <h2 className="text-lg font-bold text-white">Tạo nhóm chat</h2>
                     </div>
                     <button
@@ -267,7 +267,7 @@ export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
                     <button
                         onClick={handleCreateGroup}
                         disabled={selectedUsers.length < 2 || !groupName.trim() || isCreating}
-                        className="w-full py-3 rounded-lg font-bold text-center transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-gold-500 hover:bg-gold-400 text-slate-950"
+                        className="w-full py-3 rounded-lg font-bold text-center transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-primary hover:bg-primary/90 text-white"
                     >
                         {isCreating ? (
                             <Loader2 className="w-5 h-5 animate-spin mx-auto" />

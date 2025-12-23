@@ -31,7 +31,7 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab 
             {/* Logo */}
             <div className="mb-24">
               <button onClick={() => setActiveTab('feed')} className="flex items-center justify-center">
-                <img src="/public/assets/images/logoliqi88.png" alt="Logo" className="w-[80px] h-auto object-contain" />
+                <img src="https://i.ibb.co/JRNVKjvX/logoliqi88-removebg-preview-1.png" alt="Logo" className="w-[80px] h-auto object-contain" />
               </button>
             </div>
 

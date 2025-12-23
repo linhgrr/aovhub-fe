@@ -1,9 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { MessageCircle, Search, Plus, Users, User as UserIcon, X } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { MessageCircle, Search, Plus, Users, User as UserIcon, X, GripVertical } from 'lucide-react';
 import { ChatWindow } from './ChatWindow';
 import { CreateGroupModal } from './CreateGroupModal';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+
+const MIN_WIDTH = 400;
+const MAX_WIDTH = 1000;
+const DEFAULT_WIDTH = 500;
+
 
 interface ConversationListItem {
     id: string;
@@ -40,8 +45,47 @@ export const Messages: React.FC<MessagesProps> = ({ isOpen, onClose, onRefreshUn
     const [searchResults, setSearchResults] = useState<SearchUser[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const [showCreateGroup, setShowCreateGroup] = useState(false);
+    const [panelWidth, setPanelWidth] = useState(() => {
+        const saved = localStorage.getItem('messages_panel_width');
+        return saved ? Math.min(Math.max(parseInt(saved), MIN_WIDTH), MAX_WIDTH) : DEFAULT_WIDTH;
+    });
+    const [isResizing, setIsResizing] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
     const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const resizeRef = useRef<HTMLDivElement>(null);
+
+    // Handle resize
+    const handleResizeStart = useCallback((e: React.MouseEvent) => {
+        e.preventDefault();
+        setIsResizing(true);
+    }, []);
+
+    useEffect(() => {
+        if (!isResizing) return;
+
+        const handleMouseMove = (e: MouseEvent) => {
+            const newWidth = window.innerWidth - e.clientX;
+            const clampedWidth = Math.min(Math.max(newWidth, MIN_WIDTH), MAX_WIDTH);
+            setPanelWidth(clampedWidth);
+        };
+
+        const handleMouseUp = () => {
+            setIsResizing(false);
+            localStorage.setItem('messages_panel_width', panelWidth.toString());
+        };
+
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+        document.body.style.cursor = 'ew-resize';
+        document.body.style.userSelect = 'none';
+
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+        };
+    }, [isResizing, panelWidth]);
 
     useEffect(() => {
         if (isOpen) fetchConversations();
@@ -185,8 +229,18 @@ export const Messages: React.FC<MessagesProps> = ({ isOpen, onClose, onRefreshUn
             {/* Messages Panel */}
             <div
                 ref={containerRef}
-                className="relative bg-bg-secondary border border-white/10 rounded-[12px] md:rounded-none w-full max-w-md md:max-w-sm h-[80vh] md:h-full md:fixed md:right-0 md:top-0 md:bottom-0 shadow-2xl flex flex-col overflow-hidden"
+                style={{ width: window.innerWidth >= 768 ? `${panelWidth}px` : undefined }}
+                className={`relative bg-bg-secondary border border-white/10 rounded-[12px] md:rounded-none w-full h-[80vh] md:h-full md:fixed md:right-0 md:top-0 md:bottom-0 shadow-2xl flex flex-col overflow-hidden ${isResizing ? 'select-none' : ''}`}
             >
+                {/* Resize Handle - Only visible on desktop */}
+                <div
+                    ref={resizeRef}
+                    onMouseDown={handleResizeStart}
+                    className="hidden md:flex absolute left-0 top-0 bottom-0 w-[6px] cursor-ew-resize items-center justify-center group hover:bg-primary/20 transition-colors z-10"
+                    title="Kéo để thay đổi kích thước"
+                >
+                    <div className={`w-[3px] h-16 rounded-full transition-all ${isResizing ? 'bg-primary' : 'bg-white/20 group-hover:bg-primary/60'}`} />
+                </div>
                 {/* Header */}
                 <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 flex-shrink-0 bg-bg-secondary">
                     <div className="flex items-center gap-3">
@@ -293,9 +347,8 @@ export const Messages: React.FC<MessagesProps> = ({ isOpen, onClose, onRefreshUn
                                     avatar_url: conversation.avatar_url,
                                     type: conversation.type,
                                 })}
-                                className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors text-left group ${
-                                    conversation.unread_count > 0 ? 'bg-primary/5' : ''
-                                }`}
+                                className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors text-left group ${conversation.unread_count > 0 ? 'bg-primary/5' : ''
+                                    }`}
                             >
                                 {/* Avatar */}
                                 <div className="relative flex-shrink-0">
@@ -321,18 +374,16 @@ export const Messages: React.FC<MessagesProps> = ({ isOpen, onClose, onRefreshUn
                                 {/* Content */}
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center justify-between mb-1">
-                                        <span className={`font-montserrat font-medium text-[11px] truncate group-hover:text-primary transition-colors ${
-                                            conversation.unread_count > 0 ? 'text-white' : 'text-white/90'
-                                        }`}>
+                                        <span className={`font-montserrat font-medium text-[11px] truncate group-hover:text-primary transition-colors ${conversation.unread_count > 0 ? 'text-white' : 'text-white/90'
+                                            }`}>
                                             {conversation.name || 'Cuộc trò chuyện'}
                                         </span>
                                         <span className="text-[10px] text-[#7f7f7f] flex-shrink-0 ml-2">
                                             {formatTimeAgo(conversation.last_message_at)}
                                         </span>
                                     </div>
-                                    <p className={`text-[10px] truncate leading-relaxed ${
-                                        conversation.unread_count > 0 ? 'text-white/70 font-medium' : 'text-white/50'
-                                    }`}>
+                                    <p className={`text-[10px] truncate leading-relaxed ${conversation.unread_count > 0 ? 'text-white/70 font-medium' : 'text-white/50'
+                                        }`}>
                                         {conversation.last_message_content || 'Bắt đầu cuộc trò chuyện...'}
                                     </p>
                                 </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Send, X, ChevronLeft, User as UserIcon, Users, Smile, Paperclip, Check, CheckCheck, Loader2 } from 'lucide-react';
 import EmojiPicker, { EmojiClickData, Theme } from 'emoji-picker-react';
 import { useAuth } from '../contexts/authContext';
@@ -6,6 +6,10 @@ import { GroupMembersModal } from './GroupMembersModal';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/api/v1';
+
+const MIN_WIDTH = 400;
+const MAX_WIDTH = 1000;
+const DEFAULT_WIDTH = 500;
 
 interface MediaAttachment {
     url: string;
@@ -56,6 +60,11 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     const [isUploading, setIsUploading] = useState(false);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [showGroupMembers, setShowGroupMembers] = useState(false);
+    const [panelWidth, setPanelWidth] = useState(() => {
+        const saved = localStorage.getItem('messages_panel_width');
+        return saved ? Math.min(Math.max(parseInt(saved), MIN_WIDTH), MAX_WIDTH) : DEFAULT_WIDTH;
+    });
+    const [isResizing, setIsResizing] = useState(false);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -63,8 +72,42 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     const fileInputRef = useRef<HTMLInputElement>(null);
     const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const wsRef = useRef<WebSocket | null>(null);
+    const resizeRef = useRef<HTMLDivElement>(null);
 
     const currentUserId = user?.id || null;
+
+    // Handle resize
+    const handleResizeStart = useCallback((e: React.MouseEvent) => {
+        e.preventDefault();
+        setIsResizing(true);
+    }, []);
+
+    useEffect(() => {
+        if (!isResizing) return;
+
+        const handleMouseMove = (e: MouseEvent) => {
+            const newWidth = window.innerWidth - e.clientX;
+            const clampedWidth = Math.min(Math.max(newWidth, MIN_WIDTH), MAX_WIDTH);
+            setPanelWidth(clampedWidth);
+        };
+
+        const handleMouseUp = () => {
+            setIsResizing(false);
+            localStorage.setItem('messages_panel_width', panelWidth.toString());
+        };
+
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+        document.body.style.cursor = 'ew-resize';
+        document.body.style.userSelect = 'none';
+
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+        };
+    }, [isResizing, panelWidth]);
 
     useEffect(() => {
         fetchMessages();
@@ -418,7 +461,20 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
             />
 
             {/* Chat Window */}
-            <div className="relative bg-bg-secondary border border-white/10 rounded-[12px] md:rounded-none w-full max-w-md md:max-w-sm h-[80vh] md:h-full md:fixed md:right-0 md:top-0 md:bottom-0 shadow-2xl flex flex-col overflow-hidden">
+            <div
+                style={{ width: window.innerWidth >= 768 ? `${panelWidth}px` : undefined }}
+                className={`relative bg-bg-secondary border border-white/10 rounded-[12px] md:rounded-none w-full h-[80vh] md:h-full md:fixed md:right-0 md:top-0 md:bottom-0 shadow-2xl flex flex-col overflow-hidden ${isResizing ? 'select-none' : ''}`}
+            >
+                {/* Resize Handle - Only visible on desktop */}
+                <div
+                    ref={resizeRef}
+                    onMouseDown={handleResizeStart}
+                    className="hidden md:flex absolute left-0 top-0 bottom-0 w-[6px] cursor-ew-resize items-center justify-center group hover:bg-primary/20 transition-colors z-10"
+                    title="Kéo để thay đổi kích thước"
+                >
+                    <div className={`w-[3px] h-16 rounded-full transition-all ${isResizing ? 'bg-primary' : 'bg-white/20 group-hover:bg-primary/60'}`} />
+                </div>
+
                 {/* Header */}
                 <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10 flex-shrink-0 bg-bg-secondary">
                     <button
@@ -535,7 +591,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                                             <div className={`rounded-[12px] px-4 py-2.5 ${isOwnMessage(message)
                                                 ? 'bg-primary text-white rounded-br-[4px]'
                                                 : 'bg-bg-main text-white/90 rounded-bl-[4px]'
-                                            }`}>
+                                                }`}>
                                                 {/* Media */}
                                                 {message.media && message.media.length > 0 && (
                                                     <div className="mb-2">

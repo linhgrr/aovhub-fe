@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { X, Loader2, Trash2 } from 'lucide-react';
+import { X, Loader2, Trash2, ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
 import { useAuth } from '../contexts/authContext';
 import { VideoPlayer } from './VideoPlayer';
 
@@ -67,6 +67,115 @@ interface PostDetailModalProps {
   onPostUpdate?: (post: FeedPost) => void;
 }
 
+// Fullscreen Media Viewer Component
+interface FullscreenMediaViewerProps {
+  media: MediaItem[];
+  currentIndex: number;
+  onClose: () => void;
+  onNavigate: (index: number) => void;
+}
+
+const FullscreenMediaViewer: React.FC<FullscreenMediaViewerProps> = ({
+  media,
+  currentIndex,
+  onClose,
+  onNavigate,
+}) => {
+  const currentMedia = media[currentIndex];
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      } else if (e.key === 'ArrowLeft' && currentIndex > 0) {
+        onNavigate(currentIndex - 1);
+      } else if (e.key === 'ArrowRight' && currentIndex < media.length - 1) {
+        onNavigate(currentIndex + 1);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [currentIndex, media.length, onClose, onNavigate]);
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 animate-in fade-in">
+      {/* Close button */}
+      <button
+        onClick={onClose}
+        className="absolute top-4 right-4 z-10 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+      >
+        <X className="w-6 h-6 text-white" />
+      </button>
+
+      {/* Navigation - Previous */}
+      {currentIndex > 0 && (
+        <button
+          onClick={() => onNavigate(currentIndex - 1)}
+          className="absolute left-4 z-10 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+        >
+          <ChevronLeft className="w-7 h-7 text-white" />
+        </button>
+      )}
+
+      {/* Navigation - Next */}
+      {currentIndex < media.length - 1 && (
+        <button
+          onClick={() => onNavigate(currentIndex + 1)}
+          className="absolute right-4 z-10 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+        >
+          <ChevronRight className="w-7 h-7 text-white" />
+        </button>
+      )}
+
+      {/* Media Content */}
+      <div className="w-full h-full flex items-center justify-center p-12" onClick={onClose}>
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="w-[70vw] h-[80vh] flex items-center justify-center"
+        >
+          {currentMedia.type === 'image' ? (
+            <img
+              src={currentMedia.url}
+              alt=""
+              className="w-full max-h-full object-contain rounded-lg"
+            />
+          ) : (
+            <video
+              src={currentMedia.url}
+              poster={currentMedia.thumbnail_url}
+              controls
+              autoPlay
+              className="max-w-full max-h-full object-contain rounded-lg"
+            />
+          )}
+        </div>
+      </div>
+
+      {/* Indicator dots */}
+      {media.length > 1 && (
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2">
+          {media.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => onNavigate(index)}
+              className={`w-2.5 h-2.5 rounded-full transition-all ${index === currentIndex
+                ? 'bg-primary w-6'
+                : 'bg-white/40 hover:bg-white/60'
+                }`}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Format timestamp
 const formatTime = (isoString: string): string => {
   const date = new Date(isoString);
@@ -85,7 +194,7 @@ const formatTime = (isoString: string): string => {
 
 // Parse mentions in content and return JSX with clickable mentions
 const renderContentWithMentions = (
-  content: string, 
+  content: string,
   friends: FriendForMention[],
   userMapping: Map<string, string>
 ): React.ReactNode => {
@@ -99,7 +208,7 @@ const renderContentWithMentions = (
         userId = mentionedUser?.id;
       }
       const profileLink = userId ? `#profile/${userId}` : null;
-      
+
       if (profileLink) {
         return (
           <a
@@ -131,16 +240,19 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
   const [replyingTo, setReplyingTo] = useState<{ commentId: string; username: string } | null>(null);
   const [expandedReplies, setExpandedReplies] = useState<Record<string, Comment[]>>({});
   const [loadingReplies, setLoadingReplies] = useState<Record<string, boolean>>({});
-  
+
   const [localPost, setLocalPost] = useState(post);
-  
+
   const [showMentionDropdown, setShowMentionDropdown] = useState(false);
   const [mentionSearch, setMentionSearch] = useState('');
   const [mentionStartIndex, setMentionStartIndex] = useState(-1);
   const [friends, setFriends] = useState<FriendForMention[]>([]);
   const [filteredFriends, setFilteredFriends] = useState<FriendForMention[]>([]);
   const [userMapping, setUserMapping] = useState<Map<string, string>>(new Map());
-  
+
+  // Fullscreen media viewer state
+  const [fullscreenMediaIndex, setFullscreenMediaIndex] = useState<number | null>(null);
+
   const inputRef = useRef<HTMLInputElement>(null);
   const commentsContainerRef = useRef<HTMLDivElement>(null);
 
@@ -164,7 +276,7 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
 
   useEffect(() => {
     if (mentionSearch) {
-      const filtered = friends.filter(f => 
+      const filtered = friends.filter(f =>
         f.username.toLowerCase().includes(mentionSearch.toLowerCase())
       );
       setFilteredFriends(filtered);
@@ -184,7 +296,7 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
         const result = await response.json();
         const commentsData = result.data || [];
         setComments(commentsData);
-        
+
         const newMapping = new Map(userMapping);
         commentsData.forEach((comment: Comment) => {
           if (comment.author?.username && comment.author?.id) {
@@ -210,7 +322,7 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
         const result = await response.json();
         const friendsData = result.data || [];
         setFriends(friendsData);
-        
+
         const newMapping = new Map(userMapping);
         friendsData.forEach((friend: FriendForMention) => {
           if (friend.username && friend.id) {
@@ -226,14 +338,14 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
 
   const handleLikePost = async () => {
     if (!token) return;
-    
+
     const method = localPost.is_liked ? 'DELETE' : 'POST';
     try {
       const response = await fetch(`${API_URL}/posts/${localPost.id}/like`, {
         method,
         headers: { 'Authorization': `Bearer ${token}` },
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         const updatedPost = { ...localPost, like_count: data.like_count, is_liked: data.is_liked };
@@ -249,7 +361,7 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
 
   const fetchReplies = async (commentId: string) => {
     if (!token || loadingReplies[commentId]) return;
-    
+
     setLoadingReplies(prev => ({ ...prev, [commentId]: true }));
     try {
       const response = await fetch(`${API_URL}/comments/${commentId}/replies`, {
@@ -268,7 +380,7 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
 
   const handleSubmitComment = async () => {
     if (!commentContent.trim() || !token || isSubmitting) return;
-    
+
     setIsSubmitting(true);
     try {
       const mentionMatches = commentContent.match(/@(\w+)/g) || [];
@@ -276,12 +388,12 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
       const mentionedUserIds = friends
         .filter(f => mentionedUsernames.includes(f.username))
         .map(f => f.id);
-      
+
       const body: any = {
         content: commentContent,
         mentions: mentionedUserIds,
       };
-      
+
       if (replyingTo) {
         body.parent_id = replyingTo.commentId;
         const replyToUser = friends.find(f => f.username === replyingTo.username);
@@ -302,25 +414,25 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
       if (response.ok) {
         const result = await response.json();
         const newComment = result.data;
-        
+
         if (replyingTo) {
           setExpandedReplies(prev => ({
             ...prev,
             [replyingTo.commentId]: [newComment, ...(prev[replyingTo.commentId] || [])],
           }));
-          setComments(prev => prev.map(c => 
-            c.id === replyingTo.commentId 
+          setComments(prev => prev.map(c =>
+            c.id === replyingTo.commentId
               ? { ...c, reply_count: c.reply_count + 1 }
               : c
           ));
         } else {
           setComments(prev => [newComment, ...prev]);
         }
-        
+
         if (onPostUpdate) {
           onPostUpdate({ ...post, comment_count: post.comment_count + 1 });
         }
-        
+
         setCommentContent('');
         setReplyingTo(null);
       }
@@ -333,17 +445,17 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
 
   const handleLikeComment = async (commentId: string, isLiked: boolean, isReply: boolean = false, parentId?: string) => {
     if (!token) return;
-    
+
     const method = isLiked ? 'DELETE' : 'POST';
     try {
       const response = await fetch(`${API_URL}/comments/${commentId}/like`, {
         method,
         headers: { 'Authorization': `Bearer ${token}` },
       });
-      
+
       if (response.ok) {
         const result = await response.json();
-        
+
         if (isReply && parentId) {
           setExpandedReplies(prev => ({
             ...prev,
@@ -368,13 +480,13 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
 
   const handleDeleteComment = async (commentId: string, isReply: boolean = false, parentId?: string) => {
     if (!token) return;
-    
+
     try {
       const response = await fetch(`${API_URL}/comments/${commentId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` },
       });
-      
+
       if (response.ok) {
         if (isReply && parentId) {
           setExpandedReplies(prev => ({
@@ -390,7 +502,7 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
           const comment = comments.find(c => c.id === commentId);
           const deletedCount = 1 + (comment?.reply_count || 0);
           setComments(prev => prev.filter(c => c.id !== commentId));
-          
+
           if (onPostUpdate) {
             onPostUpdate({ ...post, comment_count: Math.max(0, post.comment_count - deletedCount) });
           }
@@ -405,10 +517,10 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
     const value = e.target.value;
     const cursorPos = e.target.selectionStart || 0;
     setCommentContent(value);
-    
+
     const textBeforeCursor = value.slice(0, cursorPos);
     const lastAtIndex = textBeforeCursor.lastIndexOf('@');
-    
+
     if (lastAtIndex !== -1) {
       const textAfterAt = textBeforeCursor.slice(lastAtIndex + 1);
       if (!textAfterAt.includes(' ')) {
@@ -418,7 +530,7 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
         return;
       }
     }
-    
+
     setShowMentionDropdown(false);
     setMentionSearch('');
   };
@@ -452,18 +564,18 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in">
       {/* Backdrop */}
-      <div 
+      <div
         className="absolute inset-0 bg-black/80 backdrop-blur-sm"
         onClick={onClose}
       />
-      
+
       {/* Modal Content */}
       <div className="relative bg-bg-secondary border border-white/5 rounded-[20px] w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl animate-in zoom-in-95">
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-white/5 shrink-0">
           <div className="w-10" />
           <h2 className="text-[14px] font-montserrat font-bold text-white">Bài viết của {post.author.username}</h2>
-          <button 
+          <button
             onClick={onClose}
             className="w-10 h-10 flex items-center justify-center rounded-[12px] bg-bg-main hover:bg-white/10 transition-colors"
           >
@@ -478,8 +590,8 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
             {/* Author */}
             <div className="flex items-center gap-3 mb-4">
               <a href={`#profile/${post.author.id}`}>
-                <img 
-                  src={post.author.avatar_url || '/assets/images/home.svg'} 
+                <img
+                  src={post.author.avatar_url || '/assets/images/home.svg'}
                   alt={post.author.username}
                   className="w-[44px] h-[44px] rounded-[12px] object-cover"
                 />
@@ -491,53 +603,75 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
                 <p className="text-[#7f7f7f] text-[11px]">{formatTime(post.created_at)}</p>
               </div>
             </div>
-            
+
             {/* Content */}
             <p className="text-white/90 text-[13px] leading-relaxed mb-4 whitespace-pre-wrap">{post.content}</p>
-            
+
             {/* Media */}
             {post.media.length > 0 && (
               <div className={`grid gap-2 mb-4 ${post.media.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
                 {post.media.map((item, index) => (
-                  <div key={index} className="rounded-[12px] overflow-hidden">
+                  <div
+                    key={index}
+                    className="rounded-[12px] overflow-hidden relative group cursor-pointer"
+                    onClick={() => setFullscreenMediaIndex(index)}
+                  >
                     {item.type === 'image' ? (
                       <img src={item.url} alt="" className="w-full object-cover max-h-80" />
                     ) : (
-                      <VideoPlayer src={item.url} poster={item.thumbnail_url} className="w-full max-h-80" />
+                      <div className="relative">
+                        <video
+                          src={item.url}
+                          poster={item.thumbnail_url}
+                          className="w-full object-cover max-h-80"
+                          muted
+                        />
+                        {/* Play icon overlay for video thumbnail */}
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                          <div className="w-12 h-12 rounded-full bg-black/50 flex items-center justify-center">
+                            <svg className="w-6 h-6 text-white ml-1" viewBox="0 0 24 24" fill="currentColor">
+                              <polygon points="5 3 19 12 5 21 5 3" />
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
                     )}
+                    {/* Fullscreen hint overlay */}
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
+                      <Maximize2 className="w-8 h-8 text-white drop-shadow-lg" />
+                    </div>
                   </div>
                 ))}
               </div>
             )}
-            
+
             {/* Stats */}
             <div className="flex items-center justify-between text-[12px] text-[#7f7f7f] py-3 border-y border-white/5">
               <span>{localPost.like_count} lượt thích</span>
               <span>{localPost.comment_count} bình luận</span>
             </div>
-            
+
             {/* Actions */}
             <div className="flex items-center justify-around py-3">
-              <button 
+              <button
                 onClick={handleLikePost}
-                className={`flex items-center gap-2 px-4 py-2 rounded-[10px] transition-all ${
-                  localPost.is_liked ? 'text-primary bg-primary/10' : 'text-[#7f7f7f] hover:bg-white/5'
-                }`}
+                className={`flex items-center gap-2 px-4 py-2 rounded-[10px] transition-all ${localPost.is_liked ? 'text-primary bg-primary/10' : 'text-[#7f7f7f] hover:bg-white/5'
+                  }`}
               >
                 <svg className={`w-5 h-5 ${localPost.is_liked ? 'fill-primary' : ''}`} viewBox="0 0 24 24" fill={localPost.is_liked ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                 </svg>
                 <span className="text-[12px] font-semibold">Thích</span>
               </button>
               <button className="flex items-center gap-2 px-4 py-2 rounded-[10px] text-[#7f7f7f] hover:bg-white/5 transition-colors">
                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
                 </svg>
                 <span className="text-[12px] font-semibold">Bình luận</span>
               </button>
               <button className="flex items-center gap-2 px-4 py-2 rounded-[10px] text-[#7f7f7f] hover:bg-white/5 transition-colors">
                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                  <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
                 </svg>
                 <span className="text-[12px] font-semibold">Chia sẻ</span>
               </button>
@@ -559,7 +693,7 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
                     {/* Root Comment */}
                     <div className="flex gap-3">
                       <a href={`#profile/${comment.author.id}`}>
-                        <img 
+                        <img
                           src={comment.author.avatar_url || '/assets/images/home.svg'}
                           alt={comment.author.username}
                           className="w-[36px] h-[36px] rounded-[10px] object-cover"
@@ -576,20 +710,20 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
                         </div>
                         <div className="flex items-center gap-4 mt-2 ml-1 text-[11px]">
                           <span className="text-[#7f7f7f]">{formatTime(comment.created_at)}</span>
-                          <button 
+                          <button
                             onClick={() => handleLikeComment(comment.id, comment.is_liked)}
                             className={`font-semibold transition-colors ${comment.is_liked ? 'text-primary' : 'text-[#7f7f7f] hover:text-white'}`}
                           >
                             Thích {comment.like_count > 0 && `(${comment.like_count})`}
                           </button>
-                          <button 
+                          <button
                             onClick={() => setReplyingTo({ commentId: comment.id, username: comment.author.username })}
                             className="font-semibold text-[#7f7f7f] hover:text-white transition-colors"
                           >
                             Trả lời
                           </button>
                           {comment.author_id === user?.id && (
-                            <button 
+                            <button
                               onClick={() => handleDeleteComment(comment.id)}
                               className="text-[#7f7f7f] hover:text-red-400 transition-colors"
                             >
@@ -597,12 +731,12 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
                             </button>
                           )}
                         </div>
-                        
+
                         {/* Replies */}
                         {comment.reply_count > 0 && (
                           <div className="mt-3">
                             {!expandedReplies[comment.id] ? (
-                              <button 
+                              <button
                                 onClick={() => fetchReplies(comment.id)}
                                 className="text-[11px] text-primary hover:underline flex items-center gap-1"
                                 disabled={loadingReplies[comment.id]}
@@ -618,7 +752,7 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
                                 {expandedReplies[comment.id]?.map(reply => (
                                   <div key={reply.id} className="flex gap-2">
                                     <a href={`#profile/${reply.author.id}`}>
-                                      <img 
+                                      <img
                                         src={reply.author.avatar_url || '/assets/images/home.svg'}
                                         alt={reply.author.username}
                                         className="w-[28px] h-[28px] rounded-[8px] object-cover"
@@ -635,20 +769,20 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
                                       </div>
                                       <div className="flex items-center gap-3 mt-1.5 ml-1 text-[10px]">
                                         <span className="text-[#7f7f7f]">{formatTime(reply.created_at)}</span>
-                                        <button 
+                                        <button
                                           onClick={() => handleLikeComment(reply.id, reply.is_liked, true, comment.id)}
                                           className={`font-semibold transition-colors ${reply.is_liked ? 'text-primary' : 'text-[#7f7f7f] hover:text-white'}`}
                                         >
                                           Thích {reply.like_count > 0 && `(${reply.like_count})`}
                                         </button>
-                                        <button 
+                                        <button
                                           onClick={() => setReplyingTo({ commentId: comment.id, username: reply.author.username })}
                                           className="font-semibold text-[#7f7f7f] hover:text-white transition-colors"
                                         >
                                           Trả lời
                                         </button>
                                         {reply.author_id === user?.id && (
-                                          <button 
+                                          <button
                                             onClick={() => handleDeleteComment(reply.id, true, comment.id)}
                                             className="text-[#7f7f7f] hover:text-red-400 transition-colors"
                                           >
@@ -677,7 +811,7 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
           {replyingTo && (
             <div className="flex items-center gap-2 mb-3 text-[11px] text-[#7f7f7f]">
               <span>Đang trả lời <span className="text-primary font-semibold">@{replyingTo.username}</span></span>
-              <button 
+              <button
                 onClick={() => {
                   setReplyingTo(null);
                   setCommentContent('');
@@ -689,7 +823,7 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
             </div>
           )}
           <div className="flex items-center gap-3 relative">
-            <img 
+            <img
               src={user?.avatar_url || '/assets/images/home.svg'}
               alt={user?.username}
               className="w-[36px] h-[36px] rounded-[10px] object-cover"
@@ -704,7 +838,7 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
                 placeholder={`Bình luận dưới tên ${user?.username}...`}
                 className="w-full bg-bg-main rounded-[10px] px-4 py-3 text-white text-[12px] placeholder-[#7f7f7f] focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all"
               />
-              
+
               {/* Mention Dropdown */}
               {showMentionDropdown && filteredFriends.length > 0 && (
                 <div className="absolute bottom-full left-0 w-full mb-2 bg-bg-main border border-white/10 rounded-[12px] shadow-xl max-h-48 overflow-y-auto">
@@ -714,7 +848,7 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
                       onClick={() => handleSelectMention(friend)}
                       className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors"
                     >
-                      <img 
+                      <img
                         src={friend.avatar_url || '/assets/images/home.svg'}
                         alt={friend.username}
                         className="w-[32px] h-[32px] rounded-[8px] object-cover"
@@ -734,13 +868,23 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
                 <Loader2 className="w-4 h-4 text-white animate-spin" />
               ) : (
                 <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                  <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
                 </svg>
               )}
             </button>
           </div>
         </div>
       </div>
+
+      {/* Fullscreen Media Viewer */}
+      {fullscreenMediaIndex !== null && (
+        <FullscreenMediaViewer
+          media={post.media}
+          currentIndex={fullscreenMediaIndex}
+          onClose={() => setFullscreenMediaIndex(null)}
+          onNavigate={setFullscreenMediaIndex}
+        />
+      )}
     </div>
   );
 };

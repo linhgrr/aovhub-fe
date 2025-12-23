@@ -88,8 +88,8 @@ export const Feed: React.FC = () => {
       });
       if (response.ok) {
         const result = await response.json();
-        setPosts(prev => prev.map(post => 
-          post.id === postId 
+        setPosts(prev => prev.map(post =>
+          post.id === postId
             ? { ...post, like_count: result.like_count, is_liked: result.is_liked }
             : post
         ));
@@ -108,12 +108,12 @@ export const Feed: React.FC = () => {
   }
 
   return (
-    <div className="w-full max-w-[1200px] pb-24 md:pb-20 pt-6 md:pt-10 px-4 md:px-10">
+    <div className="w-full pb-24 md:pb-20 pt-6 md:pt-10 pl-4 md:pl-20 px-4 md:px-10">
 
       <div className="mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
-        <CreatePost 
-          apiUrl={API_URL} 
-          onPostCreated={(newPost) => setPosts(prev => [newPost, ...prev])} 
+        <CreatePost
+          apiUrl={API_URL}
+          onPostCreated={(newPost) => setPosts(prev => [newPost, ...prev])}
         />
       </div>
 

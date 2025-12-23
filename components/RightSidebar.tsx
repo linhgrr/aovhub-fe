@@ -91,7 +91,7 @@ export const RightSidebar: React.FC = () => {
             fetchConversations();
             fetchOnlineFriends();
             setupWebSocket();
-            
+
             // Refresh online friends every 30 seconds
             const onlineInterval = setInterval(fetchOnlineFriends, 30000);
             return () => {
@@ -635,7 +635,7 @@ export const RightSidebar: React.FC = () => {
                         </button>
                     </div>
                 </div>
-                
+
                 <div className="space-y-1 overflow-y-auto flex-1 no-scrollbar">
                     {isLoadingOnline ? (
                         <div className="flex items-center justify-center py-8">

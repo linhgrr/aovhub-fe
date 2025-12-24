@@ -81,21 +81,13 @@ const LandingPage: React.FC = () => {
             {/* Navbar - Responsive */}
             <nav className="relative z-50 flex items-center justify-between px-4 md:px-12 py-4 md:py-6 backdrop-blur-md bg-black/20 border-b border-white/5">
                 <div className="flex items-center gap-3 md:gap-6">
-                    <button className="flex items-center gap-2 hover:text-primary transition-colors group">
-                        <Menu className="w-5 h-5 md:w-6 md:h-6" />
-                        <span className="hidden sm:inline font-semibold uppercase tracking-wider text-[10px] md:text-sm">Menu</span>
-                    </button>
-                    <div className="hidden sm:block w-[1px] h-6 bg-white/10 mx-1 md:mx-2"></div>
-                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-all cursor-pointer">
-                        <Search className="w-4 h-4 md:w-5 md:h-5" />
-                    </div>
                 </div>
 
-                <div className="absolute left-1/2 -translate-x-1/2 flex items-center">
+                <div className="absolute flex items-center">
                     <img
-                        src="https://i.ibb.co/F4Qfph6n/liqi88-christmas.png"
+                        src="https://i.ibb.co/84t6d1dq/image-removebg-preview-1-1.png"
                         alt="ArenaHub Logo"
-                        className="h-12 md:h-20 w-auto drop-shadow-[0_0_15px_rgba(140,103,246,0.5)]"
+                        className="h-8 md:h-14 w-auto drop-shadow-[0_0_15px_rgba(140,103,246,0.5)]"
                     />
                 </div>
 
@@ -281,9 +273,9 @@ const LandingPage: React.FC = () => {
             <footer className="relative z-10 px-6 md:px-12 py-12 border-t border-white/5 bg-black/40">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-8">
                     <img
-                        src="https://i.ibb.co/F4Qfph6n/liqi88-christmas.png"
+                        src="https://i.ibb.co/84t6d1dq/image-removebg-preview-1-1.png"
                         alt="ArenaHub Logo"
-                        className="h-16 w-auto opacity-50"
+                        className="h-10 w-auto opacity-50"
                     />
                     <p className="text-[10px] md:text-xs text-white/30 uppercase tracking-[2px]">
                         © 2024 ArenaHub Social Platform. All Rights Reserved.

@@ -1,5 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { HiOutlineChatBubbleLeftRight, HiOutlineArrowTrendingUp, HiOutlineUserGroup, HiOutlineSparkles, HiOutlineChevronRight } from 'react-icons/hi2';
+import {
+  HiOutlineChatBubbleLeftRight,
+  HiOutlineArrowTrendingUp,
+  HiOutlineUserGroup,
+  HiOutlineSparkles,
+  HiOutlineChevronRight,
+  HiOutlineChatBubbleOvalLeftEllipsis,
+  HiOutlinePuzzlePiece,
+  HiOutlineShieldCheck,
+  HiOutlineWrenchScrewdriver,
+  HiOutlineCalendarDays,
+  HiOutlineBugAnt,
+  HiOutlineLightBulb,
+  HiOutlineUsers,
+  HiOutlineFire,
+  HiOutlineFolder
+} from 'react-icons/hi2';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { ForumCategory, ForumCategoriesResponse } from '../types';
 import { API_BASE_URL } from '../constants';
@@ -39,7 +55,7 @@ export const Forum: React.FC<ForumProps> = ({ onNavigate }) => {
       setLoading(true);
       const response = await fetch(`${API_BASE_URL}/forum/categories`);
       if (!response.ok) throw new Error('Failed to fetch categories');
-      
+
       const data: ForumCategoriesResponse = await response.json();
       setCategories(data.data);
     } catch (err) {
@@ -53,20 +69,21 @@ export const Forum: React.FC<ForumProps> = ({ onNavigate }) => {
     window.location.hash = `forum/category/${categoryId}`;
   };
 
-  const getCategoryEmoji = (categoryName?: string): string => {
+  const getCategoryIcon = (categoryName?: string) => {
     const name = categoryName?.toLowerCase() || '';
-    
-    if (name.includes('general') || name.includes('chung')) return '💬';
-    if (name.includes('gameplay') || name.includes('chơi')) return '🎮';
-    if (name.includes('heroes') || name.includes('tướng')) return '⚔️';
-    if (name.includes('builds') || name.includes('build')) return '🛠️';
-    if (name.includes('events') || name.includes('sự kiện')) return '🎉';
-    if (name.includes('bugs') || name.includes('lỗi')) return '🐛';
-    if (name.includes('suggestions') || name.includes('góp ý')) return '💡';
-    if (name.includes('team') || name.includes('đội')) return '👥';
-    if (name.includes('hot') || name.includes('trending')) return '🔥';
-    
-    return '📁';
+    const iconClass = "w-7 h-7 md:w-8 md:h-8 text-white group-hover:text-primary transition-colors";
+
+    if (name.includes('general') || name.includes('chung')) return <HiOutlineChatBubbleOvalLeftEllipsis className={iconClass} />;
+    if (name.includes('gameplay') || name.includes('chơi')) return <HiOutlinePuzzlePiece className={iconClass} />;
+    if (name.includes('heroes') || name.includes('tướng')) return <HiOutlineShieldCheck className={iconClass} />;
+    if (name.includes('builds') || name.includes('build')) return <HiOutlineWrenchScrewdriver className={iconClass} />;
+    if (name.includes('events') || name.includes('sự kiện')) return <HiOutlineCalendarDays className={iconClass} />;
+    if (name.includes('bugs') || name.includes('lỗi')) return <HiOutlineBugAnt className={iconClass} />;
+    if (name.includes('suggestions') || name.includes('góp ý')) return <HiOutlineLightBulb className={iconClass} />;
+    if (name.includes('team') || name.includes('đội')) return <HiOutlineUsers className={iconClass} />;
+    if (name.includes('hot') || name.includes('trending')) return <HiOutlineFire className={iconClass} />;
+
+    return <HiOutlineFolder className={iconClass} />;
   };
 
   if (loading) {
@@ -78,7 +95,7 @@ export const Forum: React.FC<ForumProps> = ({ onNavigate }) => {
           <div className="h-8 bg-white/5 rounded-full w-64 mb-2" />
           <div className="h-4 bg-white/5 rounded-full w-96" />
         </div>
-        
+
         {/* Categories Skeleton */}
         <div className="space-y-4">
           {[1, 2, 3, 4].map((i) => (
@@ -95,7 +112,7 @@ export const Forum: React.FC<ForumProps> = ({ onNavigate }) => {
         <div className="bg-red-500/10 border border-red-500/30 rounded-[16px] p-6 text-center">
           <div className="text-4xl mb-3">😕</div>
           <p className="text-red-400 mb-4">{error}</p>
-          <button 
+          <button
             onClick={fetchCategories}
             className="px-6 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 
                        rounded-full transition-all font-medium"
@@ -114,18 +131,18 @@ export const Forum: React.FC<ForumProps> = ({ onNavigate }) => {
         <div className="p-4 md:p-6 relative">
           {/* Background decoration */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-          
+
           <span className="text-primary text-[13px] font-medium tracking-wide relative z-10">
             Diễn Đàn Chiến Trường
           </span>
           <h1 className="text-white text-[22px] md:text-[28px] font-bold mt-1 tracking-tight relative z-10">
-            Cộng đồng AOV Việt Nam 🎮
+            Cộng đồng AOV Việt Nam
           </h1>
           <p className="text-white/40 text-[13px] md:text-[14px] mt-2 leading-relaxed max-w-xl relative z-10">
-            Nơi tụ họp của các chiến binh! Thảo luận chiến thuật, chia sẻ kinh nghiệm leo rank, 
+            Nơi tụ họp của các chiến binh! Thảo luận chiến thuật, chia sẻ kinh nghiệm leo rank,
             và kết nối với những người chơi đam mê.
           </p>
-          
+
           {/* Stats */}
           <div className="flex items-center gap-6 mt-4 pt-4 border-t border-white/5 relative z-10">
             <div className="flex items-center gap-2">
@@ -170,12 +187,12 @@ export const Forum: React.FC<ForumProps> = ({ onNavigate }) => {
               <div className="flex items-center gap-4">
                 {/* Icon Container */}
                 <div className="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-primary/10 to-primary/20 
-                                rounded-[12px] flex items-center justify-center text-2xl md:text-3xl
+                                rounded-[12px] flex items-center justify-center
                                 group-hover:from-primary/20 group-hover:to-primary/30 
                                 group-hover:scale-105 transition-all duration-300 flex-shrink-0">
-                  {getCategoryEmoji(category.name)}
+                  {getCategoryIcon(category.name)}
                 </div>
-                
+
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
@@ -196,7 +213,7 @@ export const Forum: React.FC<ForumProps> = ({ onNavigate }) => {
                     </p>
                   )}
                 </div>
-                
+
                 {/* Thread Count */}
                 <div className="text-right flex-shrink-0 hidden sm:block">
                   <div className="text-xl md:text-2xl font-bold text-primary 
@@ -205,10 +222,10 @@ export const Forum: React.FC<ForumProps> = ({ onNavigate }) => {
                   </div>
                   <div className="text-[11px] text-white/40">chủ đề</div>
                 </div>
-                
+
                 {/* Arrow */}
                 <div className="flex-shrink-0">
-                  <HiOutlineChevronRight 
+                  <HiOutlineChevronRight
                     className="w-5 h-5 text-white/20 group-hover:text-primary 
                                group-hover:translate-x-1 transition-all"
                   />

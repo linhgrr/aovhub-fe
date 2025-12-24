@@ -235,7 +235,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
                         onClick={() => window.location.hash = 'feed'}
                         className="md:hidden flex-shrink-0"
                     >
-                        <img src="https://i.ibb.co/F4Qfph6n/liqi88-christmas.png" alt="Logo" className="h-[60px] w-auto object-contain" />
+                        <img src="https://i.ibb.co/84t6d1dq/image-removebg-preview-1-1.png" alt="Logo" className="h-[40px] w-auto object-contain" />
                     </button>
 
                     {/* Search Bar - Responsive */}

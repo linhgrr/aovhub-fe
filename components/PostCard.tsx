@@ -138,14 +138,16 @@ export const PostCard: React.FC<PostCardProps> = ({
                   {post.shared_post.media.map((item, index) => (
                     <div
                       key={index}
-                      className={`relative rounded-[8px] md:rounded-[10px] overflow-hidden group bg-black/20 ${post.shared_post!.media.length === 1 ? 'aspect-auto' : 'aspect-square'
+                      className={`relative rounded-[8px] md:rounded-[10px] overflow-hidden group bg-black/20 ${post.shared_post!.media.length === 1 ? 'flex justify-center items-center bg-black' : 'aspect-square'
                         }`}
                     >
                       {item.type === 'image' ? (
                         <img
                           src={item.url}
                           alt="Shared content"
-                          className="w-full h-full object-cover cursor-pointer"
+                          className={`${post.shared_post!.media.length === 1
+                            ? 'max-h-[80vh] w-auto max-w-full object-contain'
+                            : 'w-full h-full object-cover'} cursor-pointer`}
                           onClick={() => onOpenComments(post)}
                         />
                       ) : (
@@ -182,14 +184,16 @@ export const PostCard: React.FC<PostCardProps> = ({
               {post.media.map((item, index) => (
                 <div
                   key={index}
-                  className={`relative rounded-[10px] md:rounded-[12px] overflow-hidden group bg-black/20 ${post.media.length === 1 ? 'aspect-auto' : 'aspect-square'
+                  className={`relative rounded-[10px] md:rounded-[12px] overflow-hidden group bg-black/20 ${post.media.length === 1 ? 'flex justify-center items-center bg-black' : 'aspect-square'
                     }`}
                 >
                   {item.type === 'image' ? (
                     <img
                       src={item.url}
                       alt={`Content ${index + 1}`}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 cursor-pointer"
+                      className={`${post.media.length === 1
+                        ? 'max-h-[80vh] w-auto max-w-full object-contain'
+                        : 'w-full h-full object-cover'} transition-transform duration-500 group-hover:scale-105 cursor-pointer`}
                       onClick={() => onOpenComments(post)}
                     />
                   ) : (

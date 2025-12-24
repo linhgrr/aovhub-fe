@@ -298,7 +298,7 @@ export const LFG: React.FC = () => {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                <div>
                   <span className="text-primary text-[13px] font-medium tracking-wide">Tìm Đồng Đội</span>
-                  <h2 className="text-white text-[22px] md:text-[28px] font-bold mt-1 tracking-tight">Sảnh Chờ 🎮</h2>
+                  <h2 className="text-white text-[22px] md:text-[28px] font-bold mt-1 tracking-tight">Sảnh Chờ</h2>
                   <div className="flex items-center gap-2 mt-2">
                      <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
                      <p className="text-white/40 text-[13px]">{total} phòng đang mở</p>

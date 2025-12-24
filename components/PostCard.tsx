@@ -132,8 +132,8 @@ export const PostCard: React.FC<PostCardProps> = ({
             {post.shared_post.media && post.shared_post.media.length > 0 && (
               <div className="px-3 md:px-4 pb-3 md:pb-4">
                 <div className={`grid gap-1.5 ${post.shared_post.media.length === 1 ? 'grid-cols-1' :
-                    post.shared_post.media.length === 2 ? 'grid-cols-2' :
-                      'grid-cols-2 md:grid-cols-3'
+                  post.shared_post.media.length === 2 ? 'grid-cols-2' :
+                    'grid-cols-2 md:grid-cols-3'
                   }`}>
                   {post.shared_post.media.map((item, index) => (
                     <div
@@ -176,8 +176,8 @@ export const PostCard: React.FC<PostCardProps> = ({
         {!post.shared_post && post.media && post.media.length > 0 && (
           <div className="px-4 md:px-6 pb-3 md:pb-4">
             <div className={`grid gap-2 ${post.media.length === 1 ? 'grid-cols-1' :
-                post.media.length === 2 ? 'grid-cols-2' :
-                  'grid-cols-2 md:grid-cols-3'
+              post.media.length === 2 ? 'grid-cols-2' :
+                'grid-cols-2 md:grid-cols-3'
               }`}>
               {post.media.map((item, index) => (
                 <div
@@ -212,25 +212,31 @@ export const PostCard: React.FC<PostCardProps> = ({
               onClick={() => onLike(post.id, post.is_liked)}
               className={`transition-all hover:scale-110 ${post.is_liked ? '' : 'opacity-60 hover:opacity-100'}`}
             >
-              <svg className={`w-[18px] h-[18px] md:w-5 md:h-5 ${post.is_liked ? 'text-primary fill-primary' : 'text-white'}`} viewBox="0 0 24 24" fill={post.is_liked ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-              </svg>
+              <img
+                src="/assets/images/heart.svg"
+                alt="Like"
+                className={`w-[18px] h-[18px] md:w-5 md:h-5 filter-primary ${post.is_liked ? 'brightness-150' : ''}`}
+              />
             </button>
             <button
               onClick={() => onOpenComments(post)}
               className="opacity-60 hover:opacity-100 transition-all hover:scale-110"
             >
-              <svg className="w-[18px] h-[18px] md:w-5 md:h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
-              </svg>
+              <img
+                src="/assets/images/chat.svg"
+                alt="Comment"
+                className="w-[18px] h-[18px] md:w-5 md:h-5 filter-primary"
+              />
             </button>
             <button
               onClick={() => onShare?.(post)}
               className="opacity-60 hover:opacity-100 transition-all hover:scale-110"
             >
-              <svg className="w-[18px] h-[18px] md:w-5 md:h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
-              </svg>
+              <img
+                src="/assets/images/send.svg"
+                alt="Share"
+                className="w-[18px] h-[18px] md:w-5 md:h-5 filter-primary"
+              />
             </button>
           </div>
 

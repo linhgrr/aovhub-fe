@@ -11,11 +11,11 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab 
 
   const navItems = [
     { id: 'feed', icon: '/assets/images/home.svg', label: 'Trang chủ' },
-    { id: 'reels', icon: '/assets/images/game.svg', label: 'Trò chơi' },
-    { id: 'lfg', icon: '/assets/images/chart.svg', label: 'Thống kê' },
-    { id: 'forum', icon: '/assets/images/activity.svg', label: 'Hoạt động' },
+    { id: 'reels', icon: '/assets/images/game.svg', label: 'Reels' },
+    { id: 'lfg', icon: '/assets/images/chart.svg', label: 'LFG' },
+    { id: 'forum', icon: '/assets/images/activity.svg', label: 'Diễn đàn' },
     { id: 'friends', icon: '/assets/images/friends.svg', label: 'Bạn bè' },
-    { id: 'chatbot', icon: 'https://i.ibb.co/20KhSst0/image.png', label: 'Chatbot' },
+    { id: 'chatbot', icon: 'https://i.ibb.co/20KhSst0/image.png', label: 'Trợ lý thông minh' },
 
   ];
 
@@ -37,7 +37,7 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab 
             </div>
 
             {/* Nav Items */}
-            <div className="flex flex-col gap-8 items-center w-full">
+            <div className="flex flex-col gap-10 items-center w-full">
               {navItems.map((item) => {
                 const isActive = activeTab === item.id ||
                   (item.id === 'forum' && (activeTab === 'forum-category' || activeTab === 'forum-thread'));
@@ -55,7 +55,7 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab 
                       <img
                         src={item.icon}
                         alt={item.label}
-                        className={`w-7 h-7 transition-all ${item.id === 'chatbot' ? 'rounded-full object-cover' : 'filter-white'}`}
+                        className={`w-6 h-6 transition-all ${item.id === 'chatbot' ? 'rounded-full object-cover' : (isActive ? 'filter-primary brightness-125' : 'filter-white')}`}
                       />
                     </button>
                   </div>

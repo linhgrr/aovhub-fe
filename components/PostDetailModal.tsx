@@ -658,21 +658,27 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
                 className={`flex items-center gap-2 px-4 py-2 rounded-[10px] transition-all ${localPost.is_liked ? 'text-primary bg-primary/10' : 'text-[#7f7f7f] hover:bg-white/5'
                   }`}
               >
-                <svg className={`w-5 h-5 ${localPost.is_liked ? 'fill-primary' : ''}`} viewBox="0 0 24 24" fill={localPost.is_liked ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                </svg>
+                <img
+                  src="/assets/images/heart.svg"
+                  alt="Like"
+                  className={`w-5 h-5 filter-primary ${localPost.is_liked ? 'brightness-150' : ''}`}
+                />
                 <span className="text-[12px] font-semibold">Thích</span>
               </button>
               <button className="flex items-center gap-2 px-4 py-2 rounded-[10px] text-[#7f7f7f] hover:bg-white/5 transition-colors">
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
-                </svg>
+                <img
+                  src="/assets/images/chat.svg"
+                  alt="Comment"
+                  className="w-5 h-5 filter-primary"
+                />
                 <span className="text-[12px] font-semibold">Bình luận</span>
               </button>
               <button className="flex items-center gap-2 px-4 py-2 rounded-[10px] text-[#7f7f7f] hover:bg-white/5 transition-colors">
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
-                </svg>
+                <img
+                  src="/assets/images/send.svg"
+                  alt="Share"
+                  className="w-5 h-5 filter-primary"
+                />
                 <span className="text-[12px] font-semibold">Chia sẻ</span>
               </button>
             </div>

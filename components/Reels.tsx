@@ -363,7 +363,7 @@ export const Reels: React.FC = () => {
 
       <div
         ref={containerRef}
-        className="h-screen bg-black overflow-hidden relative select-none"
+        className="h-screen bg-black overflow-hidden relative select-none ml-4 mr-4 rounded-l-2xl"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >

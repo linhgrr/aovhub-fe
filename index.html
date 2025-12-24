@@ -110,6 +110,69 @@
         height: 1rem;
       }
     }
+
+    /* Morphing Sidebar Navigation - Inverted Border Radius */
+    .nav-item-wrapper {
+      position: relative;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+
+    }
+
+    .nav-item-active-bg {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 100px;
+      height: 60px;
+      background: #1a1c26;
+      border-radius: 60px 0 0 60px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Inverted corner - Top */
+    .nav-item-active-bg::before {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: -20px;
+      width: 20px;
+      height: 20px;
+      background: transparent;
+      border-radius: 0 0 60px 0;
+      box-shadow: 5px 5px 0 5px #1a1c26;
+    }
+
+    /* Inverted corner - Bottom */
+    .nav-item-active-bg::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      bottom: -20px;
+      width: 20px;
+      height: 20px;
+      background: transparent;
+      border-radius: 0 60px 0 0;
+      box-shadow: 5px -5px 0 5px #1a1c26;
+    }
+
+    .nav-icon-container {
+      position: relative;
+      z-index: 10;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .nav-icon-container.active {
+      /* Icon without purple box - only the morphing background shows */
+    }
   </style>
 </head>
 

@@ -37,28 +37,28 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab 
             </div>
 
             {/* Nav Items */}
-            <div className="flex flex-col gap-10 items-center w-full">
+            <div className="flex flex-col gap-8 items-center w-full">
               {navItems.map((item) => {
                 const isActive = activeTab === item.id ||
                   (item.id === 'forum' && (activeTab === 'forum-category' || activeTab === 'forum-thread'));
 
                 return (
-                  <button
-                    key={item.id}
-                    onClick={() => setActiveTab(item.id)}
-                    className={`group relative p-2 transition-all duration-300 ${isActive ? 'scale-110' : 'opacity-40 hover:opacity-100 hover:scale-105'
-                      }`}
-                    title={item.label}
-                  >
-                    {isActive && (
-                      <div className="absolute inset-0 bg-primary/30 blur-lg rounded-full animate-pulse"></div>
-                    )}
-                    <img
-                      src={item.icon}
-                      alt={item.label}
-                      className={`w-6 h-6 relative z-10 transition-all ${item.id === 'chatbot' ? 'rounded-full object-cover' : (isActive ? 'filter-primary brightness-150' : 'filter-white')}`}
-                    />
-                  </button>
+                  <div key={item.id} className="nav-item-wrapper">
+                    {/* Morphing background with inverted corners */}
+                    {isActive && <div className="nav-item-active-bg" />}
+
+                    <button
+                      onClick={() => setActiveTab(item.id)}
+                      className={`nav-icon-container ${isActive ? 'active' : 'opacity-50 hover:opacity-100 hover:bg-white/5'}`}
+                      title={item.label}
+                    >
+                      <img
+                        src={item.icon}
+                        alt={item.label}
+                        className={`w-7 h-7 transition-all ${item.id === 'chatbot' ? 'rounded-full object-cover' : 'filter-white'}`}
+                      />
+                    </button>
+                  </div>
                 );
               })}
             </div>

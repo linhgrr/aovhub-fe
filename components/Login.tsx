@@ -104,10 +104,10 @@ export const Login: React.FC = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
-            <img 
-              src="https://i.ibb.co/sd1N0NYW/image-removebg-preview-removebg-preview-1.png" 
-              alt="Arena Hub Logo" 
-              className="h-20 w-auto object-contain"
+            <img
+              src="https://i.ibb.co/F4Qfph6n/liqi88-christmas.png"
+              alt="Arena Hub Logo"
+              className="h-28 w-auto object-contain"
             />
           </div>
           <h2 className="text-2xl font-montserrat font-bold text-white mb-2">ĐĂNG NHẬP</h2>
@@ -139,9 +139,8 @@ export const Login: React.FC = () => {
                   type="email"
                   value={formData.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
-                  className={`w-full bg-bg-main/50 text-white pl-12 pr-4 py-3.5 rounded-[12px] border ${
-                    errors.email ? 'border-red-500' : 'border-white/5'
-                  } focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all text-sm`}
+                  className={`w-full bg-bg-main/50 text-white pl-12 pr-4 py-3.5 rounded-[12px] border ${errors.email ? 'border-red-500' : 'border-white/5'
+                    } focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all text-sm`}
                   placeholder="email@example.com"
                 />
               </div>
@@ -164,9 +163,8 @@ export const Login: React.FC = () => {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={(e) => handleInputChange('password', e.target.value)}
-                  className={`w-full bg-bg-main/50 text-white pl-12 pr-12 py-3.5 rounded-[12px] border ${
-                    errors.password ? 'border-red-500' : 'border-white/5'
-                  } focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all text-sm`}
+                  className={`w-full bg-bg-main/50 text-white pl-12 pr-12 py-3.5 rounded-[12px] border ${errors.password ? 'border-red-500' : 'border-white/5'
+                    } focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all text-sm`}
                   placeholder="Nhập mật khẩu"
                 />
                 <button

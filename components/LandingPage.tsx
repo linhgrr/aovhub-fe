@@ -64,13 +64,12 @@ const LandingPage: React.FC = () => {
                 {carouselImages.map((img, index) => (
                     <div
                         key={index}
-                        className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                            index === currentSlide ? 'opacity-40 md:opacity-60' : 'opacity-0'
-                        }`}
+                        className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? 'opacity-40 md:opacity-60' : 'opacity-0'
+                            }`}
                     >
-                        <img 
-                            src={img} 
-                            alt={`ArenaHub Background ${index + 1}`} 
+                        <img
+                            src={img}
+                            alt={`ArenaHub Background ${index + 1}`}
                             className="w-full h-full object-cover"
                         />
                     </div>
@@ -93,21 +92,21 @@ const LandingPage: React.FC = () => {
                 </div>
 
                 <div className="absolute left-1/2 -translate-x-1/2 flex items-center">
-                    <img 
-                        src="https://i.ibb.co/sd1N0NYW/image-removebg-preview-removebg-preview-1.png" 
-                        alt="ArenaHub Logo" 
-                        className="h-8 md:h-14 w-auto drop-shadow-[0_0_15px_rgba(140,103,246,0.5)]"
+                    <img
+                        src="https://i.ibb.co/F4Qfph6n/liqi88-christmas.png"
+                        alt="ArenaHub Logo"
+                        className="h-12 md:h-20 w-auto drop-shadow-[0_0_15px_rgba(140,103,246,0.5)]"
                     />
                 </div>
 
                 <div className="flex items-center gap-2 md:gap-4">
-                    <button 
+                    <button
                         onClick={handleRegister}
                         className="px-3 md:px-6 py-1.5 md:py-2 rounded-lg border border-white/20 hover:bg-white/5 transition-all font-semibold uppercase text-[10px] md:text-sm tracking-widest whitespace-nowrap"
                     >
                         Đăng Ký
                     </button>
-                    <button 
+                    <button
                         onClick={handleLogin}
                         className="px-3 md:px-6 py-1.5 md:py-2 rounded-lg bg-primary hover:bg-primary/80 transition-all font-semibold uppercase text-[10px] md:text-sm tracking-widest whitespace-nowrap shadow-lg shadow-primary/20"
                     >
@@ -130,13 +129,13 @@ const LandingPage: React.FC = () => {
                     </h1>
 
                     <div className="flex flex-col sm:flex-row items-center sm:items-center gap-6 md:gap-8 mt-4">
-                        <button 
+                        <button
                             onClick={handleRegister}
                             className="w-full sm:w-auto px-10 md:px-16 h-[60px] md:h-[70px] rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 hover:bg-white/20 hover:scale-[1.02] transition-all font-bold uppercase tracking-widest text-lg md:text-2xl shadow-xl"
                         >
                             Khám phá Ngay
                         </button>
-                        
+
                         <div className="flex items-center gap-6">
                             <div className="w-[1px] h-10 bg-white/10 hidden sm:block"></div>
                             <button className="flex items-center gap-4 group">
@@ -160,13 +159,13 @@ const LandingPage: React.FC = () => {
 
                 {/* Carousel Controls - Repositioned for small screens */}
                 <div className="absolute right-6 bottom-10 lg:bottom-12 flex items-center gap-4">
-                    <button 
+                    <button
                         onClick={prevSlide}
                         className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/5 backdrop-blur-md border border-white/10 flex items-center justify-center hover:bg-white/20 transition-all group"
                     >
                         <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 group-hover:scale-110 transition-transform" />
                     </button>
-                    <button 
+                    <button
                         onClick={nextSlide}
                         className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/5 backdrop-blur-md border border-white/10 flex items-center justify-center hover:bg-white/20 transition-all group"
                     >
@@ -178,9 +177,9 @@ const LandingPage: React.FC = () => {
                 <div className="hidden md:flex absolute right-12 top-1/2 -translate-y-1/2 flex-col items-center gap-4">
                     <span className="text-xs font-bold opacity-60">0{currentSlide + 1}</span>
                     <div className="w-[2px] h-40 lg:h-80 bg-white/10 relative">
-                        <div 
+                        <div
                             className="absolute left-0 w-full bg-primary shadow-[0_0_15px_rgba(140,103,246,0.8)] transition-all duration-700"
-                            style={{ 
+                            style={{
                                 height: `${100 / carouselImages.length}%`,
                                 top: `${(currentSlide * 100) / carouselImages.length}%`
                             }}
@@ -210,10 +209,10 @@ const LandingPage: React.FC = () => {
                             <p className="text-sm text-white/50 leading-relaxed mb-8">
                                 Chia sẻ những pha highlight, cập nhật tin tức Meta mới nhất và thảo luận cùng hàng nghìn kiện tướng khác.
                             </p>
-                            <div className="mt-auto pt-4 border-t border-white/5 flex justify-between items-center group-hover:text-primary transition-colors cursor-pointer">
+                            {/* <div className="mt-auto pt-4 border-t border-white/5 flex justify-between items-center group-hover:text-primary transition-colors cursor-pointer">
                                 <span className="text-xs font-bold uppercase tracking-widest">Xem thêm</span>
                                 <ChevronRight className="w-4 h-4" />
-                            </div>
+                            </div> */}
                         </div>
 
                         {/* Feature 2: LFG */}
@@ -225,10 +224,10 @@ const LandingPage: React.FC = () => {
                             <p className="text-sm text-white/50 leading-relaxed mb-8">
                                 Không còn phải leo rank một mình. Tìm kiếm đồng đội cùng bậc hạng, đúng vị trí sở trường để chiến thắng dễ dàng hơn.
                             </p>
-                            <div className="mt-auto pt-4 border-t border-white/5 flex justify-between items-center group-hover:text-emerald-400 transition-colors cursor-pointer">
+                            {/* <div className="mt-auto pt-4 border-t border-white/5 flex justify-between items-center group-hover:text-emerald-400 transition-colors cursor-pointer">
                                 <span className="text-xs font-bold uppercase tracking-widest">Tìm Team</span>
                                 <ChevronRight className="w-4 h-4" />
-                            </div>
+                            </div> */}
                         </div>
 
                         {/* Feature 3: AI Coach */}
@@ -240,10 +239,10 @@ const LandingPage: React.FC = () => {
                             <p className="text-sm text-white/50 leading-relaxed mb-8">
                                 Tích hợp công nghệ Gemini giúp phân tích lối chơi, gợi ý lối lên đồ và hướng dẫn kỹ năng tướng chuẩn chuyên gia.
                             </p>
-                            <div className="mt-auto pt-4 border-t border-white/5 flex justify-between items-center group-hover:text-amber-400 transition-colors cursor-pointer">
+                            {/* <div className="mt-auto pt-4 border-t border-white/5 flex justify-between items-center group-hover:text-amber-400 transition-colors cursor-pointer">
                                 <span className="text-xs font-bold uppercase tracking-widest">Hỏi AI</span>
                                 <ChevronRight className="w-4 h-4" />
-                            </div>
+                            </div> */}
                         </div>
 
                         {/* Feature 4: Verified Profile */}
@@ -255,10 +254,10 @@ const LandingPage: React.FC = () => {
                             <p className="text-sm text-white/50 leading-relaxed mb-8">
                                 Tự động xác thực bậc hạng trong game thông qua ảnh chụp màn hình bằng công nghệ AI Vision cực nhanh.
                             </p>
-                            <div className="mt-auto pt-4 border-t border-white/5 flex justify-between items-center group-hover:text-blue-400 transition-colors cursor-pointer">
+                            {/* <div className="mt-auto pt-4 border-t border-white/5 flex justify-between items-center group-hover:text-blue-400 transition-colors cursor-pointer">
                                 <span className="text-xs font-bold uppercase tracking-widest">Xác thực</span>
                                 <ChevronRight className="w-4 h-4" />
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>
@@ -269,7 +268,7 @@ const LandingPage: React.FC = () => {
                 <div className="max-w-2xl mx-auto p-12 rounded-[40px] bg-gradient-to-br from-primary/20 to-transparent border border-white/10 backdrop-blur-md">
                     <h2 className="text-3xl md:text-5xl font-black uppercase mb-6">Bắt đầu hành trình <br /> của bạn ngay hôm nay!</h2>
                     <p className="text-white/60 mb-10 text-sm md:text-base">Gia nhập cộng đồng kiện tướng Liên Quân hàng đầu để cùng nhau tỏa sáng trên đấu trường danh vọng.</p>
-                    <button 
+                    <button
                         onClick={handleRegister}
                         className="px-12 py-5 rounded-2xl bg-primary hover:bg-primary/80 transition-all font-bold uppercase tracking-widest shadow-2xl shadow-primary/40"
                     >
@@ -281,10 +280,10 @@ const LandingPage: React.FC = () => {
             {/* Footer */}
             <footer className="relative z-10 px-6 md:px-12 py-12 border-t border-white/5 bg-black/40">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-8">
-                    <img 
-                        src="https://i.ibb.co/sd1N0NYW/image-removebg-preview-removebg-preview-1.png" 
-                        alt="ArenaHub Logo" 
-                        className="h-10 w-auto opacity-50"
+                    <img
+                        src="https://i.ibb.co/F4Qfph6n/liqi88-christmas.png"
+                        alt="ArenaHub Logo"
+                        className="h-16 w-auto opacity-50"
                     />
                     <p className="text-[10px] md:text-xs text-white/30 uppercase tracking-[2px]">
                         © 2024 ArenaHub Social Platform. All Rights Reserved.

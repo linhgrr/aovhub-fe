@@ -213,9 +213,9 @@ export const PostCard: React.FC<PostCardProps> = ({
               className={`transition-all hover:scale-110 ${post.is_liked ? '' : 'opacity-60 hover:opacity-100'}`}
             >
               <img
-                src="/assets/images/heart.svg"
+                src={post.is_liked ? "/assets/images/heart-filled.svg" : "/assets/images/heart.svg"}
                 alt="Like"
-                className={`w-[18px] h-[18px] md:w-5 md:h-5 filter-primary ${post.is_liked ? 'brightness-150' : ''}`}
+                className={`w-[18px] h-[18px] md:w-5 md:h-5 transition-all ${post.is_liked ? 'brightness-110 drop-shadow-[0_0_8px_rgba(140,103,246,0.8)]' : 'filter-primary'}`}
               />
             </button>
             <button

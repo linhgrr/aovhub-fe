@@ -659,9 +659,9 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
                   }`}
               >
                 <img
-                  src="/assets/images/heart.svg"
+                  src={localPost.is_liked ? "/assets/images/heart-filled.svg" : "/assets/images/heart.svg"}
                   alt="Like"
-                  className={`w-5 h-5 filter-primary ${localPost.is_liked ? 'brightness-150' : ''}`}
+                  className={`w-5 h-5 transition-all ${localPost.is_liked ? 'brightness-110 drop-shadow-[0_0_8px_rgba(140,103,246,0.8)]' : 'filter-primary'}`}
                 />
                 <span className="text-[12px] font-semibold">Thích</span>
               </button>

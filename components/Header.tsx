@@ -235,7 +235,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
                         onClick={() => window.location.hash = 'feed'}
                         className="md:hidden flex-shrink-0"
                     >
-                        <img src="https://i.ibb.co/JRNVKjvX/logoliqi88-removebg-preview-1.png" alt="Logo" className="h-[40px] w-auto object-contain" />
+                        <img src="https://i.ibb.co/F4Qfph6n/liqi88-christmas.png" alt="Logo" className="h-[60px] w-auto object-contain" />
                     </button>
 
                     {/* Search Bar - Responsive */}
@@ -334,18 +334,18 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
 
                             {showProfileMenu && (
                                 <div className="absolute right-0 top-full mt-4 w-[200px] bg-bg-secondary border border-white/5 rounded-[20px] shadow-2xl overflow-hidden">
-                                    {(user?.is_superuser || 
-                                      user?.role === 'ADMIN' || 
-                                      user?.role === 'admin' || 
-                                      (user as any)?.role === 'MODERATOR' || 
-                                      (user as any)?.role === 'moderator') && (
-                                        <button
-                                            onClick={() => { onNavigate('admin'); setShowProfileMenu(false); }}
-                                            className="w-full px-6 py-4 flex items-center gap-3 hover:bg-white/5 transition-colors text-white text-sm border-b border-white/5"
-                                        >
-                                            <LayoutDashboard size={16} className="text-primary" /> Quản trị
-                                        </button>
-                                    )}
+                                    {(user?.is_superuser ||
+                                        user?.role === 'ADMIN' ||
+                                        user?.role === 'admin' ||
+                                        (user as any)?.role === 'MODERATOR' ||
+                                        (user as any)?.role === 'moderator') && (
+                                            <button
+                                                onClick={() => { onNavigate('admin'); setShowProfileMenu(false); }}
+                                                className="w-full px-6 py-4 flex items-center gap-3 hover:bg-white/5 transition-colors text-white text-sm border-b border-white/5"
+                                            >
+                                                <LayoutDashboard size={16} className="text-primary" /> Quản trị
+                                            </button>
+                                        )}
                                     <button
                                         onClick={() => { onNavigate('profile'); setShowProfileMenu(false); }}
                                         className="w-full px-6 py-4 flex items-center gap-3 hover:bg-white/5 transition-colors text-white text-sm"

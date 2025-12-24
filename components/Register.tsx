@@ -299,10 +299,10 @@ export const Register: React.FC = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
-            <img 
-              src="https://i.ibb.co/sd1N0NYW/image-removebg-preview-removebg-preview-1.png" 
-              alt="Arena Hub Logo" 
-              className="h-20 w-auto object-contain"
+            <img
+              src="https://i.ibb.co/F4Qfph6n/liqi88-christmas.png"
+              alt="Arena Hub Logo"
+              className="h-28 w-auto object-contain"
             />
           </div>
           <h2 className="text-2xl font-montserrat font-bold text-white mb-2 uppercase">ĐĂNG KÝ TÀI KHOẢN</h2>
@@ -342,9 +342,8 @@ export const Register: React.FC = () => {
                       type="text"
                       value={formData.username}
                       onChange={(e) => handleInputChange('username', e.target.value)}
-                      className={`w-full bg-bg-main/50 text-white pl-12 pr-4 py-3.5 rounded-[12px] border ${
-                        errors.username ? 'border-red-500' : 'border-white/5'
-                      } focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all text-sm`}
+                      className={`w-full bg-bg-main/50 text-white pl-12 pr-4 py-3.5 rounded-[12px] border ${errors.username ? 'border-red-500' : 'border-white/5'
+                        } focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all text-sm`}
                       placeholder="vd: ProGamerVN"
                     />
                   </div>
@@ -361,9 +360,8 @@ export const Register: React.FC = () => {
                       type="email"
                       value={formData.email}
                       onChange={(e) => handleInputChange('email', e.target.value)}
-                      className={`w-full bg-bg-main/50 text-white pl-12 pr-4 py-3.5 rounded-[12px] border ${
-                        errors.email ? 'border-red-500' : 'border-white/5'
-                      } focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all text-sm`}
+                      className={`w-full bg-bg-main/50 text-white pl-12 pr-4 py-3.5 rounded-[12px] border ${errors.email ? 'border-red-500' : 'border-white/5'
+                        } focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all text-sm`}
                       placeholder="email@example.com"
                     />
                   </div>
@@ -380,9 +378,8 @@ export const Register: React.FC = () => {
                       type={showPassword ? 'text' : 'password'}
                       value={formData.password}
                       onChange={(e) => handleInputChange('password', e.target.value)}
-                      className={`w-full bg-bg-main/50 text-white pl-12 pr-12 py-3.5 rounded-[12px] border ${
-                        errors.password ? 'border-red-500' : 'border-white/5'
-                      } focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all text-sm`}
+                      className={`w-full bg-bg-main/50 text-white pl-12 pr-12 py-3.5 rounded-[12px] border ${errors.password ? 'border-red-500' : 'border-white/5'
+                        } focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all text-sm`}
                       placeholder="Tối thiểu 8 ký tự"
                     />
                   </div>
@@ -399,9 +396,8 @@ export const Register: React.FC = () => {
                       type={showConfirmPassword ? 'text' : 'password'}
                       value={formData.confirmPassword}
                       onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                      className={`w-full bg-bg-main/50 text-white pl-12 pr-12 py-3.5 rounded-[12px] border ${
-                        errors.confirmPassword ? 'border-red-500' : 'border-white/5'
-                      } focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all text-sm`}
+                      className={`w-full bg-bg-main/50 text-white pl-12 pr-12 py-3.5 rounded-[12px] border ${errors.confirmPassword ? 'border-red-500' : 'border-white/5'
+                        } focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all text-sm`}
                       placeholder="Nhập lại mật khẩu"
                     />
                   </div>
@@ -427,9 +423,8 @@ export const Register: React.FC = () => {
                     <select
                       value={formData.mainRole}
                       onChange={(e) => handleInputChange('mainRole', e.target.value)}
-                      className={`w-full bg-bg-main/50 text-white pl-12 pr-4 py-3.5 rounded-[12px] border ${
-                        errors.mainRole ? 'border-red-500' : 'border-white/5'
-                      } focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all appearance-none cursor-pointer text-sm`}
+                      className={`w-full bg-bg-main/50 text-white pl-12 pr-4 py-3.5 rounded-[12px] border ${errors.mainRole ? 'border-red-500' : 'border-white/5'
+                        } focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all appearance-none cursor-pointer text-sm`}
                     >
                       <option value="">-- Chọn vị trí --</option>
                       {renderRoleOptions()}
@@ -443,9 +438,8 @@ export const Register: React.FC = () => {
                     Ảnh hồ sơ game *
                   </label>
 
-                  <div className={`border-2 border-dashed ${
-                    errors.profileScreenshot ? 'border-red-500' : 'border-white/5'
-                  } bg-bg-main/30 p-6 rounded-[12px] transition-all hover:border-primary/50 cursor-pointer relative`}>
+                  <div className={`border-2 border-dashed ${errors.profileScreenshot ? 'border-red-500' : 'border-white/5'
+                    } bg-bg-main/30 p-6 rounded-[12px] transition-all hover:border-primary/50 cursor-pointer relative`}>
                     <input
                       type="file"
                       accept="image/jpeg,image/jpg,image/png"

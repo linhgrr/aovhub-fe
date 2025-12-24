@@ -394,7 +394,7 @@ export const RightSidebar: React.FC = () => {
     // Inline Chat View
     if (selectedConversation) {
         return (
-            <aside className="w-[420px] hidden xl:flex flex-col pt-10 pb-10 pr-6 h-[calc(100vh-110px)] sticky top-[110px] overflow-hidden">
+            <aside className="w-[420px] hidden xl:flex flex-col pt-10 pb-10 pr-6 h-[calc(100vh-90px)] sticky top-[90px] overflow-hidden">
                 <div className="bg-bg-secondary rounded-[20px] shadow-xl flex-1 flex flex-col overflow-hidden">
                     {/* Chat Header */}
                     <div className="flex items-center gap-3 px-5 py-4 border-b border-white/5">
@@ -571,7 +571,7 @@ export const RightSidebar: React.FC = () => {
 
     // Default Sidebar View
     return (
-        <aside className="w-[380px] hidden xl:flex flex-col gap-6 pt-10 pb-10 pr-6 h-[calc(100vh-110px)] sticky top-[110px] overflow-y-auto no-scrollbar pb-4 md:pb-10 pr-4 md:pr-8">
+        <aside className="w-[420px] hidden xl:flex flex-col gap-6 pt-10 pb-10 pr-6 h-[calc(100vh-90px)] sticky top-[90px] overflow-y-auto no-scrollbar pb-4 md:pb-10 pr-4 md:pr-8">
             {/* Suggested Section */}
             <div className="bg-bg-secondary rounded-[20px] p-6 shadow-xl">
                 <div className="flex items-center justify-between mb-6">

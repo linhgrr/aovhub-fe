@@ -80,7 +80,8 @@ export const Login: React.FC = () => {
       const result = await response.json();
 
       if (!response.ok) {
-        setApiError(result.error || 'Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.');
+        const errorMessage = result.message || result.error || result.detail || 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.';
+        setApiError(errorMessage);
         setIsLoading(false);
         return;
       }
@@ -121,13 +122,9 @@ export const Login: React.FC = () => {
             {apiError && (
               <div className="mb-6 bg-red-900/20 border border-red-500/50 p-4 rounded-lg flex items-start gap-3">
                 <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-red-400 font-bold text-xs mb-1 uppercase tracking-wider">LỖI ĐĂNG NHẬP</p>
-                  <p className="text-red-300 text-xs">{apiError}</p>
-                </div>
+                <p className="text-red-300 text-sm">{apiError}</p>
               </div>
             )}
-
             {/* Email */}
             <div className="mb-6">
               <label className="block text-[#7f7f7f] text-[10px] font-bold mb-2 uppercase tracking-widest">

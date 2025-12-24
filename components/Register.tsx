@@ -165,7 +165,8 @@ export const Register: React.FC = () => {
       const verifyResult = await verifyResponse.json();
 
       if (!verifyResponse.ok || !verifyResult.success) {
-        setApiError(verifyResult.error || 'Không thể xác thực ảnh hồ sơ. Vui lòng thử lại.');
+        const errorMessage = verifyResult.message || verifyResult.error || verifyResult.detail || 'Không thể xác thực ảnh hồ sơ. Vui lòng thử lại.';
+        setApiError(errorMessage);
         setIsLoading(false);
         return;
       }
@@ -197,7 +198,8 @@ export const Register: React.FC = () => {
       const registerResult = await registerResponse.json();
 
       if (!registerResponse.ok) {
-        setApiError(registerResult.error || 'Đăng ký thất bại. Vui lòng thử lại.');
+        const errorMessage = registerResult.message || registerResult.error || registerResult.detail || 'Đăng ký thất bại. Vui lòng thử lại.';
+        setApiError(errorMessage);
         setIsLoading(false);
         return;
       }
@@ -316,10 +318,7 @@ export const Register: React.FC = () => {
             {apiError && (
               <div className="mb-6 bg-red-900/20 border border-red-500/50 p-4 rounded-lg flex items-start gap-3">
                 <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-red-400 font-bold text-xs mb-1 uppercase tracking-wider">LỖI ĐĂNG KÝ</p>
-                  <p className="text-red-300 text-xs">{apiError}</p>
-                </div>
+                <p className="text-red-300 text-sm">{apiError}</p>
               </div>
             )}
 
@@ -347,6 +346,12 @@ export const Register: React.FC = () => {
                       placeholder="vd: ProGamerVN"
                     />
                   </div>
+                  {errors.username && (
+                    <p className="text-red-400 text-[10px] mt-1 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
+                      {errors.username}
+                    </p>
+                  )}
                 </div>
 
                 {/* Email */}
@@ -365,6 +370,12 @@ export const Register: React.FC = () => {
                       placeholder="email@example.com"
                     />
                   </div>
+                  {errors.email && (
+                    <p className="text-red-400 text-[10px] mt-1 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
+                      {errors.email}
+                    </p>
+                  )}
                 </div>
 
                 {/* Password */}
@@ -383,6 +394,12 @@ export const Register: React.FC = () => {
                       placeholder="Tối thiểu 8 ký tự"
                     />
                   </div>
+                  {errors.password && (
+                    <p className="text-red-400 text-[10px] mt-1 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
+                      {errors.password}
+                    </p>
+                  )}
                 </div>
 
                 {/* Confirm Password */}

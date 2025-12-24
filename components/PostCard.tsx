@@ -192,7 +192,7 @@ export const PostCard: React.FC<PostCardProps> = ({
                       src={item.url}
                       alt={`Content ${index + 1}`}
                       className={`${post.media.length === 1
-                        ? 'max-h-[80vh] w-auto max-w-full object-contain'
+                        ? 'max-h-[65vh] w-auto max-w-full object-contain'
                         : 'w-full h-full object-cover'} transition-transform duration-500 group-hover:scale-105 cursor-pointer`}
                       onClick={() => onOpenComments(post)}
                     />

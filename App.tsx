@@ -138,7 +138,7 @@ const AppContent: React.FC = () => {
               {/* Feed Page: Content + RightSidebar wrapper */}
               <div className="flex-1 flex flex-col min-h-screen min-w-0">
                 {showHeader && <Header onNavigate={handleTabChange} />}
-                <main className={`flex-1 ${showHeader ? 'mt-[110px]' : ''} relative`}>
+                <main className={`flex-1 ${showHeader ? 'mt-[90px]' : ''} relative`}>
                   {renderContent()}
                 </main>
               </div>
@@ -148,7 +148,7 @@ const AppContent: React.FC = () => {
             <>
               {/* Other Pages: Normal layout */}
               {showHeader && <Header onNavigate={handleTabChange} />}
-              <main className={`flex-1 ${showHeader ? 'mt-[110px]' : ''} relative`}>
+              <main className={`flex-1 ${showHeader ? 'mt-[90px]' : ''} relative`}>
                 {renderContent()}
               </main>
             </>

@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { MoreVertical, Trash2 } from 'lucide-react';
 import { VideoPlayer } from './VideoPlayer';
 import { LikesModal } from './LikesModal';
+import { HashtagText } from './HashtagText';
 
 // Types matching backend
 export interface MediaItem {
@@ -51,6 +53,8 @@ interface PostCardProps {
   onLike: (postId: string, isLiked: boolean) => void;
   onOpenComments: (post: FeedPost) => void;
   onShare?: (post: FeedPost) => void;
+  onDelete?: (postId: string) => void;
+  currentUserId?: string;
   showAuthor?: boolean;
 }
 
@@ -59,9 +63,37 @@ export const PostCard: React.FC<PostCardProps> = ({
   onLike,
   onOpenComments,
   onShare,
+  onDelete,
+  currentUserId,
   showAuthor = true,
 }) => {
   const [showLikesModal, setShowLikesModal] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+    if (showMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showMenu]);
+
+  const handleDeleteClick = () => {
+    setShowMenu(false);
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = () => {
+    setShowDeleteConfirm(false);
+    onDelete?.(post.id);
+  };
 
   return (
     <>
@@ -71,6 +103,36 @@ export const PostCard: React.FC<PostCardProps> = ({
         onClose={() => setShowLikesModal(false)}
         totalCount={post.like_count}
       />
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => setShowDeleteConfirm(false)}
+          />
+          <div className="relative bg-bg-secondary rounded-[16px] border border-white/10 p-6 max-w-[320px] w-full animate-in zoom-in-95 fade-in duration-200">
+            <h3 className="text-white font-bold text-[16px] mb-2">Xóa bài viết?</h3>
+            <p className="text-white/60 text-[13px] mb-5">
+              Bạn có chắc muốn xóa bài viết này? Hành động này không thể hoàn tác.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="flex-1 py-2.5 rounded-[10px] bg-white/10 text-white text-[13px] font-semibold hover:bg-white/20 transition-colors"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                className="flex-1 py-2.5 rounded-[10px] bg-red-500 text-white text-[13px] font-semibold hover:bg-red-600 transition-colors"
+              >
+                Xóa
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="bg-bg-secondary rounded-[10px] md:rounded-[12px] overflow-hidden mb-4 md:mb-6 border border-white/5">
         {/* Header - Responsive */}
         <div className="p-4 md:p-6 flex items-center justify-between">
@@ -95,13 +157,37 @@ export const PostCard: React.FC<PostCardProps> = ({
             </div>
           </div>
 
+          {/* 3-dot menu - only show for own posts */}
+          {currentUserId && post.author_id === currentUserId && onDelete && (
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={() => setShowMenu(!showMenu)}
+                className="p-2 hover:bg-white/10 rounded-full text-white/40 hover:text-white transition-all"
+              >
+                <MoreVertical size={18} />
+              </button>
+
+              {/* Dropdown menu */}
+              {showMenu && (
+                <div className="absolute right-0 top-full mt-1 bg-bg-secondary border border-white/10 rounded-[10px] shadow-xl overflow-hidden z-50 min-w-[140px] animate-in fade-in zoom-in-95 duration-150">
+                  <button
+                    onClick={handleDeleteClick}
+                    className="w-full px-4 py-2.5 flex items-center gap-2 text-red-400 hover:bg-white/5 transition-colors text-[13px]"
+                  >
+                    <Trash2 size={16} />
+                    Xóa bài viết
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Caption - shown before media for both regular and shared posts */}
         {post.content && (
           <div className="px-4 md:px-6 pb-3">
             <p className="text-white/90 text-[11px] md:text-[12px] leading-relaxed">
-              {post.content}
+              <HashtagText content={post.content} />
             </p>
           </div>
         )}
@@ -167,7 +253,7 @@ export const PostCard: React.FC<PostCardProps> = ({
             {post.shared_post.content && (
               <div className="px-3 md:px-4 pb-3 md:pb-4">
                 <p className="text-white/70 text-[10px] md:text-[11px] leading-relaxed line-clamp-3">
-                  {post.shared_post.content}
+                  <HashtagText content={post.shared_post.content} />
                 </p>
               </div>
             )}

@@ -192,14 +192,19 @@ const formatTime = (isoString: string): string => {
   return date.toLocaleDateString('vi-VN');
 };
 
-// Parse mentions in content and return JSX with clickable mentions
+// Special hashtags that should be highlighted in yellow
+const SPECIAL_HASHTAGS = ['happynewyear2026', 'nguyensontung'];
+
+// Parse mentions and hashtags in content and return JSX with clickable mentions and highlighted hashtags
 const renderContentWithMentions = (
   content: string,
   friends: FriendForMention[],
   userMapping: Map<string, string>
 ): React.ReactNode => {
-  const parts = content.split(/(@\w+)/g);
+  // Split by both mentions and hashtags
+  const parts = content.split(/(@\w+|#\w+)/g);
   return parts.map((part, index) => {
+    // Handle mentions
     if (part.startsWith('@')) {
       const username = part.slice(1);
       let userId = userMapping.get(username);
@@ -222,6 +227,37 @@ const renderContentWithMentions = (
       }
       return <span key={index} className="text-primary font-semibold">{part}</span>;
     }
+
+    // Handle hashtags
+    if (part.startsWith('#')) {
+      const tag = part.slice(1).toLowerCase();
+      const isSpecial = SPECIAL_HASHTAGS.includes(tag);
+
+      if (isSpecial) {
+        return (
+          <span
+            key={index}
+            className="text-yellow-400 font-semibold hover:text-yellow-300 transition-colors cursor-pointer animate-pulse"
+            style={{
+              textShadow: '0 0 10px rgba(250, 204, 21, 0.5)',
+            }}
+          >
+            {part}
+          </span>
+        );
+      }
+
+      // Regular hashtag
+      return (
+        <span
+          key={index}
+          className="text-primary hover:underline cursor-pointer"
+        >
+          {part}
+        </span>
+      );
+    }
+
     return part;
   });
 };
@@ -605,7 +641,7 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
             </div>
 
             {/* Content */}
-            <p className="text-white/90 text-[13px] leading-relaxed mb-4 whitespace-pre-wrap">{post.content}</p>
+            <p className="text-white/90 text-[13px] leading-relaxed mb-4 whitespace-pre-wrap">{renderContentWithMentions(post.content, friends, userMapping)}</p>
 
             {/* Media */}
             {post.media.length > 0 && (

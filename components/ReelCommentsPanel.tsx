@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Loader2, Trash2, Send, ChevronDown } from 'lucide-react';
+import { HashtagText } from './HashtagText';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
@@ -326,7 +327,7 @@ export const ReelCommentsPanel: React.FC<ReelCommentsPanelProps> = ({
                                                 {comment.author.username}
                                             </a>
                                             <p className="text-white/80 text-[13px] mt-0.5 break-words">
-                                                {comment.content}
+                                                <HashtagText content={comment.content} />
                                             </p>
                                         </div>
                                         <div className="flex items-center gap-4 mt-1.5 ml-1 text-[11px]">
@@ -400,7 +401,7 @@ export const ReelCommentsPanel: React.FC<ReelCommentsPanelProps> = ({
                                                                             {reply.author.username}
                                                                         </a>
                                                                         <p className="text-white/80 text-[12px] mt-0.5 break-words">
-                                                                            {reply.content}
+                                                                            <HashtagText content={reply.content} />
                                                                         </p>
                                                                     </div>
                                                                     <div className="flex items-center gap-3 mt-1 ml-1 text-[10px]">

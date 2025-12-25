@@ -147,6 +147,26 @@ export const Feed: React.FC = () => {
     }
   }, [token, API_URL]);
 
+  const handleDeletePost = useCallback(async (postId: string) => {
+    if (!token) return;
+
+    // Confirm deletion
+    if (!window.confirm('Bạn có chắc muốn xóa bài viết này?')) return;
+
+    try {
+      const response = await fetch(`${API_URL}/posts/${postId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      if (response.ok) {
+        // Remove post from state
+        setPosts(prev => prev.filter(post => post.id !== postId));
+      }
+    } catch (err) {
+      console.error('Delete post failed:', err);
+    }
+  }, [token]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -176,6 +196,8 @@ export const Feed: React.FC = () => {
               onLike={handleLikePost}
               onOpenComments={setSelectedPost}
               onShare={setPostToShare}
+              onDelete={handleDeletePost}
+              currentUserId={user?.id}
             />
           ))}
         </div>

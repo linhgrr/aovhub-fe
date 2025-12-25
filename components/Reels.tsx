@@ -3,6 +3,7 @@ import { Loader2, AlertCircle, Plus, Volume2, VolumeX, Play, Pause, MessageCircl
 import { CreateReel } from './CreateReel';
 import { MyReelsPanel } from './MyReelsPanel';
 import { ReelCommentsPanel } from './ReelCommentsPanel';
+import { HashtagText } from './HashtagText';
 
 interface ReelData {
   id: string;
@@ -536,7 +537,7 @@ export const Reels: React.FC = () => {
           {/* Caption */}
           {currentReel.caption && (
             <p className="text-white/90 text-[13px] leading-relaxed mb-3 line-clamp-2">
-              {currentReel.caption}
+              <HashtagText content={currentReel.caption} />
             </p>
           )}
 

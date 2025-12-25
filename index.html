@@ -127,13 +127,12 @@
     .nav-item-active-bg {
       position: absolute;
       right: 0;
-      top: 50%;
-      transform: translateY(-50%);
       width: 100px;
       height: 60px;
       background: #1a1c26;
       border-radius: 28px 0 0 28px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+      z-index: 5;
     }
 
     /* Inverted corner - Top */
@@ -172,10 +171,6 @@
       justify-content: center;
       border-radius: 12px;
       transition: all 0.3s ease;
-    }
-
-    .nav-icon-container.active {
-      /* Icon without purple box - only the morphing background shows */
     }
   </style>
 </head>

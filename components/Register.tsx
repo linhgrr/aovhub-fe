@@ -302,9 +302,9 @@ export const Register: React.FC = () => {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
             <img
-              src="https://i.ibb.co/84t6d1dq/image-removebg-preview-1-1.png"
+              src="https://i.ibb.co/Y7zWPJVZ/liqi88-2026.png"
               alt="Arena Hub Logo"
-              className="h-20 w-auto object-contain"
+              className="h-28 w-auto object-contain"
             />
           </div>
           <h2 className="text-2xl font-montserrat font-bold text-white mb-2 uppercase">ĐĂNG KÝ TÀI KHOẢN</h2>

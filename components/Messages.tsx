@@ -30,9 +30,11 @@ interface MessagesProps {
     isOpen: boolean;
     onClose: () => void;
     onRefreshUnread?: () => void;
+    pendingDirectMessage?: { userId: string; username: string; avatar_url: string | null } | null;
+    onDirectMessageOpened?: () => void;
 }
 
-export const Messages: React.FC<MessagesProps> = ({ isOpen, onClose, onRefreshUnread }) => {
+export const Messages: React.FC<MessagesProps> = ({ isOpen, onClose, onRefreshUnread, pendingDirectMessage, onDirectMessageOpened }) => {
     const [conversations, setConversations] = useState<ConversationListItem[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [selectedConversation, setSelectedConversation] = useState<{
@@ -90,6 +92,38 @@ export const Messages: React.FC<MessagesProps> = ({ isOpen, onClose, onRefreshUn
     useEffect(() => {
         if (isOpen) fetchConversations();
     }, [isOpen]);
+
+    // Handle pending direct message from Friends page
+    useEffect(() => {
+        if (isOpen && pendingDirectMessage && !selectedConversation) {
+            const openPendingChat = async () => {
+                try {
+                    const token = localStorage.getItem('auth_token');
+                    if (!token) return;
+
+                    const response = await fetch(`${API_URL}/messages/direct/${pendingDirectMessage.userId}`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        setSelectedConversation({
+                            id: data.data.id,
+                            name: data.data.name || pendingDirectMessage.username,
+                            avatar_url: data.data.avatar_url || pendingDirectMessage.avatar_url,
+                            type: 'DIRECT',
+                        });
+                        onDirectMessageOpened?.();
+                    }
+                } catch (error) {
+                    console.error('Failed to open direct chat:', error);
+                    onDirectMessageOpened?.();
+                }
+            };
+            openPendingChat();
+        }
+    }, [isOpen, pendingDirectMessage, selectedConversation, onDirectMessageOpened]);
 
     useEffect(() => {
         if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);

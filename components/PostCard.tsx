@@ -214,7 +214,7 @@ export const PostCard: React.FC<PostCardProps> = ({
           <div className="flex items-center gap-4 md:gap-5">
             <button
               onClick={() => onLike(post.id, post.is_liked)}
-              className={`transition-all hover:scale-110 ${post.is_liked ? '' : 'opacity-60 hover:opacity-100'}`}
+              className={`transition-all hover:scale-110 ${post.is_liked ? '' : 'opacity-100 hover:opacity-100'}`}
             >
               <img
                 src={post.is_liked ? "/assets/images/heart-filled.svg" : "/assets/images/heart.svg"}
@@ -224,7 +224,7 @@ export const PostCard: React.FC<PostCardProps> = ({
             </button>
             <button
               onClick={() => onOpenComments(post)}
-              className="opacity-60 hover:opacity-100 transition-all hover:scale-110"
+              className="opacity-100 hover:opacity-100 transition-all hover:scale-110"
             >
               <img
                 src="/assets/images/chat.svg"
@@ -234,7 +234,7 @@ export const PostCard: React.FC<PostCardProps> = ({
             </button>
             <button
               onClick={() => onShare?.(post)}
-              className="opacity-60 hover:opacity-100 transition-all hover:scale-110"
+              className="opacity-100 hover:opacity-100 transition-all hover:scale-110"
             >
               <img
                 src="/assets/images/send.svg"
@@ -244,11 +244,11 @@ export const PostCard: React.FC<PostCardProps> = ({
             </button>
           </div>
 
-          <button className="opacity-60 hover:opacity-100 transition-all">
+          {/* <button className="opacity-60 hover:opacity-100 transition-all">
             <svg className="w-[18px] h-[18px] md:w-5 md:h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
             </svg>
-          </button>
+          </button> */}
         </div>
 
         {/* Stats and Content - Responsive */}

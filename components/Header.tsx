@@ -72,6 +72,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
     const [showMessages, setShowMessages] = useState(false);
     const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
     const [searchValue, setSearchValue] = useState('');
+    const [pendingDirectMessage, setPendingDirectMessage] = useState<{ userId: string; username: string; avatar_url: string | null } | null>(null);
 
     const notificationRef = useRef<HTMLDivElement>(null);
     const profileRef = useRef<HTMLDivElement>(null);
@@ -94,6 +95,17 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
     useEffect(() => {
         fetchUnreadCount();
         fetchUnreadMessagesCount();
+    }, []);
+
+    // Listen for openDirectMessage event from Friends page
+    useEffect(() => {
+        const handleOpenDirectMessage = (event: CustomEvent<{ userId: string; username: string; avatar_url: string | null }>) => {
+            setPendingDirectMessage(event.detail);
+            setShowMessages(true);
+        };
+
+        window.addEventListener('openDirectMessage', handleOpenDirectMessage as EventListener);
+        return () => window.removeEventListener('openDirectMessage', handleOpenDirectMessage as EventListener);
     }, []);
 
     const fetchUnreadCount = async () => {
@@ -383,8 +395,13 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
 
             <Messages
                 isOpen={showMessages}
-                onClose={() => setShowMessages(false)}
+                onClose={() => {
+                    setShowMessages(false);
+                    setPendingDirectMessage(null);
+                }}
                 onRefreshUnread={fetchUnreadMessagesCount}
+                pendingDirectMessage={pendingDirectMessage}
+                onDirectMessageOpened={() => setPendingDirectMessage(null)}
             />
         </>
     );

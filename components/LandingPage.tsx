@@ -85,9 +85,9 @@ const LandingPage: React.FC = () => {
 
                 <div className="absolute flex items-center">
                     <img
-                        src="https://i.ibb.co/84t6d1dq/image-removebg-preview-1-1.png"
+                        src="https://i.ibb.co/Y7zWPJVZ/liqi88-2026.png"
                         alt="ArenaHub Logo"
-                        className="h-8 md:h-14 w-auto drop-shadow-[0_0_15px_rgba(140,103,246,0.5)]"
+                        className="h-12 md:h-20 w-auto drop-shadow-[0_0_15px_rgba(140,103,246,0.5)]"
                     />
                 </div>
 
@@ -144,9 +144,9 @@ const LandingPage: React.FC = () => {
 
                 {/* Social Sidebar - Responsive */}
                 <div className="hidden lg:flex absolute left-8 bottom-12 flex-col gap-6">
-                    <a href="#" className="p-2 hover:text-primary transition-colors hover:scale-110 border border-white/5 rounded-full bg-white/5 backdrop-blur-sm"><Instagram className="w-5 h-5" /></a>
-                    <a href="#" className="p-2 hover:text-primary transition-colors hover:scale-110 border border-white/5 rounded-full bg-white/5 backdrop-blur-sm"><Facebook className="w-5 h-5" /></a>
-                    <a href="#" className="p-2 hover:text-primary transition-colors hover:scale-110 border border-white/5 rounded-full bg-white/5 backdrop-blur-sm font-bold italic text-lg w-9 h-9 flex items-center justify-center">X</a>
+                    <a href="https://www.facebook.com/tung.nguyenson.1044" className="p-2 hover:text-primary transition-colors hover:scale-110 border border-white/5 rounded-full bg-white/5 backdrop-blur-sm"><Instagram className="w-5 h-5" /></a>
+                    <a href="https://www.facebook.com/tung.nguyenson.1044" className="p-2 hover:text-primary transition-colors hover:scale-110 border border-white/5 rounded-full bg-white/5 backdrop-blur-sm"><Facebook className="w-5 h-5" /></a>
+                    <a href="https://www.facebook.com/tung.nguyenson.1044" className="p-2 hover:text-primary transition-colors hover:scale-110 border border-white/5 rounded-full bg-white/5 backdrop-blur-sm font-bold italic text-lg w-9 h-9 flex items-center justify-center">X</a>
                 </div>
 
                 {/* Carousel Controls - Repositioned for small screens */}
@@ -273,9 +273,9 @@ const LandingPage: React.FC = () => {
             <footer className="relative z-10 px-6 md:px-12 py-12 border-t border-white/5 bg-black/40">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-8">
                     <img
-                        src="https://i.ibb.co/84t6d1dq/image-removebg-preview-1-1.png"
+                        src="https://i.ibb.co/Y7zWPJVZ/liqi88-2026.png"
                         alt="ArenaHub Logo"
-                        className="h-10 w-auto opacity-50"
+                        className="h-14 w-auto opacity-50"
                     />
                     <p className="text-[10px] md:text-xs text-white/30 uppercase tracking-[2px]">
                         © 2024 ArenaHub Social Platform. All Rights Reserved.

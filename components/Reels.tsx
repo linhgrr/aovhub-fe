@@ -375,12 +375,12 @@ export const Reels: React.FC = () => {
           />
         </div>
 
-        {/* Reel Counter */}
+        {/* Reel Counter
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30">
           <span className="text-white/60 text-[11px] font-medium bg-black/30 px-3 py-1 rounded-full backdrop-blur-sm">
             {currentIndex + 1} / {reels.length}
           </span>
-        </div>
+        </div> */}
 
         {/* Video Container with snap scroll simulation */}
         <div className="absolute inset-0">

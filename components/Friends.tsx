@@ -44,7 +44,7 @@ export const Friends: React.FC = () => {
   useEffect(() => {
     const fetchFriends = async () => {
       if (!token) return;
-      
+
       try {
         const response = await fetch(`${API_URL}/friends`, {
           headers: { 'Authorization': `Bearer ${token}` },
@@ -67,7 +67,7 @@ export const Friends: React.FC = () => {
   useEffect(() => {
     const fetchPending = async () => {
       if (!token) return;
-      
+
       try {
         const response = await fetch(`${API_URL}/friends/pending`, {
           headers: { 'Authorization': `Bearer ${token}` },
@@ -89,7 +89,7 @@ export const Friends: React.FC = () => {
   const handleRespondToRequest = async (friendshipId: string, accept: boolean) => {
     if (!token) return;
     setRespondingTo(friendshipId);
-    
+
     try {
       const response = await fetch(`${API_URL}/friends/respond/${friendshipId}`, {
         method: 'POST',
@@ -104,7 +104,7 @@ export const Friends: React.FC = () => {
         // Remove from pending list
         const acceptedRequest = pendingRequests.find(r => r.friendship_id === friendshipId);
         setPendingRequests(prev => prev.filter(r => r.friendship_id !== friendshipId));
-        
+
         // If accepted, add to friends list
         if (accept && acceptedRequest) {
           setFriends(prev => [...prev, acceptedRequest.requester]);
@@ -124,7 +124,7 @@ export const Friends: React.FC = () => {
   const handleRemoveFriend = async (userId: string) => {
     if (!token) return;
     setRemovingFriend(userId);
-    
+
     try {
       const response = await fetch(`${API_URL}/friends/${userId}`, {
         method: 'DELETE',
@@ -145,8 +145,15 @@ export const Friends: React.FC = () => {
     }
   };
 
-  const handleMessageFriend = (userId: string) => {
-    window.location.hash = `messages?user=${userId}`;
+  const handleMessageFriend = (friend: FriendData) => {
+    // Dispatch custom event to open Messages modal and start chat with this friend
+    window.dispatchEvent(new CustomEvent('openDirectMessage', {
+      detail: {
+        userId: friend.id,
+        username: friend.username,
+        avatar_url: friend.avatar_url
+      }
+    }));
   };
 
   if (!isAuthenticated) {
@@ -155,7 +162,7 @@ export const Friends: React.FC = () => {
         <div className="text-center">
           <Users className="w-16 h-16 text-slate-600 mx-auto mb-4" />
           <p className="text-slate-400">Vui lòng đăng nhập để xem danh sách bạn bè</p>
-          <button 
+          <button
             onClick={() => window.location.hash = 'login'}
             className="mt-4 bg-gold-500 text-slate-900 font-bold py-2 px-6 rounded hover:bg-gold-400 transition-colors"
           >
@@ -205,12 +212,12 @@ export const Friends: React.FC = () => {
               {pendingRequests.map((request) => (
                 <div key={request.friendship_id} className="p-4 md:p-5 flex items-center gap-4 hover:bg-white/5 transition-colors">
                   {/* Avatar */}
-                  <div 
+                  <div
                     className="w-12 h-12 rounded-full overflow-hidden ring-2 ring-white/5 cursor-pointer hover:ring-primary/30 transition-colors"
                     onClick={() => handleViewProfile(request.requester.id)}
                   >
-                    <img 
-                      src={request.requester.avatar_url || '/assets/images/home.svg'} 
+                    <img
+                      src={request.requester.avatar_url || '/assets/images/home.svg'}
                       alt={request.requester.username}
                       className="w-full h-full object-cover"
                     />
@@ -218,7 +225,7 @@ export const Friends: React.FC = () => {
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <div 
+                    <div
                       className="font-semibold text-white text-[14px] truncate cursor-pointer hover:text-primary transition-colors"
                       onClick={() => handleViewProfile(request.requester.id)}
                     >
@@ -291,24 +298,24 @@ export const Friends: React.FC = () => {
           ) : (
             <div className="divide-y divide-white/5">
               {friends.map((friend) => (
-                <div 
-                  key={friend.id} 
+                <div
+                  key={friend.id}
                   className="p-4 md:p-5 flex items-center gap-4 hover:bg-white/5 transition-colors group"
                 >
                   {/* Avatar */}
-                  <div 
+                  <div
                     className="w-12 h-12 rounded-full overflow-hidden ring-2 ring-white/5 group-hover:ring-primary/30 transition-colors flex-shrink-0 cursor-pointer"
                     onClick={() => handleViewProfile(friend.id)}
                   >
-                    <img 
-                      src={friend.avatar_url || '/assets/images/home.svg'} 
+                    <img
+                      src={friend.avatar_url || '/assets/images/home.svg'}
                       alt={friend.username}
                       className="w-full h-full object-cover"
                     />
                   </div>
 
                   {/* Info */}
-                  <div 
+                  <div
                     className="flex-1 min-w-0 cursor-pointer"
                     onClick={() => handleViewProfile(friend.id)}
                   >
@@ -333,7 +340,7 @@ export const Friends: React.FC = () => {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleMessageFriend(friend.id);
+                        handleMessageFriend(friend);
                       }}
                       className="w-9 h-9 rounded-full bg-primary/20 text-primary hover:bg-primary hover:text-white transition-all flex items-center justify-center"
                       title="Nhắn tin"
@@ -388,8 +395,8 @@ export const Friends: React.FC = () => {
               {/* Friend Info */}
               <div className="bg-black/30 rounded-[12px] p-4 mb-6 flex items-center gap-3">
                 <div className="w-11 h-11 rounded-full overflow-hidden ring-2 ring-white/5">
-                  <img 
-                    src={friendToRemove.avatar_url || '/assets/images/home.svg'} 
+                  <img
+                    src={friendToRemove.avatar_url || '/assets/images/home.svg'}
                     alt={friendToRemove.username}
                     className="w-full h-full object-cover"
                   />

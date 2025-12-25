@@ -4,6 +4,7 @@ import { API_BASE_URL } from '../constants';
 import { useAuth } from '../contexts/authContext';
 import { TeamDetail, TeamMemberInfo } from '../types';
 import { TeamChat } from './TeamChat';
+import { VoiceChat } from './VoiceChat';
 
 interface TeamMemberDashboardProps {
     teamId: string;
@@ -195,9 +196,14 @@ export const TeamMemberDashboard: React.FC<TeamMemberDashboardProps> = ({ teamId
                 </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8">
+            {/* Voice Chat Section at top */}
+            <div className="mb-8">
+                <VoiceChat teamId={teamId} />
+            </div>
+
+            <div className="grid lg:grid-cols-3 gap-8 items-start">
                 {/* Current Members */}
-                <div className="bg-slate-800/60 border border-slate-700/50 shadow-lg rounded-xl overflow-hidden">
+                <div className="lg:col-span-1 bg-slate-800/60 border border-slate-700/50 shadow-lg rounded-xl overflow-hidden">
                     <div className="bg-gradient-to-r from-slate-800 to-slate-900 border-b border-slate-700 p-4 flex items-center justify-between">
                         <h2 className="text-lg font-bold text-white flex items-center gap-2 uppercase tracking-wide">
                             <div className="w-2 h-2 bg-blue-500 rotate-45"></div>
@@ -205,7 +211,7 @@ export const TeamMemberDashboard: React.FC<TeamMemberDashboardProps> = ({ teamId
                             <span className="bg-slate-700 text-blue-400 text-xs px-2 py-0.5 rounded-full">{team.members.length}/{team.max_members}</span>
                         </h2>
                     </div>
-                    <div className="p-4 space-y-2 max-h-[400px] overflow-y-auto custom-scrollbar">
+                    <div className="p-4 space-y-2 max-h-[500px] overflow-y-auto custom-scrollbar">
                         {team.members.map((member: TeamMemberInfo, index: number) => (
                             <div
                                 key={member.id}
@@ -263,13 +269,15 @@ export const TeamMemberDashboard: React.FC<TeamMemberDashboardProps> = ({ teamId
                 </div>
 
                 {/* Team Chat */}
-                {team.conversation_id && (
-                    <TeamChat
-                        conversationId={team.conversation_id}
-                        teamName={team.name}
-                        className="h-[500px]"
-                    />
-                )}
+                <div className="lg:col-span-2">
+                    {team.conversation_id && (
+                        <TeamChat
+                            conversationId={team.conversation_id}
+                            teamName={team.name}
+                            className="h-[600px] shadow-lg rounded-xl overflow-hidden border border-slate-700/50"
+                        />
+                    )}
+                </div>
             </div>
         </div>
     );

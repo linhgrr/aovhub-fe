@@ -4,6 +4,7 @@ import { API_BASE_URL } from '../constants';
 import { useAuth } from '../contexts/authContext';
 import { TeamDetail, TeamJoinRequest, TeamMemberInfo } from '../types';
 import { TeamChat } from './TeamChat';
+import { VoiceChat } from './VoiceChat';
 
 interface TeamOwnerDashboardProps {
     teamId: string;
@@ -262,7 +263,8 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
                 </p>
             </div>
 
-                <div className="grid md:grid-cols-2 gap-8">
+            {/* Row 1: Requests & Members */}
+            <div className="grid md:grid-cols-2 gap-8 mb-8 items-start">
                 {/* Pending Requests */}
                 <div className="bg-slate-800/60 border border-slate-700/50 shadow-lg rounded-xl overflow-hidden">
                     <div className="bg-gradient-to-r from-slate-800 to-slate-900 border-b border-slate-700 p-4 flex items-center justify-between">
@@ -272,11 +274,11 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
                             <span className="bg-slate-700 text-primary text-xs px-2 py-0.5 rounded-full">{requests.length}</span>
                         </h2>
                     </div>
-                    <div className="p-4 space-y-3 h-[400px] overflow-y-auto custom-scrollbar">
+                    <div className="p-4 space-y-3 h-[400px] overflow-y-auto custom-scrollbar font-sans">
                         {requests.length === 0 ? (
                             <div className="h-full flex flex-col items-center justify-center text-slate-500 space-y-3">
                                 <Users className="w-12 h-12 opacity-20" />
-                                <p className="font-mono text-sm">Chưa có yêu cầu mới</p>
+                                <p className="font-mono text-sm uppercase tracking-tighter opacity-50">Chưa có yêu cầu mới</p>
                             </div>
                         ) : (
                             <div className="space-y-3">
@@ -335,7 +337,7 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
                 </div>
 
                 {/* Current Members */}
-                <div className="bg-slate-800/60 border border-slate-700/50 shadow-lg rounded-xl overflow-hidden">
+                <div className="bg-slate-800/60 border border-slate-700/50 shadow-lg rounded-xl overflow-hidden font-sans">
                     <div className="bg-gradient-to-r from-slate-800 to-slate-900 border-b border-slate-700 p-4 flex items-center justify-between">
                         <h2 className="text-lg font-bold text-white flex items-center gap-2 uppercase tracking-wide">
                             <div className="w-2 h-2 bg-blue-500 rotate-45"></div>
@@ -374,15 +376,6 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
                                             <Trophy className="w-3 h-3 text-primary" />
                                             {translateRank(member.rank)}
                                         </span>
-                                        {member.main_role && (
-                                            <>
-                                                <span className="text-slate-600">|</span>
-                                                <span className="flex items-center gap-1 text-slate-300">
-                                                    <Target className="w-3 h-3" />
-                                                    {translateRole(member.main_role)}
-                                                </span>
-                                            </>
-                                        )}
                                     </div>
                                 </div>
                                 {index > 0 && (
@@ -411,13 +404,18 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
                 </div>
             </div>
 
-            {/* Team Chat Section */}
+            {/* Row 2: Voice Chat Section */}
+            <div className="mb-8">
+                <VoiceChat teamId={teamId} />
+            </div>
+
+            {/* Row 3: Team Chat Section */}
             {team.conversation_id && (
                 <div className="mt-8">
                     <TeamChat
                         conversationId={team.conversation_id}
                         teamName={team.name}
-                        className="h-[500px]"
+                        className="h-[600px] shadow-2xl rounded-xl overflow-hidden border border-white/5"
                     />
                 </div>
             )}

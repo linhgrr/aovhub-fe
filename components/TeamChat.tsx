@@ -440,7 +440,7 @@ export const TeamChat: React.FC<TeamChatProps> = ({
             {/* Messages Area */}
             <div
                 ref={messagesContainerRef}
-                className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar min-h-[300px] max-h-[400px]"
+                className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar"
             >
                 {isLoading ? (
                     <div className="flex items-center justify-center py-8">
@@ -503,7 +503,7 @@ export const TeamChat: React.FC<TeamChatProps> = ({
                                         <div className={`rounded-xl px-3 py-2 ${isOwnMessage(message)
                                             ? 'bg-primary text-white rounded-br-sm'
                                             : 'bg-slate-700 text-white/90 rounded-bl-sm'
-                                        }`}>
+                                            }`}>
                                             {/* Media */}
                                             {message.media && message.media.length > 0 && (
                                                 <div className="mb-2">

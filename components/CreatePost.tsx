@@ -166,7 +166,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated, apiUrl })
         duration={3500}
       />
 
-      <div className="bg-bg-secondary rounded-[16px] border border-white/5 transition-all duration-300 overflow-hidden shadow-lg">
+      <div className=" bg-bg-secondary rounded-[16px] border border-white/5 transition-all duration-300 overflow-hidden shadow-lg">
         {/* Header Section */}
         <div className="p-4 md:p-6 pb-3">
           <span className="text-primary text-[13px] font-medium tracking-wide">Bảng Tin Chiến Trường</span>
@@ -222,7 +222,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated, apiUrl })
 
         {/* Modal Popup - Full Editor */}
         {isExpanded && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
             {/* Backdrop */}
             <div
               className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200"

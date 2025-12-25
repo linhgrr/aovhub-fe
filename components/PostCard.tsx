@@ -3,6 +3,7 @@ import { MoreVertical, Trash2 } from 'lucide-react';
 import { VideoPlayer } from './VideoPlayer';
 import { LikesModal } from './LikesModal';
 import { HashtagText } from './HashtagText';
+import { formatTimeAgo, formatDate } from '../utils/timeUtils';
 
 // Types matching backend
 export interface MediaItem {
@@ -107,7 +108,7 @@ export const PostCard: React.FC<PostCardProps> = ({
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div 
+          <div
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             onClick={() => setShowDeleteConfirm(false)}
           />
@@ -153,7 +154,11 @@ export const PostCard: React.FC<PostCardProps> = ({
                   <span className="text-[#7f7f7f] text-[10px] md:text-[11px]">đã chia sẻ bài viết</span>
                 )}
               </div>
-              <span className="text-[#7f7f7f] text-[9px] md:text-[10px] uppercase">Công khai</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[#7f7f7f] text-[9px] md:text-[10px]">{formatTimeAgo(post.created_at)}</span>
+                <span className="text-[#7f7f7f] text-[9px] md:text-[10px]">•</span>
+                <span className="text-[#7f7f7f] text-[9px] md:text-[10px] uppercase">Công khai</span>
+              </div>
             </div>
           </div>
 
@@ -209,7 +214,7 @@ export const PostCard: React.FC<PostCardProps> = ({
                   {post.shared_post.author.username}
                 </a>
                 <span className="text-[#7f7f7f] text-[8px] md:text-[9px]">
-                  {new Date(post.shared_post.created_at).toLocaleDateString('vi-VN')}
+                  {formatDate(post.shared_post.created_at)}
                 </span>
               </div>
             </div>

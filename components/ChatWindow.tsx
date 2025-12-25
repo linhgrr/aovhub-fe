@@ -3,6 +3,7 @@ import { Send, X, ChevronLeft, User as UserIcon, Users, Smile, Paperclip, Check,
 import EmojiPicker, { EmojiClickData, Theme } from 'emoji-picker-react';
 import { useAuth } from '../contexts/authContext';
 import { GroupMembersModal } from './GroupMembersModal';
+import { formatTime as formatTimeUtil, formatDateSeparator as formatDateSeparatorUtil } from '../utils/timeUtils';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/api/v1';
@@ -409,19 +410,11 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     };
 
     const formatTime = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+        return formatTimeUtil(dateString);
     };
 
     const formatDateHeader = (dateString: string) => {
-        const date = new Date(dateString);
-        const today = new Date();
-        const yesterday = new Date(today);
-        yesterday.setDate(yesterday.getDate() - 1);
-
-        if (date.toDateString() === today.toDateString()) return 'Hôm nay';
-        if (date.toDateString() === yesterday.toDateString()) return 'Hôm qua';
-        return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        return formatDateSeparatorUtil(dateString);
     };
 
     const shouldShowDateHeader = (message: MessageItem, index: number) => {

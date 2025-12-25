@@ -7,6 +7,7 @@ import {
 } from '../types';
 import { API_BASE_URL } from '../constants';
 import { useAuth } from '../contexts/authContext';
+import { formatTimeAgo, formatFullDate } from '../utils/timeUtils';
 
 interface ForumThreadPageProps {
   threadId: string;
@@ -24,27 +25,10 @@ const CommentItem: React.FC<{
   // Handle snake_case from API
   const createdAt = comment.createdAt || (comment as any).created_at;
 
+  // Use shared time utility
   const formatDate = (dateStr: string | undefined): string => {
     if (!dateStr) return '';
-    const date = new Date(dateStr);
-    if (isNaN(date.getTime())) return '';
-    
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMins / 60);
-    const diffDays = Math.floor(diffHours / 24);
-
-    if (diffMins < 1) return 'Vừa xong';
-    if (diffMins < 60) return `${diffMins} phút trước`;
-    if (diffHours < 24) return `${diffHours} giờ trước`;
-    if (diffDays < 7) return `${diffDays} ngày trước`;
-    
-    return date.toLocaleDateString('vi-VN', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
-    });
+    return formatTimeAgo(dateStr);
   };
 
   const isHidden = comment.status === ForumCommentStatus.HIDDEN ||
@@ -327,7 +311,7 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
 
   useEffect(() => {
     if (observerRef.current) observerRef.current.disconnect();
-    
+
     observerRef.current = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasMore && !loadingComments) {
@@ -336,11 +320,11 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
       },
       { threshold: 0.1 }
     );
-    
+
     if (loadMoreRef.current) {
       observerRef.current.observe(loadMoreRef.current);
     }
-    
+
     return () => observerRef.current?.disconnect();
   }, [hasMore, loadingComments, loadMoreComments]);
 
@@ -451,20 +435,9 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
     }
   };
 
+  // Use shared time utility for thread page
   const formatDate = (dateStr: string): string => {
-    const date = new Date(dateStr);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMins / 60);
-    const diffDays = Math.floor(diffHours / 24);
-
-    if (diffMins < 1) return 'Vừa xong';
-    if (diffMins < 60) return `${diffMins} phút trước`;
-    if (diffHours < 24) return `${diffHours} giờ trước`;
-    if (diffDays < 7) return `${diffDays} ngày trước`;
-    
-    return date.toLocaleString('vi-VN');
+    return formatTimeAgo(dateStr);
   };
 
   // Set focus to comment input when replying
@@ -670,7 +643,7 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
         ) : (
           <div className="space-y-3 md:space-y-4">
             {comments.map((comment, index) => (
-              <div 
+              <div
                 key={comment.id}
                 className="animate-in fade-in slide-in-from-bottom-2"
                 style={{ animationDelay: `${index * 30}ms` }}
@@ -724,10 +697,10 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
               <div className="flex flex-wrap gap-2 mb-3 animate-in fade-in">
                 {commentMediaUrls.map((url, index) => (
                   <div key={index} className="relative">
-                    <img 
-                      src={url} 
-                      alt="" 
-                      className="h-14 w-14 object-cover rounded-lg border border-white/10" 
+                    <img
+                      src={url}
+                      alt=""
+                      className="h-14 w-14 object-cover rounded-lg border border-white/10"
                     />
                     <button
                       type="button"

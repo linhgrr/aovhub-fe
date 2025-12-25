@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/authContext';
 import EmojiPicker, { EmojiClickData, Theme } from 'emoji-picker-react';
 import { CreateGroupModal } from './CreateGroupModal';
 import { GroupMembersModal } from './GroupMembersModal';
+import { formatChatTime, formatTime as formatTimeUtil } from '../utils/timeUtils';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/api/v1';
@@ -366,22 +367,13 @@ export const RightSidebar: React.FC = () => {
         }
     };
 
+    // Use shared time utilities
     const formatTimeAgo = (dateString: string | null) => {
         if (!dateString) return '';
-        const date = new Date(dateString);
-        const now = new Date();
-        const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-        if (seconds < 60) return 'Vừa xong';
-        if (seconds < 3600) return `${Math.floor(seconds / 60)}p`;
-        if (seconds < 86400) return `${Math.floor(seconds / 3600)}h`;
-        return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+        return formatChatTime(dateString);
     };
 
-    const formatTime = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-    };
+    const formatTime = (dateString: string) => formatTimeUtil(dateString);
 
     const isOwnMessage = (message: MessageItem) => message.sender_id === currentUserId;
 

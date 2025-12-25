@@ -63,7 +63,7 @@ export const CreateTeamModal: React.FC<CreateTeamModalProps> = ({
     ];
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
             {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-black/80 backdrop-blur-sm"
@@ -144,8 +144,8 @@ export const CreateTeamModal: React.FC<CreateTeamModalProps> = ({
                                     type="button"
                                     onClick={() => setGameMode(option.value)}
                                     className={`p-2 border-2 transition-all rounded-lg ${gameMode === option.value
-                                            ? 'bg-primary text-white border-primary'
-                                            : 'bg-slate-800/60 border-slate-700/50 text-slate-400 hover:border-primary/30 hover:text-white'
+                                        ? 'bg-primary text-white border-primary'
+                                        : 'bg-slate-800/60 border-slate-700/50 text-slate-400 hover:border-primary/30 hover:text-white'
                                         }`}
                                 >
                                     <div className="font-bold text-sm uppercase">{option.label}</div>
@@ -170,8 +170,8 @@ export const CreateTeamModal: React.FC<CreateTeamModalProps> = ({
                                     type="button"
                                     onClick={() => setMaxMembers(num)}
                                     className={`flex-1 py-2 border-2 font-bold transition-all rounded-lg ${maxMembers === num
-                                            ? 'bg-primary text-white border-primary'
-                                            : 'bg-slate-800/60 border-slate-700/50 text-slate-400 hover:border-primary/30 hover:text-white'
+                                        ? 'bg-primary text-white border-primary'
+                                        : 'bg-slate-800/60 border-slate-700/50 text-slate-400 hover:border-primary/30 hover:text-white'
                                         }`}
                                 >
                                     {num}

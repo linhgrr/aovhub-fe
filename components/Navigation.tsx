@@ -45,7 +45,7 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab 
   return (
     <>
       {/* Desktop Sidebar - Fixed position with spacer */}
-      <aside className="fixed left-0 top-0 h-screen w-[126px] z-40 hidden md:block">
+      <aside className="fixed left-0 top-0 h-screen w-[126px] z-30 hidden md:block">
         <div className="relative h-full w-full flex flex-col">
           {/* Sidebar Background */}
           <div className="absolute inset-0 bg-bg-secondary border-r border-white/5"></div>
@@ -115,7 +115,7 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab 
       <div className="hidden md:block w-[126px] flex-shrink-0"></div>
 
       {/* Mobile Navigation */}
-      <nav className="fixed bottom-0 left-0 w-full bg-bg-main/95 backdrop-blur-md border-t border-white/5 md:hidden z-50 px-4 py-2 safe-area-inset-bottom">
+      <nav className="fixed bottom-0 left-0 w-full bg-bg-main/95 backdrop-blur-md border-t border-white/5 md:hidden z-35 px-4 py-2 safe-area-inset-bottom">
         <div className="flex justify-around items-center max-w-md mx-auto">
           {navItems.map((item) => {
             const isActive = activeTab === item.id ||

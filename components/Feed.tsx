@@ -5,6 +5,7 @@ import { PostDetailModal } from './PostDetailModal';
 import { PostCard, FeedPost } from './PostCard';
 import { SharePostModal } from './SharePostModal';
 import { CreatePost } from './CreatePost';
+import { ConfirmDialog } from './ConfirmDialog';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
@@ -77,6 +78,10 @@ export const Feed: React.FC = () => {
   const [postToShare, setPostToShare] = useState<FeedPost | null>(null);
   const [selectedPost, setSelectedPost] = useState<FeedPost | null>(null);
 
+  // Delete confirmation modal state
+  const [postToDelete, setPostToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const fetchFeed = async (cursor?: string) => {
     if (!token) return;
     try {
@@ -147,25 +152,31 @@ export const Feed: React.FC = () => {
     }
   }, [token, API_URL]);
 
-  const handleDeletePost = useCallback(async (postId: string) => {
-    if (!token) return;
+  // Open delete confirmation modal
+  const handleDeletePost = useCallback((postId: string) => {
+    setPostToDelete(postId);
+  }, []);
 
-    // Confirm deletion
-    if (!window.confirm('Bạn có chắc muốn xóa bài viết này?')) return;
+  // Confirm and execute deletion
+  const confirmDeletePost = useCallback(async () => {
+    if (!token || !postToDelete) return;
 
+    setIsDeleting(true);
     try {
-      const response = await fetch(`${API_URL}/posts/${postId}`, {
+      const response = await fetch(`${API_URL}/posts/${postToDelete}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` },
       });
       if (response.ok) {
-        // Remove post from state
-        setPosts(prev => prev.filter(post => post.id !== postId));
+        setPosts(prev => prev.filter(post => post.id !== postToDelete));
       }
     } catch (err) {
       console.error('Delete post failed:', err);
+    } finally {
+      setIsDeleting(false);
+      setPostToDelete(null);
     }
-  }, [token]);
+  }, [token, postToDelete]);
 
   if (isLoading) {
     return (
@@ -229,6 +240,19 @@ export const Feed: React.FC = () => {
             token={token || ''}
           />
         )}
+
+        {/* Delete Confirmation Modal */}
+        <ConfirmDialog
+          isOpen={!!postToDelete}
+          onClose={() => setPostToDelete(null)}
+          onConfirm={confirmDeletePost}
+          title="Xóa bài viết"
+          message="Bạn có chắc chắn muốn xóa bài viết này? Hành động này không thể hoàn tác."
+          confirmText="Xóa"
+          cancelText="Hủy"
+          isLoading={isDeleting}
+          variant="danger"
+        />
       </div>
     </>
   );

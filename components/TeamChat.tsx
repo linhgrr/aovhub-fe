@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Send, User as UserIcon, Users, Smile, Paperclip, Check, CheckCheck, Loader2, MessageSquare } from 'lucide-react';
 import EmojiPicker, { EmojiClickData, Theme } from 'emoji-picker-react';
 import { useAuth } from '../contexts/authContext';
+import { formatTime as formatTimeUtil, formatDateSeparator as formatDateSeparatorUtil } from '../utils/timeUtils';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/api/v1';
@@ -359,21 +360,9 @@ export const TeamChat: React.FC<TeamChatProps> = ({
         if (e.target.value.length > 0 && !typingTimeoutRef.current) sendTyping();
     };
 
-    const formatTime = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-    };
-
-    const formatDateHeader = (dateString: string) => {
-        const date = new Date(dateString);
-        const today = new Date();
-        const yesterday = new Date(today);
-        yesterday.setDate(yesterday.getDate() - 1);
-
-        if (date.toDateString() === today.toDateString()) return 'Hôm nay';
-        if (date.toDateString() === yesterday.toDateString()) return 'Hôm qua';
-        return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    };
+    // Use shared time utilities
+    const formatTime = (dateString: string) => formatTimeUtil(dateString);
+    const formatDateHeader = (dateString: string) => formatDateSeparatorUtil(dateString);
 
     const shouldShowDateHeader = (message: MessageItem, index: number) => {
         if (index === 0) return true;

@@ -4,6 +4,7 @@ import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { ForumCategory, ForumThreadListItem, ForumThreadsResponse, ThreadStatus } from '../types';
 import { API_BASE_URL } from '../constants';
 import { useAuth } from '../contexts/authContext';
+import { formatTimeAgo } from '../utils/timeUtils';
 
 interface ForumCategoryPageProps {
   categoryId: string;
@@ -159,7 +160,7 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
 
   useEffect(() => {
     if (observerRef.current) observerRef.current.disconnect();
-    
+
     observerRef.current = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasMore && !loadingMore) {
@@ -168,11 +169,11 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
       },
       { threshold: 0.1 }
     );
-    
+
     if (loadMoreRef.current) {
       observerRef.current.observe(loadMoreRef.current);
     }
-    
+
     return () => observerRef.current?.disconnect();
   }, [hasMore, loadingMore, loadMore]);
 
@@ -219,22 +220,10 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
     }
   };
 
+  // Use shared time utility
   const formatDate = (dateStr: string | undefined): string => {
     if (!dateStr) return '';
-    const date = new Date(dateStr);
-    if (isNaN(date.getTime())) return '';
-
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMins / 60);
-    const diffDays = Math.floor(diffHours / 24);
-
-    if (diffMins < 1) return 'Vừa xong';
-    if (diffMins < 60) return `${diffMins} phút trước`;
-    if (diffHours < 24) return `${diffHours} giờ trước`;
-    if (diffDays < 7) return `${diffDays} ngày trước`;
-    return date.toLocaleDateString('vi-VN');
+    return formatTimeAgo(dateStr);
   };
 
   const sortOptions = [
@@ -252,7 +241,7 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
           <div className="h-8 bg-white/5 rounded-full w-48 mb-2" />
           <div className="h-4 bg-white/5 rounded-full w-72" />
         </div>
-        
+
         {/* Threads Skeleton */}
         <div className="space-y-4">
           {[1, 2, 3, 4].map((i) => (
@@ -403,7 +392,7 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
                     </span>
                     <span className="text-white/30">•</span>
                     <span className="text-white/40">{formatDate(thread.createdAt)}</span>
-                    
+
                     {/* Stats */}
                     <div className="flex items-center gap-3 ml-auto">
                       <span className="flex items-center gap-1 text-white/40">
@@ -436,9 +425,9 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
 
       {/* New Thread Modal */}
       {showNewThread && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           {/* Backdrop */}
-          <div 
+          <div
             className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200"
             onClick={() => {
               if (!newTitle && !newContent && threadMediaUrls.length === 0) {
@@ -527,10 +516,10 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
                     {threadMediaUrls.map((url, index) => (
                       <div key={index} className="relative aspect-square rounded-[10px] 
                                                    overflow-hidden group bg-black/20">
-                        <img 
-                          src={url} 
-                          alt="" 
-                          className="w-full h-full object-cover" 
+                        <img
+                          src={url}
+                          alt=""
+                          className="w-full h-full object-cover"
                         />
                         <button
                           type="button"

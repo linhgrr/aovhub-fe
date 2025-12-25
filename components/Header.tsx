@@ -3,6 +3,7 @@ import { ChevronDown, User as UserIcon, Settings, LogOut, X, LayoutDashboard } f
 import { useAuth } from '../contexts/authContext';
 import { PostDetailModal } from './PostDetailModal';
 import { Messages } from './Messages';
+import { formatTimeAgo } from '../utils/timeUtils';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
@@ -207,15 +208,8 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
         }
     };
 
-    const formatTimeAgo = (dateString: string) => {
-        const date = new Date(dateString);
-        const now = new Date();
-        const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-        if (seconds < 60) return 'Vừa xong';
-        if (seconds < 3600) return `${Math.floor(seconds / 60)} phút`;
-        if (seconds < 86400) return `${Math.floor(seconds / 3600)} giờ`;
-        return `${Math.floor(seconds / 86400)} ngày`;
-    };
+    // Use shared time utility
+    const formatTimeAgoLocal = formatTimeAgo;
 
     const handleNotificationItemClick = async (notification: NotificationItem) => {
         setShowNotifications(false);
@@ -239,7 +233,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
     return (
         <>
             {/* Responsive Header - full width on mobile, offset on desktop */}
-            <header className="fixed top-0 left-0 md:left-[126px] right-0 h-[70px] md:h-[110px] bg-bg-main z-40 pl-4 md:pl-20 pr-4 md:pr-20 flex items-center border-b border-white/5 md:border-0">
+            <header className="fixed top-0 left-0 md:left-[126px] right-0 h-[70px] md:h-[110px] bg-bg-main z-30 pl-4 md:pl-20 pr-4 md:pr-20 flex items-center border-b border-white/5 md:border-0">
                 <div className="w-full flex items-center justify-between gap-3 md:gap-8">
 
                     {/* Mobile Logo */}
@@ -307,7 +301,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
                                                         <img src={n.actor.avatar_url || '/assets/images/home.svg'} className="w-8 h-8 rounded-lg object-cover" alt="" />
                                                         <div className="flex-1">
                                                             <p className="text-xs text-white leading-relaxed">{n.content}</p>
-                                                            <p className="text-[10px] text-[#7f7f7f] mt-1">{formatTimeAgo(n.created_at)}</p>
+                                                            <p className="text-[10px] text-[#7f7f7f] mt-1">{formatTimeAgoLocal(n.created_at)}</p>
                                                         </div>
                                                     </div>
                                                 </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { MessageCircle, Search, Plus, Users, User as UserIcon, X, GripVertical } from 'lucide-react';
 import { ChatWindow } from './ChatWindow';
 import { CreateGroupModal } from './CreateGroupModal';
+import { formatChatTime } from '../utils/timeUtils';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
@@ -208,17 +209,10 @@ export const Messages: React.FC<MessagesProps> = ({ isOpen, onClose, onRefreshUn
         }
     };
 
+    // Use shared time utility
     const formatTimeAgo = (dateString: string | null) => {
         if (!dateString) return '';
-        const date = new Date(dateString);
-        const now = new Date();
-        const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-        if (seconds < 60) return 'Vừa xong';
-        if (seconds < 3600) return `${Math.floor(seconds / 60)}p`;
-        if (seconds < 86400) return `${Math.floor(seconds / 3600)}h`;
-        if (seconds < 604800) return `${Math.floor(seconds / 86400)}d`;
-        return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+        return formatChatTime(dateString);
     };
 
     const filteredConversations = searchQuery

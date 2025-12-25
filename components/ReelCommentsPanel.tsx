@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Loader2, Trash2, Send, ChevronDown } from 'lucide-react';
 import { HashtagText } from './HashtagText';
+import { formatTimeAgo } from '../utils/timeUtils';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
@@ -32,19 +33,9 @@ interface ReelCommentsPanelProps {
     onCommentCountUpdate?: (count: number) => void;
 }
 
+// Use shared time utility
 const formatTime = (isoString: string): string => {
-    const date = new Date(isoString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMin = Math.floor(diffMs / 60000);
-    const diffHour = Math.floor(diffMs / 3600000);
-    const diffDay = Math.floor(diffMs / 86400000);
-
-    if (diffMin < 1) return 'Vừa xong';
-    if (diffMin < 60) return `${diffMin}p`;
-    if (diffHour < 24) return `${diffHour}h`;
-    if (diffDay < 7) return `${diffDay}d`;
-    return date.toLocaleDateString('vi-VN');
+    return formatTimeAgo(isoString);
 };
 
 export const ReelCommentsPanel: React.FC<ReelCommentsPanelProps> = ({
@@ -257,7 +248,7 @@ export const ReelCommentsPanel: React.FC<ReelCommentsPanelProps> = ({
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-end justify-center"
+            className="fixed inset-0 z-[60] flex items-end justify-center"
             onClick={(e) => {
                 if (e.target === e.currentTarget) onClose();
             }}

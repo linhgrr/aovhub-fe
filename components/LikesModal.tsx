@@ -29,7 +29,7 @@ export const LikesModal: React.FC<LikesModalProps> = ({
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
-  
+
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
@@ -80,9 +80,9 @@ export const LikesModal: React.FC<LikesModalProps> = ({
   // Infinite scroll
   useEffect(() => {
     if (!isOpen) return;
-    
+
     if (observerRef.current) observerRef.current.disconnect();
-    
+
     observerRef.current = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasMore && !isLoadingMore && nextCursor) {
@@ -91,17 +91,17 @@ export const LikesModal: React.FC<LikesModalProps> = ({
       },
       { threshold: 0.1 }
     );
-    
+
     if (loadMoreRef.current) observerRef.current.observe(loadMoreRef.current);
-    
+
     return () => observerRef.current?.disconnect();
   }, [hasMore, isLoadingMore, nextCursor, isOpen, fetchLikes]);
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
-      <div 
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
+      <div
         className="bg-bg-secondary rounded-[20px] w-full max-w-[400px] max-h-[80vh] flex flex-col border border-white/5 shadow-2xl animate-in zoom-in-95"
         onClick={(e) => e.stopPropagation()}
       >
@@ -116,7 +116,7 @@ export const LikesModal: React.FC<LikesModalProps> = ({
               <p className="text-[#7f7f7f] text-xs">{totalCount} người đã thích</p>
             </div>
           </div>
-          <button 
+          <button
             onClick={onClose}
             className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors"
           >
@@ -156,7 +156,7 @@ export const LikesModal: React.FC<LikesModalProps> = ({
                       {user.rank || 'Chưa xếp hạng'} • Level {user.level || 1}
                     </p>
                   </div>
-                  <button 
+                  <button
                     className="bg-primary/20 text-primary text-[10px] font-semibold px-3 py-1.5 rounded-[6px] hover:bg-primary hover:text-white transition-all opacity-0 group-hover:opacity-100"
                     onClick={(e) => {
                       e.preventDefault();

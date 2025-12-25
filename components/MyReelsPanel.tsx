@@ -85,7 +85,7 @@ export const MyReelsPanel: React.FC<MyReelsPanelProps> = ({ isOpen, onClose, onR
             )}
 
             {/* Panel Overlay */}
-            <div className="fixed inset-0 z-50 flex justify-end">
+            <div className="fixed inset-0 z-[60] flex justify-end">
                 {/* Backdrop */}
                 <div
                     className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-in fade-in"
@@ -109,22 +109,20 @@ export const MyReelsPanel: React.FC<MyReelsPanelProps> = ({ isOpen, onClose, onR
                     <div className="flex border-b border-white/5 bg-bg-main">
                         <button
                             onClick={() => setActiveTab('my')}
-                            className={`flex-1 py-3.5 flex items-center justify-center gap-2 text-[12px] font-medium transition-all ${
-                                activeTab === 'my'
+                            className={`flex-1 py-3.5 flex items-center justify-center gap-2 text-[12px] font-medium transition-all ${activeTab === 'my'
                                     ? 'text-primary border-b-2 border-primary'
                                     : 'text-[#7f7f7f] hover:text-white'
-                            }`}
+                                }`}
                         >
                             <Play className="w-4 h-4" />
                             <span>Reels của tôi</span>
                         </button>
                         <button
                             onClick={() => setActiveTab('saved')}
-                            className={`flex-1 py-3.5 flex items-center justify-center gap-2 text-[12px] font-medium transition-all ${
-                                activeTab === 'saved'
+                            className={`flex-1 py-3.5 flex items-center justify-center gap-2 text-[12px] font-medium transition-all ${activeTab === 'saved'
                                     ? 'text-primary border-b-2 border-primary'
                                     : 'text-[#7f7f7f] hover:text-white'
-                            }`}
+                                }`}
                         >
                             <Bookmark className="w-4 h-4" />
                             <span>Đã lưu</span>

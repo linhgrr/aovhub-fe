@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { X, Loader2, Trash2, ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
 import { useAuth } from '../contexts/authContext';
 import { VideoPlayer } from './VideoPlayer';
+import { ConfirmDialog } from './ConfirmDialog';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
@@ -176,21 +177,8 @@ const FullscreenMediaViewer: React.FC<FullscreenMediaViewerProps> = ({
   );
 };
 
-// Format timestamp
-const formatTime = (isoString: string): string => {
-  const date = new Date(isoString);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMin = Math.floor(diffMs / 60000);
-  const diffHour = Math.floor(diffMs / 3600000);
-  const diffDay = Math.floor(diffMs / 86400000);
-
-  if (diffMin < 1) return 'Vừa xong';
-  if (diffMin < 60) return `${diffMin} phút`;
-  if (diffHour < 24) return `${diffHour} giờ`;
-  if (diffDay < 7) return `${diffDay} ngày`;
-  return date.toLocaleDateString('vi-VN');
-};
+// Format timestamp - using shared utility
+import { formatTimeAgo as formatTime } from '../utils/timeUtils';
 
 // Special hashtags that should be highlighted in yellow
 const SPECIAL_HASHTAGS = ['happynewyear2026', 'nguyensontung'];
@@ -288,6 +276,10 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
 
   // Fullscreen media viewer state
   const [fullscreenMediaIndex, setFullscreenMediaIndex] = useState<number | null>(null);
+
+  // Delete comment confirmation state
+  const [commentToDelete, setCommentToDelete] = useState<{ id: string; isReply: boolean; parentId?: string } | null>(null);
+  const [isDeletingComment, setIsDeletingComment] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const commentsContainerRef = useRef<HTMLDivElement>(null);
@@ -514,30 +506,37 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
     }
   };
 
-  const handleDeleteComment = async (commentId: string, isReply: boolean = false, parentId?: string) => {
-    if (!token) return;
+  // Open delete comment confirmation modal
+  const handleDeleteComment = (commentId: string, isReply: boolean = false, parentId?: string) => {
+    setCommentToDelete({ id: commentId, isReply, parentId });
+  };
 
+  // Confirm and execute comment deletion
+  const confirmDeleteComment = async () => {
+    if (!token || !commentToDelete) return;
+
+    setIsDeletingComment(true);
     try {
-      const response = await fetch(`${API_URL}/comments/${commentId}`, {
+      const response = await fetch(`${API_URL}/comments/${commentToDelete.id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` },
       });
 
       if (response.ok) {
-        if (isReply && parentId) {
+        if (commentToDelete.isReply && commentToDelete.parentId) {
           setExpandedReplies(prev => ({
             ...prev,
-            [parentId]: prev[parentId]?.filter(c => c.id !== commentId) || [],
+            [commentToDelete.parentId!]: prev[commentToDelete.parentId!]?.filter(c => c.id !== commentToDelete.id) || [],
           }));
           setComments(prev => prev.map(c =>
-            c.id === parentId
+            c.id === commentToDelete.parentId
               ? { ...c, reply_count: Math.max(0, c.reply_count - 1) }
               : c
           ));
         } else {
-          const comment = comments.find(c => c.id === commentId);
+          const comment = comments.find(c => c.id === commentToDelete.id);
           const deletedCount = 1 + (comment?.reply_count || 0);
-          setComments(prev => prev.filter(c => c.id !== commentId));
+          setComments(prev => prev.filter(c => c.id !== commentToDelete.id));
 
           if (onPostUpdate) {
             onPostUpdate({ ...post, comment_count: Math.max(0, post.comment_count - deletedCount) });
@@ -546,6 +545,9 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
       }
     } catch (err) {
       console.error('Failed to delete comment:', err);
+    } finally {
+      setIsDeletingComment(false);
+      setCommentToDelete(null);
     }
   };
 
@@ -598,7 +600,7 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 animate-in fade-in">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/80 backdrop-blur-sm"
@@ -927,6 +929,19 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
           onNavigate={setFullscreenMediaIndex}
         />
       )}
+
+      {/* Delete Comment Confirmation Modal */}
+      <ConfirmDialog
+        isOpen={!!commentToDelete}
+        onClose={() => setCommentToDelete(null)}
+        onConfirm={confirmDeleteComment}
+        title="Xóa bình luận"
+        message="Bạn có chắc chắn muốn xóa bình luận này? Hành động này không thể hoàn tác."
+        confirmText="Xóa"
+        cancelText="Hủy"
+        isLoading={isDeletingComment}
+        variant="danger"
+      />
     </div>
   );
 };

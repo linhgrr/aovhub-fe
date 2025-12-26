@@ -13,7 +13,10 @@ interface SuggestedUser {
     id: string;
     username: string;
     avatar_url: string | null;
-    is_following: boolean;
+    rank: string | null;
+    level: number | null;
+    mutual_friends_count: number;
+    suggestion_score: number;
 }
 
 interface OnlineFriend {
@@ -214,7 +217,7 @@ export const RightSidebar: React.FC = () => {
     const fetchSuggestedUsers = async () => {
         try {
             setIsLoadingUsers(true);
-            const response = await fetch(`${API_URL}/users/suggested?limit=5`, {
+            const response = await fetch(`${API_URL}/friends/suggestions?limit=20`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (response.ok) {
@@ -275,23 +278,6 @@ export const RightSidebar: React.FC = () => {
             );
         } catch (error) {
             console.error('Failed to mark conversation as seen:', error);
-        }
-    };
-
-    const handleFollow = async (userId: string, isFollowing: boolean) => {
-        try {
-            const method = isFollowing ? 'DELETE' : 'POST';
-            const response = await fetch(`${API_URL}/friendships/${userId}/follow`, {
-                method,
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (response.ok) {
-                setSuggestedUsers(prev => prev.map(u =>
-                    u.id === userId ? { ...u, is_following: !isFollowing } : u
-                ));
-            }
-        } catch (error) {
-            console.error('Failed to follow/unfollow:', error);
         }
     };
 
@@ -574,37 +560,55 @@ export const RightSidebar: React.FC = () => {
                         <div className="w-[3px] h-[3px] bg-white rounded-full"></div>
                     </button>
                 </div>
-                <div className="space-y-5">
+                <div className="space-y-5 max-h-[400px] overflow-y-auto no-scrollbar">
                     {isLoadingUsers ? (
                         <div className="flex items-center justify-center py-4">
                             <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
                         </div>
                     ) : suggestedUsers.length === 0 ? (
-                        <p className="text-[10px] text-[#7f7f7f] text-center py-4">Không có gợi ý nào</p>
+                        <p className="text-[10px] text-[#7f7f7f] text-center py-4">Đã hết danh sách bạn bè gợi ý</p>
                     ) : (
                         suggestedUsers.map(user => (
                             <div key={user.id} className="flex items-center justify-between group">
                                 <a href={`#profile/${user.id}`} className="flex items-center gap-3 flex-1 min-w-0">
-                                    {user.avatar_url ? (
-                                        <img src={user.avatar_url} className="w-[52px] h-[52px] rounded-[12px] object-cover transition-transform group-hover:scale-105" alt="" />
-                                    ) : (
-                                        <div className="w-[52px] h-[52px] rounded-[12px] bg-bg-main flex items-center justify-center">
-                                            <UserIcon className="w-6 h-6 text-[#7f7f7f]" />
-                                        </div>
-                                    )}
-                                    <div className="min-w-0">
+                                    <div className="relative">
+                                        {user.avatar_url ? (
+                                            <img src={user.avatar_url} className="w-[52px] h-[52px] rounded-[12px] object-cover transition-transform group-hover:scale-105" alt="" />
+                                        ) : (
+                                            <div className="w-[52px] h-[52px] rounded-[12px] bg-bg-main flex items-center justify-center">
+                                                <UserIcon className="w-6 h-6 text-[#7f7f7f]" />
+                                            </div>
+                                        )}
+                                        {user.level && (
+                                            <div className="absolute -bottom-1 -right-1 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full px-1.5 py-0.5 text-[9px] font-bold text-white shadow-md">
+                                                {user.level}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="min-w-0 flex-1">
                                         <p className="font-montserrat font-medium text-[13px] text-white truncate group-hover:text-primary transition-colors">{user.username}</p>
-                                        <p className="text-[#7f7f7f] text-[11px] mt-0.5">Gợi ý cho bạn</p>
+                                        <p className="text-[#7f7f7f] text-[10px] mt-0.5">
+                                            {user.mutual_friends_count} bạn chung
+                                        </p>
                                     </div>
                                 </a>
                                 <button
-                                    onClick={() => handleFollow(user.id, user.is_following)}
-                                    className={`px-5 py-2 rounded-[8px] text-[12px] font-semibold transition-all hover:scale-105 ${user.is_following
-                                        ? 'bg-white/10 text-white hover:bg-white/20'
-                                        : 'bg-primary text-white hover:bg-primary/90'
-                                        }`}
+                                    onClick={async () => {
+                                        try {
+                                            const response = await fetch(`${API_URL}/friends/request/${user.id}`, {
+                                                method: 'POST',
+                                                headers: { 'Authorization': `Bearer ${token}` }
+                                            });
+                                            if (response.ok) {
+                                                setSuggestedUsers(prev => prev.filter(u => u.id !== user.id));
+                                            }
+                                        } catch (error) {
+                                            console.error('Failed to send friend request:', error);
+                                        }
+                                    }}
+                                    className="px-4 py-2 rounded-[8px] text-[11px] font-semibold transition-all hover:scale-105 bg-primary text-white hover:bg-primary/90"
                                 >
-                                    {user.is_following ? 'Đang theo dõi' : 'Theo dõi'}
+                                    Kết bạn
                                 </button>
                             </div>
                         ))

@@ -6,6 +6,7 @@ interface ReelThumbnail {
     id: string;
     thumbnail_url: string;
     views_count: number;
+    video_processed?: boolean;
 }
 
 interface MyReelsPanelProps {
@@ -26,6 +27,7 @@ export const MyReelsPanel: React.FC<MyReelsPanelProps> = ({ isOpen, onClose, onR
     useEffect(() => {
         if (isOpen) {
             loadMyReels();
+            loadSavedReels();
         }
     }, [isOpen]);
 
@@ -60,6 +62,22 @@ export const MyReelsPanel: React.FC<MyReelsPanelProps> = ({ isOpen, onClose, onR
             console.error('Failed to load my reels:', err);
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const loadSavedReels = async () => {
+        try {
+            const token = localStorage.getItem('auth_token');
+            const response = await fetch(`${API_URL}/reels/saved?limit=50`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setSavedReels(data.reels || []);
+            }
+        } catch (err) {
+            console.error('Failed to load saved reels:', err);
         }
     };
 
@@ -110,8 +128,8 @@ export const MyReelsPanel: React.FC<MyReelsPanelProps> = ({ isOpen, onClose, onR
                         <button
                             onClick={() => setActiveTab('my')}
                             className={`flex-1 py-3.5 flex items-center justify-center gap-2 text-[12px] font-medium transition-all ${activeTab === 'my'
-                                    ? 'text-primary border-b-2 border-primary'
-                                    : 'text-[#7f7f7f] hover:text-white'
+                                ? 'text-primary border-b-2 border-primary'
+                                : 'text-[#7f7f7f] hover:text-white'
                                 }`}
                         >
                             <Play className="w-4 h-4" />
@@ -120,8 +138,8 @@ export const MyReelsPanel: React.FC<MyReelsPanelProps> = ({ isOpen, onClose, onR
                         <button
                             onClick={() => setActiveTab('saved')}
                             className={`flex-1 py-3.5 flex items-center justify-center gap-2 text-[12px] font-medium transition-all ${activeTab === 'saved'
-                                    ? 'text-primary border-b-2 border-primary'
-                                    : 'text-[#7f7f7f] hover:text-white'
+                                ? 'text-primary border-b-2 border-primary'
+                                : 'text-[#7f7f7f] hover:text-white'
                                 }`}
                         >
                             <Bookmark className="w-4 h-4" />
@@ -155,16 +173,33 @@ export const MyReelsPanel: React.FC<MyReelsPanelProps> = ({ isOpen, onClose, onR
                                         onClick={() => onReelClick?.(reel.id)}
                                         className="aspect-[9/16] bg-bg-secondary relative overflow-hidden group rounded-[4px]"
                                     >
-                                        <img
-                                            src={reel.thumbnail_url}
-                                            alt=""
-                                            className="w-full h-full object-cover"
-                                        />
+                                        {reel.thumbnail_url ? (
+                                            <img
+                                                src={reel.thumbnail_url}
+                                                alt=""
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+                                                <Play className="w-8 h-8 text-primary/40" />
+                                            </div>
+                                        )}
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                                        {/* Processing Badge
+                                        {!reel.video_processed && (
+                                            <div className="absolute top-1.5 right-1.5 bg-amber-500/90 text-white text-[8px] font-semibold px-1.5 py-0.5 rounded-[4px]">
+                                                Đang xử lý
+                                            </div>
+                                        )} */}
+
+                                        {/* Views Count */}
                                         <div className="absolute bottom-1.5 left-1.5 flex items-center gap-1 text-white text-[9px]">
                                             <Eye className="w-3 h-3" />
                                             <span className="font-medium">{formatViews(reel.views_count)}</span>
                                         </div>
+
+                                        {/* Play Button Overlay */}
                                         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                             <div className="w-10 h-10 bg-black/40 rounded-full flex items-center justify-center backdrop-blur-sm">
                                                 <Play className="w-5 h-5 text-white ml-0.5" />
@@ -195,11 +230,17 @@ export const MyReelsPanel: React.FC<MyReelsPanelProps> = ({ isOpen, onClose, onR
                                             onClick={() => onReelClick?.(reel.id)}
                                             className="aspect-[9/16] bg-bg-secondary relative overflow-hidden group rounded-[4px]"
                                         >
-                                            <img
-                                                src={reel.thumbnail_url}
-                                                alt=""
-                                                className="w-full h-full object-cover"
-                                            />
+                                            {reel.thumbnail_url ? (
+                                                <img
+                                                    src={reel.thumbnail_url}
+                                                    alt=""
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+                                                    <Play className="w-8 h-8 text-primary/40" />
+                                                </div>
+                                            )}
                                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                                             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <div className="w-10 h-10 bg-black/40 rounded-full flex items-center justify-center backdrop-blur-sm">

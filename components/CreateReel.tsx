@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { X, Loader2, CheckCircle, AlertCircle, Play } from 'lucide-react';
 
 interface CreateReelProps {
@@ -9,6 +9,8 @@ interface CreateReelProps {
 export const CreateReel: React.FC<CreateReelProps> = ({ onClose, onSuccess }) => {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
+  const [thumbnailBlob, setThumbnailBlob] = useState<Blob | null>(null);
+  const [thumbnailUrl, setThumbnailUrl] = useState<string>('');
   const [caption, setCaption] = useState('');
 
   const [isUploading, setIsUploading] = useState(false);
@@ -19,7 +21,50 @@ export const CreateReel: React.FC<CreateReelProps> = ({ onClose, onSuccess }) =>
   const fileInputRef = useRef<HTMLInputElement>(null);
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Extract thumbnail from video at specified time (default 1 second)
+  const extractVideoThumbnail = useCallback(async (videoFile: File, timeInSeconds: number = 1): Promise<Blob | null> => {
+    return new Promise((resolve) => {
+      const video = document.createElement('video');
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+
+      if (!ctx) {
+        resolve(null);
+        return;
+      }
+
+      video.preload = 'metadata';
+      video.src = URL.createObjectURL(videoFile);
+
+      video.onloadedmetadata = () => {
+        // Use half of duration or 1 second, whichever is smaller
+        const captureTime = Math.min(timeInSeconds, video.duration / 2);
+        video.currentTime = captureTime;
+      };
+
+      video.onseeked = () => {
+        // Set canvas size to video dimensions
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        // Draw video frame to canvas
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Convert canvas to blob
+        canvas.toBlob((blob) => {
+          URL.revokeObjectURL(video.src);
+          resolve(blob);
+        }, 'image/jpeg', 0.85);
+      };
+
+      video.onerror = () => {
+        URL.revokeObjectURL(video.src);
+        resolve(null);
+      };
+    });
+  }, []);
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -38,6 +83,19 @@ export const CreateReel: React.FC<CreateReelProps> = ({ onClose, onSuccess }) =>
     setError('');
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
+
+    // Extract thumbnail
+    try {
+      const thumbnail = await extractVideoThumbnail(file);
+      if (thumbnail) {
+        setThumbnailBlob(thumbnail);
+        const thumbUrl = URL.createObjectURL(thumbnail);
+        setThumbnailUrl(thumbUrl);
+      }
+    } catch (err) {
+      console.error('Failed to extract thumbnail:', err);
+      // Continue without thumbnail - not critical
+    }
   };
 
   const handleSubmit = async () => {
@@ -87,6 +145,32 @@ export const CreateReel: React.FC<CreateReelProps> = ({ onClose, onSuccess }) =>
         headers: { 'Authorization': `Bearer ${token}` },
       });
 
+      setUploadProgress(70);
+
+      // Upload thumbnail if available
+      let thumbnailUploadUrl = '';
+      if (thumbnailBlob) {
+        try {
+          const formData = new FormData();
+          formData.append('thumbnail', thumbnailBlob, 'thumbnail.jpg');
+          formData.append('video_id', video_id);
+
+          const thumbResponse = await fetch(`${API_URL}/reels/upload-thumbnail`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` },
+            body: formData,
+          });
+
+          if (thumbResponse.ok) {
+            const thumbData = await thumbResponse.json();
+            thumbnailUploadUrl = thumbData.thumbnail_url;
+          }
+        } catch (err) {
+          console.error('Thumbnail upload failed:', err);
+          // Continue without thumbnail - not critical
+        }
+      }
+
       setUploadProgress(80);
       const reelResponse = await fetch(`${API_URL}/reels`, {
         method: 'POST',
@@ -97,6 +181,7 @@ export const CreateReel: React.FC<CreateReelProps> = ({ onClose, onSuccess }) =>
         body: JSON.stringify({
           video_id: video_id,
           caption: caption || undefined,
+          temp_thumbnail_url: thumbnailUploadUrl || undefined,
         }),
       });
 
@@ -154,9 +239,9 @@ export const CreateReel: React.FC<CreateReelProps> = ({ onClose, onSuccess }) =>
               >
                 <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-[16px] flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                   <svg className="w-8 h-8 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <polyline points="17 8 12 3 7 8"/>
-                    <line x1="12" y1="3" x2="12" y2="15"/>
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
                   </svg>
                 </div>
                 <p className="text-white font-medium text-[13px] mb-1">
@@ -184,12 +269,25 @@ export const CreateReel: React.FC<CreateReelProps> = ({ onClose, onSuccess }) =>
                   onClick={() => {
                     setVideoFile(null);
                     setPreviewUrl('');
+                    setThumbnailBlob(null);
+                    if (thumbnailUrl) {
+                      URL.revokeObjectURL(thumbnailUrl);
+                      setThumbnailUrl('');
+                    }
                   }}
                   className="absolute top-3 right-3 w-8 h-8 bg-red-500/80 hover:bg-red-500 text-white rounded-[10px] flex items-center justify-center transition-colors"
                   disabled={isUploading}
                 >
                   <X className="w-4 h-4" />
                 </button>
+                {thumbnailUrl && (
+                  <div className="absolute bottom-3 left-3 right-3">
+                    <div className="bg-black/60 backdrop-blur-sm rounded-[8px] p-2 flex items-center gap-2">
+                      <img src={thumbnailUrl} alt="Thumbnail" className="w-12 h-12 rounded-[6px] object-cover" />
+                      <span className="text-white/80 text-[10px]">Thumbnail sẵn sàng ✓</span>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -275,9 +373,9 @@ export const CreateReel: React.FC<CreateReelProps> = ({ onClose, onSuccess }) =>
             ) : (
               <>
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                  <polyline points="17 8 12 3 7 8"/>
-                  <line x1="12" y1="3" x2="12" y2="15"/>
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="17 8 12 3 7 8" />
+                  <line x1="12" y1="3" x2="12" y2="15" />
                 </svg>
                 Đăng Reel
               </>

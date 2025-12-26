@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Loader2, AlertCircle, Plus, Volume2, VolumeX, Play, Pause, MessageCircle, Share2, Bookmark, ChevronUp, ChevronDown } from 'lucide-react';
+import { Loader2, AlertCircle, Plus, Volume2, VolumeX, Play, Pause, MessageCircle, Bookmark, ChevronUp, ChevronDown } from 'lucide-react';
 import { CreateReel } from './CreateReel';
 import { MyReelsPanel } from './MyReelsPanel';
 import { ReelCommentsPanel } from './ReelCommentsPanel';
@@ -21,6 +21,7 @@ interface ReelData {
   comments_count: number;
   shares_count: number;
   is_liked: boolean;
+  is_saved: boolean;
   created_at: string;
 }
 
@@ -174,6 +175,27 @@ export const Reels: React.FC = () => {
       }
     } catch (err) {
       console.error('Like error:', err);
+    }
+  };
+
+  const handleSave = async (reelId: string) => {
+    try {
+      const token = localStorage.getItem('auth_token');
+      const response = await fetch(`${API_URL}/reels/${reelId}/save`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setReels(prev => prev.map(reel =>
+          reel.id === reelId
+            ? { ...reel, is_saved: result.saved }
+            : reel
+        ));
+      }
+    } catch (err) {
+      console.error('Save error:', err);
     }
   };
 
@@ -509,18 +531,17 @@ export const Reels: React.FC = () => {
             <span className="text-white text-[11px] font-semibold">{formatNumber(currentReel.comments_count)}</span>
           </button>
 
-          {/* Share Button */}
-          <button className="flex flex-col items-center gap-1 group">
-            <div className="w-12 h-12 rounded-[14px] bg-white/10 group-hover:bg-white/20 flex items-center justify-center transition-all">
-              <Share2 className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-white text-[11px] font-semibold">{formatNumber(currentReel.shares_count)}</span>
-          </button>
-
-          {/* Bookmark */}
-          <button className="group">
-            <div className="w-12 h-12 rounded-[14px] bg-white/10 group-hover:bg-white/20 flex items-center justify-center transition-all">
-              <Bookmark className="w-6 h-6 text-white" />
+          {/* Save/Bookmark Button */}
+          <button
+            onClick={() => handleSave(currentReel.id)}
+            className="group"
+          >
+            <div className={`w-12 h-12 rounded-[14px] flex items-center justify-center transition-all ${currentReel.is_saved ? 'bg-primary/20' : 'bg-white/10 group-hover:bg-white/20'
+              }`}>
+              <Bookmark
+                className={`w-6 h-6 transition-all ${currentReel.is_saved ? 'text-primary fill-current' : 'text-white'
+                  }`}
+              />
             </div>
           </button>
         </div>

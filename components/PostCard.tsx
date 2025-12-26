@@ -157,8 +157,6 @@ export const PostCard: React.FC<PostCardProps> = ({
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="text-[#7f7f7f] text-[9px] md:text-[10px]">{formatTimeAgo(post.created_at)}</span>
-                <span className="text-[#7f7f7f] text-[9px] md:text-[10px]">•</span>
-                <span className="text-[#7f7f7f] text-[9px] md:text-[10px] uppercase">Công khai</span>
               </div>
             </div>
           </div>

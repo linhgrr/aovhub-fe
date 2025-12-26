@@ -3,7 +3,8 @@ import { Image, Smile, Send, X, Loader2, Plus, Film } from 'lucide-react';
 import { useAuth } from '../contexts/authContext';
 import { MediaItem } from './PostCard';
 import { Firework } from './Firework';
-import { hasSpecialHashtag } from './HashtagText';
+import { FlyingCharacter } from './FlyingCharacter';
+import { hasNguyenSonTungHashtag, hasHappyNewYearHashtag } from './HashtagText';
 
 interface CreatePostProps {
   onPostCreated: (post: any) => void;
@@ -24,6 +25,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated, apiUrl })
   const [isUploading, setIsUploading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [showFirework, setShowFirework] = useState(false);
+  const [showFlyingCharacter, setShowFlyingCharacter] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -116,8 +118,9 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated, apiUrl })
     if ((!content.trim() && mediaItems.length === 0) || !token) return;
     setIsPosting(true);
 
-    // Check for special hashtags before posting
-    const shouldShowFirework = hasSpecialHashtag(content);
+    // Check for specific hashtags before posting
+    const shouldShowFirework = hasHappyNewYearHashtag(content);
+    const shouldShowFlyingCharacter = hasNguyenSonTungHashtag(content);
 
     try {
       // Clean media items for API (remove local-only fields)
@@ -142,9 +145,12 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated, apiUrl })
         setMediaItems([]);
         setIsExpanded(false);
 
-        // Trigger firework effect if post contains special hashtags
+        // Trigger animation effects based on specific hashtags
         if (shouldShowFirework) {
           setShowFirework(true);
+        }
+        if (shouldShowFlyingCharacter) {
+          setShowFlyingCharacter(true);
         }
       }
     } catch (err) {
@@ -159,11 +165,18 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated, apiUrl })
 
   return (
     <>
-      {/* Firework effect for special hashtags */}
+      {/* Firework effect for #happynewyear2026 hashtag */}
       <Firework
         isActive={showFirework}
         onComplete={() => setShowFirework(false)}
         duration={3500}
+      />
+
+      {/* Flying character effect for #nguyensontung hashtag */}
+      <FlyingCharacter
+        isActive={showFlyingCharacter}
+        onComplete={() => setShowFlyingCharacter(false)}
+        duration={5000}
       />
 
       <div className=" bg-bg-secondary rounded-[16px] border border-white/5 transition-all duration-300 overflow-hidden shadow-lg">
@@ -261,7 +274,6 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated, apiUrl })
                   />
                   <div>
                     <p className="text-white font-semibold">{user?.username || 'User'}</p>
-                    <p className="text-white/40 text-[13px]">Đăng công khai</p>
                   </div>
                 </div>
 

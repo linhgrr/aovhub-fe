@@ -13,6 +13,22 @@ export const hasSpecialHashtag = (content: string): boolean => {
 };
 
 /**
+ * Check if content contains #nguyensontung hashtag
+ */
+export const hasNguyenSonTungHashtag = (content: string): boolean => {
+    if (!content) return false;
+    return content.toLowerCase().includes('#nguyensontung');
+};
+
+/**
+ * Check if content contains #happynewyear2026 hashtag
+ */
+export const hasHappyNewYearHashtag = (content: string): boolean => {
+    if (!content) return false;
+    return content.toLowerCase().includes('#happynewyear2026');
+};
+
+/**
  * Parse content and render hashtags with appropriate styling
  * Special hashtags (#happynewyear2026, #nguyensontung) are highlighted in yellow
  * Other hashtags are rendered in primary color

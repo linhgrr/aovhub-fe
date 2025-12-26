@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/authContext';
 import { UserPlus, Users, Check, X, Loader, User, Crown, ChevronRight, Trash2, MessageCircle } from 'lucide-react';
+import { getAvatarUrl } from '../utils/avatarUtils';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 

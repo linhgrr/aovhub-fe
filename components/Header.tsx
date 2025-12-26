@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/authContext';
 import { PostDetailModal } from './PostDetailModal';
 import { Messages } from './Messages';
 import { formatTimeAgo } from '../utils/timeUtils';
+import { getAvatarUrl } from '../utils/avatarUtils';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
@@ -298,7 +299,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
                                                     className="px-6 py-4 hover:bg-white/5 cursor-pointer transition-colors border-b border-white/5 last:border-0"
                                                 >
                                                     <div className="flex gap-3">
-                                                        <img src={n.actor.avatar_url || '/assets/images/home.svg'} className="w-8 h-8 rounded-lg object-cover" alt="" />
+                                                        <img src={getAvatarUrl(n.actor.avatar_url, n.actor.username)} className="w-8 h-8 rounded-lg object-cover" alt="" />
                                                         <div className="flex-1">
                                                             <p className="text-xs text-white leading-relaxed">{n.content}</p>
                                                             <p className="text-[10px] text-[#7f7f7f] mt-1">{formatTimeAgoLocal(n.created_at)}</p>
@@ -329,13 +330,11 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
                                 onClick={() => setShowProfileMenu(!showProfileMenu)}
                                 className={`w-[40px] h-[40px] md:w-[62px] md:h-[62px] rounded-[12px] md:rounded-[20px] overflow-hidden border-2 transition-all ${showProfileMenu ? 'border-primary' : 'border-transparent'}`}
                             >
-                                {user?.avatar_url ? (
-                                    <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
-                                ) : (
-                                    <div className="w-full h-full bg-primary flex items-center justify-center">
-                                        <span className="text-white font-bold">{user?.username?.charAt(0).toUpperCase()}</span>
-                                    </div>
-                                )}
+                                <img
+                                    src={getAvatarUrl(user?.avatar_url, user?.username)}
+                                    alt={user?.username || 'User'}
+                                    className="w-full h-full object-cover"
+                                />
                             </button>
 
                             {showProfileMenu && (

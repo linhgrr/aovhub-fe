@@ -4,6 +4,7 @@ import { VideoPlayer } from './VideoPlayer';
 import { LikesModal } from './LikesModal';
 import { HashtagText } from './HashtagText';
 import { formatTimeAgo, formatDate } from '../utils/timeUtils';
+import { getAvatarUrl } from '../utils/avatarUtils';
 
 // Types matching backend
 export interface MediaItem {
@@ -140,8 +141,8 @@ export const PostCard: React.FC<PostCardProps> = ({
           <div className="flex items-center gap-2 md:gap-3">
             <a href={`#profile/${post.author.id}`}>
               <img
-                src={post.author.avatar_url || '/assets/images/home.svg'}
-                alt=""
+                src={getAvatarUrl(post.author.avatar_url, post.author.username)}
+                alt={post.author.username}
                 className="w-[32px] h-[32px] md:w-[38px] md:h-[38px] rounded-[8px] md:rounded-[10px] object-cover"
               />
             </a>
@@ -204,8 +205,8 @@ export const PostCard: React.FC<PostCardProps> = ({
             <div className="p-3 md:p-4 flex items-center gap-2 md:gap-3">
               <a href={`#profile/${post.shared_post.author.id}`}>
                 <img
-                  src={post.shared_post.author.avatar_url || '/assets/images/home.svg'}
-                  alt=""
+                  src={getAvatarUrl(post.shared_post.author.avatar_url, post.shared_post.author.username)}
+                  alt={post.shared_post.author.username}
                   className="w-[28px] h-[28px] md:w-[32px] md:h-[32px] rounded-[6px] md:rounded-[8px] object-cover"
                 />
               </a>
@@ -356,7 +357,7 @@ export const PostCard: React.FC<PostCardProps> = ({
                   {post.recent_likers.slice(0, 3).map((liker) => (
                     <img
                       key={liker.id}
-                      src={liker.avatar_url || '/assets/images/home.svg'}
+                      src={getAvatarUrl(liker.avatar_url, liker.username)}
                       alt={liker.username}
                       className="w-5 h-5 md:w-6 md:h-6 rounded-full border-2 border-bg-secondary object-cover"
                     />
@@ -385,8 +386,8 @@ export const PostCard: React.FC<PostCardProps> = ({
             onClick={() => onOpenComments(post)}
           >
             <img
-              src={post.author.avatar_url || '/assets/images/home.svg'}
-              alt=""
+              src={getAvatarUrl(post.author.avatar_url, post.author.username)}
+              alt={post.author.username}
               className="w-8 h-8 md:w-10 md:h-10 rounded-[8px] md:rounded-[10px] object-cover"
             />
             <div className="flex-1 relative">

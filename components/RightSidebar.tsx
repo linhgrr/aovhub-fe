@@ -4,7 +4,8 @@ import { useAuth } from '../contexts/authContext';
 import EmojiPicker, { EmojiClickData, Theme } from 'emoji-picker-react';
 import { CreateGroupModal } from './CreateGroupModal';
 import { GroupMembersModal } from './GroupMembersModal';
-import { formatChatTime, formatTime as formatTimeUtil } from '../utils/timeUtils';
+import { formatChatTime, formatTime as formatTimeUtil, formatTimeAgo } from '../utils/timeUtils';
+import { getAvatarUrl } from '../utils/avatarUtils';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/api/v1';
@@ -25,6 +26,8 @@ interface OnlineFriend {
     avatar_url: string | null;
     rank: string | null;
     level: number | null;
+    is_online: boolean;
+    last_active_at: string | null;
 }
 
 interface ConversationListItem {
@@ -383,21 +386,14 @@ export const RightSidebar: React.FC = () => {
                             <ChevronLeft className="w-5 h-5 text-white/60" />
                         </button>
 
-                        {selectedConversation.avatar_url ? (
-                            <img
-                                src={selectedConversation.avatar_url}
-                                alt=""
-                                className="w-[38px] h-[38px] rounded-[10px] object-cover"
-                            />
-                        ) : (
-                            <div className="w-[38px] h-[38px] rounded-[10px] bg-bg-main flex items-center justify-center">
-                                {selectedConversation.type === 'GROUP' ? (
-                                    <Users className="w-4 h-4 text-[#7f7f7f]" />
-                                ) : (
-                                    <UserIcon className="w-4 h-4 text-[#7f7f7f]" />
-                                )}
-                            </div>
-                        )}
+                        <img
+                            src={selectedConversation.type === 'GROUP'
+                                ? (selectedConversation.avatar_url || '/assets/images/home.svg')
+                                : getAvatarUrl(selectedConversation.avatar_url, selectedConversation.name || undefined)
+                            }
+                            alt={selectedConversation.name || ''}
+                            className="w-[38px] h-[38px] rounded-[10px] object-cover"
+                        />
 
                         <div className="flex-1 min-w-0">
                             <h3 className="font-montserrat font-semibold text-[12px] text-white truncate">
@@ -560,7 +556,7 @@ export const RightSidebar: React.FC = () => {
                         <div className="w-[3px] h-[3px] bg-white rounded-full"></div>
                     </button>
                 </div>
-                <div className="space-y-5 max-h-[400px] overflow-y-auto no-scrollbar">
+                <div className="space-y-5 max-h-[275px] overflow-y-auto no-scrollbar">
                     {isLoadingUsers ? (
                         <div className="flex items-center justify-center py-4">
                             <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
@@ -572,13 +568,11 @@ export const RightSidebar: React.FC = () => {
                             <div key={user.id} className="flex items-center justify-between group">
                                 <a href={`#profile/${user.id}`} className="flex items-center gap-3 flex-1 min-w-0">
                                     <div className="relative">
-                                        {user.avatar_url ? (
-                                            <img src={user.avatar_url} className="w-[52px] h-[52px] rounded-[12px] object-cover transition-transform group-hover:scale-105" alt="" />
-                                        ) : (
-                                            <div className="w-[52px] h-[52px] rounded-[12px] bg-bg-main flex items-center justify-center">
-                                                <UserIcon className="w-6 h-6 text-[#7f7f7f]" />
-                                            </div>
-                                        )}
+                                        <img
+                                            src={getAvatarUrl(user.avatar_url, user.username)}
+                                            className="w-[52px] h-[52px] rounded-[12px] object-cover transition-transform group-hover:scale-105"
+                                            alt={user.username}
+                                        />
                                         {user.level && (
                                             <div className="absolute -bottom-1 -right-1 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full px-1.5 py-0.5 text-[9px] font-bold text-white shadow-md">
                                                 {user.level}
@@ -617,8 +611,8 @@ export const RightSidebar: React.FC = () => {
             </div>
 
             {/* Online Friends Section - Messenger Style */}
-            <div className="bg-bg-secondary rounded-[20px] p-5 shadow-xl flex-1 min-h-0 flex flex-col">
-                <div className="flex items-center justify-between mb-4">
+            <div className="bg-bg-secondary rounded-[20px] p-6 shadow-xl flex-1 min-h-[420px] flex flex-col">
+                <div className="flex items-center justify-between mb-6">
                     <h3 className="font-montserrat font-extrabold text-[13px] text-white uppercase tracking-wider">
                         Người liên hệ
                     </h3>
@@ -642,7 +636,7 @@ export const RightSidebar: React.FC = () => {
                             <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-white/5 flex items-center justify-center">
                                 <UserIcon className="w-6 h-6 opacity-40" />
                             </div>
-                            <p className="text-[12px]">Không có ai online</p>
+                            <p className="text-[12px]">Chưa có bạn bè</p>
                         </div>
                     ) : (
                         onlineFriends.map((friend) => (
@@ -652,23 +646,25 @@ export const RightSidebar: React.FC = () => {
                                 className="w-full flex items-center gap-3 p-2 -mx-2 rounded-lg hover:bg-white/5 transition-colors group"
                             >
                                 <div className="relative flex-shrink-0">
-                                    {friend.avatar_url ? (
-                                        <img
-                                            src={friend.avatar_url}
-                                            alt={friend.username}
-                                            className="w-9 h-9 rounded-full object-cover"
-                                        />
-                                    ) : (
-                                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                                            <UserIcon className="w-4 h-4 text-white" />
-                                        </div>
-                                    )}
-                                    {/* Online indicator - green dot */}
-                                    <div className="absolute bottom-0 right-0 w-[10px] h-[10px] bg-[#31a24c] rounded-full border-2 border-bg-secondary"></div>
+                                    <img
+                                        src={getAvatarUrl(friend.avatar_url, friend.username)}
+                                        alt={friend.username}
+                                        className="w-[52px] h-[52px] rounded-[12px] object-cover transition-transform group-hover:scale-105"
+                                    />
+                                    {/* Online/Offline indicator */}
+                                    <div className={`absolute -bottom-0.5 -right-0.5 w-[12px] h-[12px] rounded-full border-2 border-bg-secondary ${friend.is_online ? 'bg-[#31a24c]' : 'bg-[#7f7f7f]'
+                                        }`}></div>
                                 </div>
-                                <span className="font-medium text-[14px] text-white/90 group-hover:text-white transition-colors truncate">
-                                    {friend.username}
-                                </span>
+                                <div className="flex flex-col items-start min-w-0 flex-1">
+                                    <span className="font-medium text-[14px] text-white/90 group-hover:text-white transition-colors truncate w-full text-left">
+                                        {friend.username}
+                                    </span>
+                                    {!friend.is_online && friend.last_active_at && (
+                                        <span className="text-[11px] text-[#7f7f7f] truncate w-full text-left">
+                                            {formatTimeAgo(friend.last_active_at)}
+                                        </span>
+                                    )}
+                                </div>
                             </button>
                         ))
                     )}

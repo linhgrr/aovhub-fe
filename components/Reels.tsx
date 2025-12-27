@@ -52,6 +52,7 @@ export const Reels: React.FC = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showHeartAnimation, setShowHeartAnimation] = useState(false);
+  const [showVolumeAnimation, setShowVolumeAnimation] = useState<'muted' | 'unmuted' | null>(null);
   const [showCommentsPanel, setShowCommentsPanel] = useState(false);
 
   const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
@@ -59,6 +60,7 @@ export const Reels: React.FC = () => {
   const touchStartY = useRef<number>(0);
   const isScrolling = useRef(false);
   const lastTapTime = useRef(0);
+  const singleTapTimeout = useRef<NodeJS.Timeout | null>(null);
   const progressInterval = useRef<NodeJS.Timeout | null>(null);
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
@@ -199,19 +201,53 @@ export const Reels: React.FC = () => {
     }
   };
 
-  // Double tap to like
-  const handleDoubleTap = useCallback(() => {
+  // Toggle mute (single tap)
+  const toggleMute = useCallback(() => {
+    setIsMuted(prev => {
+      if (prev) {
+        // Unmuting - restore previous volume
+        const newVol = prevVolume > 0 ? prevVolume : 0.5;
+        setVolume(newVol);
+        setShowVolumeAnimation('unmuted');
+      } else {
+        // Muting - save current volume
+        setPrevVolume(volume);
+        setVolume(0);
+        setShowVolumeAnimation('muted');
+      }
+      setTimeout(() => setShowVolumeAnimation(null), 600);
+      return !prev;
+    });
+  }, [volume, prevVolume]);
+
+  // Handle video tap - single tap for mute toggle, double tap for like
+  const handleVideoTap = useCallback(() => {
     const now = Date.now();
-    if (now - lastTapTime.current < 300) {
+    const timeSinceLastTap = now - lastTapTime.current;
+
+    if (timeSinceLastTap < 300) {
+      // Double tap detected - cancel single tap and trigger like
+      if (singleTapTimeout.current) {
+        clearTimeout(singleTapTimeout.current);
+        singleTapTimeout.current = null;
+      }
+
       const currentReel = reels[currentIndex];
       if (currentReel && !currentReel.is_liked) {
         handleLike(currentReel.id);
         setShowHeartAnimation(true);
         setTimeout(() => setShowHeartAnimation(false), 1000);
       }
+    } else {
+      // Potential single tap - wait to confirm it's not a double tap
+      singleTapTimeout.current = setTimeout(() => {
+        toggleMute();
+        singleTapTimeout.current = null;
+      }, 300);
     }
+
     lastTapTime.current = now;
-  }, [currentIndex, reels]);
+  }, [currentIndex, reels, toggleMute]);
 
   const handleScroll = useCallback((direction: 'up' | 'down') => {
     if (isScrolling.current) return;
@@ -276,10 +312,9 @@ export const Reels: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleScroll, currentIndex, reels]);
 
-  // Toggle play/pause on video click
+  // Handle video click
   const handleVideoClick = () => {
-    handleDoubleTap();
-    // Single tap handled by detecting if it's not a double tap
+    handleVideoTap();
   };
 
   const togglePlayPause = () => {
@@ -444,6 +479,19 @@ export const Reels: React.FC = () => {
             >
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
             </svg>
+          </div>
+        )}
+
+        {/* Volume Animation (Single Tap) */}
+        {showVolumeAnimation && (
+          <div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none">
+            <div className="w-20 h-20 bg-black/50 rounded-full flex items-center justify-center backdrop-blur-sm animate-pulse">
+              {showVolumeAnimation === 'muted' ? (
+                <VolumeX className="w-10 h-10 text-white" />
+              ) : (
+                <Volume2 className="w-10 h-10 text-white" />
+              )}
+            </div>
           </div>
         )}
 

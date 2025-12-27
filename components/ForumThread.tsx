@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { HiOutlineHeart, HiHeart, HiOutlineChatBubbleLeft, HiOutlineShare, HiOutlineArrowUturnLeft, HiOutlineEye, HiOutlinePhoto, HiXMark, HiArrowLeft, HiPaperAirplane } from 'react-icons/hi2';
-import { AiOutlineLoading3Quarters } from 'react-icons/ai';
+import { Heart, MessageCircle, CornerUpLeft, Eye, ImagePlus, X, ArrowLeft, Send, Loader2, AlertCircle, MessageSquare, Lock } from 'lucide-react';
 import {
   ForumThread, ForumComment, ForumCommentsResponse,
   ThreadStatus, ForumCommentStatus
@@ -126,11 +125,11 @@ const CommentItem: React.FC<{
                          ${comment.isLiked ? 'text-primary' : 'text-white/40 hover:text-primary'}
                          disabled:opacity-50 disabled:cursor-not-allowed`}
             >
-              {comment.isLiked ? (
-                <HiHeart className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
-              ) : (
-                <HiOutlineHeart className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
-              )}
+              <Heart
+                className="w-4 h-4 group-hover/btn:scale-110 transition-transform"
+                strokeWidth={1.5}
+                fill={comment.isLiked ? 'currentColor' : 'none'}
+              />
               {comment.likeCount > 0 && (
                 <span className="text-[12px] font-medium">{comment.likeCount}</span>
               )}
@@ -142,15 +141,12 @@ const CommentItem: React.FC<{
                 className="flex items-center gap-1.5 text-white/40 hover:text-blue-400 
                            transition-all group/btn text-[12px]"
               >
-                <HiOutlineArrowUturnLeft className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
+                <CornerUpLeft className="w-4 h-4 group-hover/btn:scale-110 transition-transform" strokeWidth={1.5} />
                 Trả lời
               </button>
             )}
 
-            <button className="flex items-center gap-1.5 text-white/40 hover:text-white/60 
-                               transition-all group/btn ml-auto">
-              <HiOutlineShare className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
-            </button>
+
           </div>
         </div>
       </div>
@@ -482,7 +478,9 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
     return (
       <div className="max-w-3xl mx-auto p-4 pb-24 md:pb-20 pt-6 w-full">
         <div className="bg-red-500/10 border border-red-500/30 rounded-[16px] p-6 text-center">
-          <div className="text-4xl mb-3">😕</div>
+          <div className="flex justify-center mb-3">
+            <AlertCircle className="w-12 h-12 text-red-400" strokeWidth={1.5} />
+          </div>
           <p className="text-red-400 mb-4">{error || 'Không tìm thấy chủ đề'}</p>
           <button
             onClick={() => window.location.hash = 'forum'}
@@ -508,7 +506,7 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
             className="flex items-center gap-2 text-white/50 hover:text-primary 
                        transition-colors mb-4 group"
           >
-            <HiArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" strokeWidth={1.5} />
             <span className="text-[13px]">{thread.categoryName || 'Quay lại'}</span>
           </button>
 
@@ -542,7 +540,10 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
                 {thread.status === ThreadStatus.LOCKED && (
                   <>
                     <span>•</span>
-                    <span className="text-red-400">🔒 Đã khóa</span>
+                    <span className="flex items-center gap-1 text-red-400">
+                      <Lock className="w-3 h-3" strokeWidth={2} />
+                      Đã khóa
+                    </span>
                   </>
                 )}
               </div>
@@ -588,30 +589,27 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
                   : 'bg-white/5 text-white/60 hover:bg-primary/10 hover:text-primary'}
                          disabled:opacity-50 disabled:cursor-not-allowed`}
             >
-              {thread.isLiked ? (
-                <HiHeart className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
-              ) : (
-                <HiOutlineHeart className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
-              )}
+              <Heart
+                className="w-5 h-5 group-hover/btn:scale-110 transition-transform"
+                strokeWidth={1.5}
+                fill={thread.isLiked ? 'currentColor' : 'none'}
+              />
               <span className="font-semibold text-[13px]">{thread.likeCount}</span>
             </button>
 
             <div className="flex items-center gap-2 text-blue-400/70">
-              <HiOutlineChatBubbleLeft className="w-5 h-5" />
+              <MessageCircle className="w-5 h-5" strokeWidth={1.5} />
               <span className="font-semibold text-[13px]">{thread.commentCount}</span>
               <span className="text-white/40 text-[12px] hidden sm:inline">bình luận</span>
             </div>
 
             <div className="flex items-center gap-2 text-white/40">
-              <HiOutlineEye className="w-5 h-5" />
+              <Eye className="w-5 h-5" strokeWidth={1.5} />
               <span className="font-semibold text-[13px]">{thread.viewCount}</span>
               <span className="text-white/40 text-[12px] hidden sm:inline">lượt xem</span>
             </div>
 
-            <button className="flex items-center gap-2 text-white/40 hover:text-white/60 
-                               transition-all ml-auto group/btn">
-              <HiOutlineShare className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
-            </button>
+
           </div>
         </div>
       </article>
@@ -619,7 +617,7 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
       {/* Comments Section */}
       <section className="mb-6">
         <div className="flex items-center gap-2 mb-4">
-          <HiOutlineChatBubbleLeft className="w-5 h-5 text-primary" />
+          <MessageCircle className="w-5 h-5 text-primary" strokeWidth={1.5} />
           <h2 className="text-white text-[16px] md:text-[18px] font-semibold">
             Bình luận ({thread.commentCount})
           </h2>
@@ -634,7 +632,9 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
           </div>
         ) : comments.length === 0 ? (
           <div className="bg-bg-secondary rounded-[16px] border border-white/5 p-8 text-center">
-            <div className="text-4xl mb-3">💬</div>
+            <div className="flex justify-center mb-3">
+              <MessageSquare className="w-12 h-12 text-white/20" strokeWidth={1.5} />
+            </div>
             <p className="text-white/40 text-[14px] mb-1">Chưa có bình luận nào</p>
             {isAuthenticated && (
               <p className="text-white/30 text-[12px]">Hãy là người đầu tiên bình luận!</p>
@@ -663,7 +663,7 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
         {/* Infinite Scroll Trigger */}
         <div ref={loadMoreRef} className="py-8 flex justify-center">
           {loadingComments && comments.length > 0 && (
-            <AiOutlineLoading3Quarters className="w-6 h-6 text-primary animate-spin" />
+            <Loader2 className="w-6 h-6 text-primary animate-spin" />
           )}
         </div>
       </section>
@@ -687,7 +687,7 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
                   className="p-1.5 hover:bg-white/5 rounded-full text-white/40 hover:text-red-400 
                              transition-all"
                 >
-                  <HiXMark className="w-4 h-4" />
+                  <X className="w-4 h-4" strokeWidth={1.5} />
                 </button>
               </div>
             )}
@@ -708,7 +708,7 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
                       className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 rounded-full 
                                  flex items-center justify-center hover:bg-red-400 transition-colors"
                     >
-                      <HiXMark className="w-3 h-3 text-white" />
+                      <X className="w-3 h-3 text-white" strokeWidth={2} />
                     </button>
                   </div>
                 ))}
@@ -745,9 +745,9 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
                 title="Thêm ảnh"
               >
                 {isUploading ? (
-                  <AiOutlineLoading3Quarters className="w-5 h-5 text-green-400 animate-spin" />
+                  <Loader2 className="w-5 h-5 text-green-400 animate-spin" />
                 ) : (
-                  <HiOutlinePhoto className="w-5 h-5 text-green-400" />
+                  <ImagePlus className="w-5 h-5 text-green-400" strokeWidth={1.5} />
                 )}
               </button>
 
@@ -773,9 +773,9 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
                            shadow-lg shadow-primary/20 flex-shrink-0"
               >
                 {submitting ? (
-                  <AiOutlineLoading3Quarters className="w-5 h-5 animate-spin" />
+                  <Loader2 className="w-5 h-5 animate-spin" />
                 ) : (
-                  <HiPaperAirplane className="w-5 h-5" />
+                  <Send className="w-5 h-5" strokeWidth={1.5} />
                 )}
               </button>
             </div>
@@ -788,8 +788,9 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
         <div className="fixed bottom-0 left-0 md:left-[126px] right-0 bg-bg-main/95 backdrop-blur-lg 
                         border-t border-white/5 py-4 text-center z-40">
           <div className="max-w-3xl mx-auto px-4">
-            <p className="text-white/50 text-[13px]">
-              🔒 Chủ đề này đã bị khóa, không thể bình luận thêm
+            <p className="flex items-center justify-center gap-2 text-white/50 text-[13px]">
+              <Lock className="w-4 h-4" strokeWidth={1.5} />
+              Chủ đề này đã bị khóa, không thể bình luận thêm
             </p>
           </div>
         </div>

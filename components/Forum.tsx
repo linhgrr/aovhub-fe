@@ -1,22 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import {
-  HiOutlineChatBubbleLeftRight,
-  HiOutlineArrowTrendingUp,
-  HiOutlineUserGroup,
-  HiOutlineSparkles,
-  HiOutlineChevronRight,
-  HiOutlineChatBubbleOvalLeftEllipsis,
-  HiOutlinePuzzlePiece,
-  HiOutlineShieldCheck,
-  HiOutlineWrenchScrewdriver,
-  HiOutlineCalendarDays,
-  HiOutlineBugAnt,
-  HiOutlineLightBulb,
-  HiOutlineUsers,
-  HiOutlineFire,
-  HiOutlineFolder
-} from 'react-icons/hi2';
-import { AiOutlineLoading3Quarters } from 'react-icons/ai';
+  MessagesSquare,
+  TrendingUp,
+  ChevronRight,
+  MessageCircle,
+  Gamepad2,
+  Sword,
+  Wrench,
+  CalendarDays,
+  Bug,
+  Lightbulb,
+  Users,
+  Flame,
+  FolderOpen,
+  Loader2,
+  ScrollText,
+  AlertCircle,
+  Inbox
+} from 'lucide-react';
 import { ForumCategory, ForumCategoriesResponse } from '../types';
 import { API_BASE_URL } from '../constants';
 
@@ -73,17 +74,17 @@ export const Forum: React.FC<ForumProps> = ({ onNavigate }) => {
     const name = categoryName?.toLowerCase() || '';
     const iconClass = "w-7 h-7 md:w-8 md:h-8 text-white group-hover:text-primary transition-colors";
 
-    if (name.includes('general') || name.includes('chung')) return <HiOutlineChatBubbleOvalLeftEllipsis className={iconClass} />;
-    if (name.includes('gameplay') || name.includes('chơi')) return <HiOutlinePuzzlePiece className={iconClass} />;
-    if (name.includes('heroes') || name.includes('tướng')) return <HiOutlineShieldCheck className={iconClass} />;
-    if (name.includes('builds') || name.includes('build')) return <HiOutlineWrenchScrewdriver className={iconClass} />;
-    if (name.includes('events') || name.includes('sự kiện')) return <HiOutlineCalendarDays className={iconClass} />;
-    if (name.includes('bugs') || name.includes('lỗi')) return <HiOutlineBugAnt className={iconClass} />;
-    if (name.includes('suggestions') || name.includes('góp ý')) return <HiOutlineLightBulb className={iconClass} />;
-    if (name.includes('team') || name.includes('đội')) return <HiOutlineUsers className={iconClass} />;
-    if (name.includes('hot') || name.includes('trending')) return <HiOutlineFire className={iconClass} />;
+    if (name.includes('general') || name.includes('chung')) return <MessageCircle className={iconClass} strokeWidth={1.5} />;
+    if (name.includes('gameplay') || name.includes('chơi')) return <Gamepad2 className={iconClass} strokeWidth={1.5} />;
+    if (name.includes('heroes') || name.includes('tướng')) return <Sword className={iconClass} strokeWidth={1.5} />;
+    if (name.includes('builds') || name.includes('build')) return <Wrench className={iconClass} strokeWidth={1.5} />;
+    if (name.includes('events') || name.includes('sự kiện')) return <CalendarDays className={iconClass} strokeWidth={1.5} />;
+    if (name.includes('bugs') || name.includes('lỗi')) return <Bug className={iconClass} strokeWidth={1.5} />;
+    if (name.includes('suggestions') || name.includes('góp ý')) return <Lightbulb className={iconClass} strokeWidth={1.5} />;
+    if (name.includes('team') || name.includes('đội')) return <Users className={iconClass} strokeWidth={1.5} />;
+    if (name.includes('hot') || name.includes('trending')) return <Flame className={iconClass} strokeWidth={1.5} />;
 
-    return <HiOutlineFolder className={iconClass} />;
+    return <FolderOpen className={iconClass} strokeWidth={1.5} />;
   };
 
   if (loading) {
@@ -110,7 +111,9 @@ export const Forum: React.FC<ForumProps> = ({ onNavigate }) => {
     return (
       <div className="max-w-3xl mx-auto p-4 pb-24 md:pb-8 w-full pt-6">
         <div className="bg-red-500/10 border border-red-500/30 rounded-[16px] p-6 text-center">
-          <div className="text-4xl mb-3">😕</div>
+          <div className="flex justify-center mb-3">
+            <AlertCircle className="w-12 h-12 text-red-400" strokeWidth={1.5} />
+          </div>
           <p className="text-red-400 mb-4">{error}</p>
           <button
             onClick={fetchCategories}
@@ -146,13 +149,13 @@ export const Forum: React.FC<ForumProps> = ({ onNavigate }) => {
           {/* Stats */}
           <div className="flex items-center gap-6 mt-4 pt-4 border-t border-white/5 relative z-10">
             <div className="flex items-center gap-2">
-              <HiOutlineChatBubbleLeftRight className="w-4 h-4 text-primary" />
+              <MessagesSquare className="w-4 h-4 text-primary" strokeWidth={1.5} />
               <span className="text-white/60 text-[12px]">
                 <span className="text-white font-semibold">{categories.length}</span> danh mục
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <HiOutlineArrowTrendingUp className="w-4 h-4 text-green-400" />
+              <TrendingUp className="w-4 h-4 text-green-400" strokeWidth={1.5} />
               <span className="text-white/60 text-[12px]">
                 <span className="text-white font-semibold">
                   {categories.reduce((acc, cat) => acc + (cat.threadCount || 0), 0)}
@@ -166,7 +169,9 @@ export const Forum: React.FC<ForumProps> = ({ onNavigate }) => {
       {/* Category List */}
       {categories.length === 0 ? (
         <div className="bg-bg-secondary rounded-[16px] border border-white/5 p-8 md:p-12 text-center animate-in fade-in duration-500">
-          <div className="text-5xl mb-4">📭</div>
+          <div className="flex justify-center mb-4">
+            <Inbox className="w-14 h-14 text-white/20" strokeWidth={1.5} />
+          </div>
           <h3 className="text-white text-lg font-semibold mb-2">Chưa có danh mục nào</h3>
           <p className="text-white/40 text-[13px]">
             Hãy quay lại sau để xem các chủ đề mới nhất!
@@ -225,9 +230,10 @@ export const Forum: React.FC<ForumProps> = ({ onNavigate }) => {
 
                 {/* Arrow */}
                 <div className="flex-shrink-0">
-                  <HiOutlineChevronRight
+                  <ChevronRight
                     className="w-5 h-5 text-white/20 group-hover:text-primary 
                                group-hover:translate-x-1 transition-all"
+                    strokeWidth={1.5}
                   />
                 </div>
               </div>
@@ -241,9 +247,9 @@ export const Forum: React.FC<ForumProps> = ({ onNavigate }) => {
                       overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-700">
         <div className="p-4 md:p-6">
           <div className="flex items-start gap-4">
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-[10px] 
+            <div className="w-10 h-10 md:w-12 md:h-12 bg-amber-500/10 rounded-[10px] 
                             flex items-center justify-center flex-shrink-0">
-              <span className="text-xl md:text-2xl">📜</span>
+              <ScrollText className="w-5 h-5 md:w-6 md:h-6 text-amber-400" strokeWidth={1.5} />
             </div>
             <div className="flex-1">
               <h4 className="font-semibold text-white text-[14px] md:text-[15px] mb-2">

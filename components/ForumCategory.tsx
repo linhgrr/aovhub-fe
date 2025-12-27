@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { HiOutlineChatBubbleLeft, HiOutlineHeart, HiOutlineEye, HiOutlinePhoto, HiXMark, HiArrowLeft, HiPlus, HiOutlineClock, HiOutlineArrowTrendingUp, HiOutlineFire } from 'react-icons/hi2';
-import { AiOutlineLoading3Quarters } from 'react-icons/ai';
+import { MessageCircle, Heart, Eye, ImagePlus, X, ArrowLeft, Plus, Clock, TrendingUp, Flame, Loader2, Inbox, Lock } from 'lucide-react';
 import { ForumCategory, ForumThreadListItem, ForumThreadsResponse, ThreadStatus } from '../types';
 import { API_BASE_URL } from '../constants';
 import { useAuth } from '../contexts/authContext';
@@ -146,11 +145,11 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
     }
   }, [categoryId, sortBy, token]);
 
-  // Initial load
+  // Initial load and when sort changes
   useEffect(() => {
     fetchCategory();
     fetchThreads();
-  }, [categoryId, sortBy]);
+  }, [categoryId, sortBy, fetchThreads]);
 
   // Infinite scroll setup
   const loadMore = useCallback(async () => {
@@ -227,9 +226,9 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
   };
 
   const sortOptions = [
-    { key: 'latest' as const, label: 'Mới nhất', Icon: HiOutlineClock },
-    { key: 'activity' as const, label: 'Hoạt động', Icon: HiOutlineArrowTrendingUp },
-    { key: 'popular' as const, label: 'Phổ biến', Icon: HiOutlineFire },
+    { key: 'latest' as const, label: 'Mới nhất', Icon: Clock },
+    { key: 'activity' as const, label: 'Hoạt động', Icon: TrendingUp },
+    { key: 'popular' as const, label: 'Phổ biến', Icon: Flame },
   ];
 
   if (loading && !threads.length) {
@@ -263,7 +262,7 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
             className="flex items-center gap-2 text-white/50 hover:text-primary 
                        transition-colors mb-4 group"
           >
-            <HiArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" strokeWidth={1.5} />
             <span className="text-[13px]">Quay lại diễn đàn</span>
           </button>
 
@@ -290,7 +289,7 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
                            transition-all shadow-lg shadow-primary/20 active:scale-95
                            text-[13px] md:text-[14px] flex-shrink-0"
               >
-                <HiPlus className="w-4 h-4" />
+                <Plus className="w-4 h-4" strokeWidth={2} />
                 Tạo chủ đề
               </button>
             )}
@@ -323,7 +322,9 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
       {threads.length === 0 ? (
         <div className="bg-bg-secondary rounded-[16px] border border-white/5 p-8 md:p-12 
                         text-center animate-in fade-in duration-500">
-          <div className="text-5xl mb-4">📭</div>
+          <div className="flex justify-center mb-4">
+            <Inbox className="w-14 h-14 text-white/20" strokeWidth={1.5} />
+          </div>
           <h3 className="text-white text-lg font-semibold mb-2">Chưa có chủ đề nào</h3>
           <p className="text-white/40 text-[13px] mb-4">
             Hãy là người đầu tiên tạo chủ đề trong danh mục này!
@@ -367,9 +368,10 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
                       {thread.title}
                     </h3>
                     {thread.status === ThreadStatus.LOCKED && (
-                      <span className="text-[10px] px-2 py-0.5 bg-red-500/20 text-red-400 
+                      <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 bg-red-500/20 text-red-400 
                                        rounded-full flex-shrink-0">
-                        🔒 Khóa
+                        <Lock className="w-3 h-3" strokeWidth={2} />
+                        Khóa
                       </span>
                     )}
                   </div>
@@ -396,15 +398,15 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
                     {/* Stats */}
                     <div className="flex items-center gap-3 ml-auto">
                       <span className="flex items-center gap-1 text-white/40">
-                        <HiOutlineEye className="w-3.5 h-3.5" />
+                        <Eye className="w-3.5 h-3.5" strokeWidth={1.5} />
                         {thread.viewCount}
                       </span>
                       <span className="flex items-center gap-1 text-blue-400/70">
-                        <HiOutlineChatBubbleLeft className="w-3.5 h-3.5" />
+                        <MessageCircle className="w-3.5 h-3.5" strokeWidth={1.5} />
                         {thread.commentCount}
                       </span>
                       <span className="flex items-center gap-1 text-primary/70">
-                        <HiOutlineHeart className="w-3.5 h-3.5" />
+                        <Heart className="w-3.5 h-3.5" strokeWidth={1.5} />
                         {thread.likeCount}
                       </span>
                     </div>
@@ -419,7 +421,7 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
       {/* Infinite Scroll Trigger */}
       <div ref={loadMoreRef} className="py-10 flex justify-center">
         {loadingMore && (
-          <AiOutlineLoading3Quarters className="w-6 h-6 text-primary animate-spin" />
+          <Loader2 className="w-6 h-6 text-primary animate-spin" />
         )}
       </div>
 
@@ -453,7 +455,7 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
                 className="p-2 hover:bg-white/5 rounded-full text-white/60 
                            hover:text-white transition-all"
               >
-                <HiXMark className="w-5 h-5" />
+                <X className="w-5 h-5" strokeWidth={1.5} />
               </button>
             </div>
 
@@ -528,7 +530,7 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
                                      rounded-full flex items-center justify-center 
                                      opacity-0 group-hover:opacity-100 hover:bg-red-500 transition-all"
                         >
-                          <HiXMark className="w-3.5 h-3.5 text-white" />
+                          <X className="w-3.5 h-3.5 text-white" strokeWidth={2} />
                         </button>
                       </div>
                     ))}
@@ -554,9 +556,9 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
                              transition-colors disabled:opacity-50 text-[13px]"
                 >
                   {isUploading ? (
-                    <AiOutlineLoading3Quarters className="w-4 h-4 text-green-400 animate-spin" />
+                    <Loader2 className="w-4 h-4 text-green-400 animate-spin" />
                   ) : (
-                    <HiOutlinePhoto className="w-4 h-4 text-green-400" />
+                    <ImagePlus className="w-4 h-4 text-green-400" strokeWidth={1.5} />
                   )}
                   <span className="text-white/60">Thêm ảnh</span>
                 </button>
@@ -585,7 +587,7 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
                              disabled:cursor-not-allowed text-[13px] shadow-lg shadow-primary/20"
                 >
                   {submitting ? (
-                    <AiOutlineLoading3Quarters className="w-4 h-4 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
                     'Đăng chủ đề'
                   )}

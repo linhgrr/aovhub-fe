@@ -248,7 +248,7 @@ export const Register: React.FC = () => {
 
               {/* Verified Profile Info */}
               <div className="bg-slate-950/50 border border-slate-700 p-6 mb-6">
-                <h3 className="text-gold-400 font-display font-bold text-lg mb-4 flex items-center gap-2">
+                <h3 className="text-primary font-display font-bold text-lg mb-4 flex items-center gap-2">
                   <Shield className="w-5 h-5" />
                   THÔNG TIN ĐÃ XÁC THỰC
                 </h3>
@@ -283,7 +283,7 @@ export const Register: React.FC = () => {
 
               <button
                 onClick={() => window.location.hash = 'login'}
-                className="w-full bg-gold-500 hover:bg-gold-400 text-slate-950 font-display font-bold py-3 px-6 clip-hex-button transition-all hover:translate-y-[-2px] hover:shadow-[0_0_15px_rgba(245,158,11,0.4)]"
+                className="w-full bg-primary hover:bg-primary/90 text-white font-display font-bold py-3 px-6 clip-hex-button transition-all hover:translate-y-[-2px] hover:shadow-[0_0_15px_rgba(140,103,246,0.4)]"
               >
                 ĐĂNG NHẬP NGAY
               </button>
@@ -393,6 +393,17 @@ export const Register: React.FC = () => {
                         } focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all text-sm`}
                       placeholder="Tối thiểu 8 ký tự"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-[#7f7f7f] hover:text-primary transition-colors"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
+                    </button>
                   </div>
                   {errors.password && (
                     <p className="text-red-400 text-[10px] mt-1 flex items-center gap-1">
@@ -417,7 +428,24 @@ export const Register: React.FC = () => {
                         } focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all text-sm`}
                       placeholder="Nhập lại mật khẩu"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-[#7f7f7f] hover:text-primary transition-colors"
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
+                    </button>
                   </div>
+                  {errors.confirmPassword && (
+                    <p className="text-red-400 text-[10px] mt-1 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
+                      {errors.confirmPassword}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

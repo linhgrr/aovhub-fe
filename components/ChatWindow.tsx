@@ -37,6 +37,7 @@ interface ChatWindowProps {
     conversationName: string;
     conversationAvatar: string | null;
     conversationType: 'DIRECT' | 'GROUP';
+    otherUserId?: string | null;
     onBack: () => void;
     onClose: () => void;
 }
@@ -46,6 +47,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     conversationName,
     conversationAvatar,
     conversationType,
+    otherUserId,
     onBack,
     onClose,
 }) => {
@@ -477,26 +479,51 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                         <ChevronLeft className="w-5 h-5 text-white/60" />
                     </button>
 
-                    {/* Avatar */}
-                    {conversationAvatar ? (
-                        <img
-                            src={conversationAvatar}
-                            alt=""
-                            className="w-[40px] h-[40px] rounded-[10px] object-cover"
-                        />
-                    ) : (
-                        <div className="w-[40px] h-[40px] rounded-[10px] bg-bg-main flex items-center justify-center">
-                            {conversationType === 'GROUP' ? (
-                                <Users className="w-5 h-5 text-[#7f7f7f]" />
+                    {/* Avatar - clickable for DIRECT chats */}
+                    {conversationType === 'DIRECT' && otherUserId ? (
+                        <a href={`#profile/${otherUserId}`} className="block hover:opacity-80 transition-opacity">
+                            {conversationAvatar ? (
+                                <img
+                                    src={conversationAvatar}
+                                    alt=""
+                                    className="w-[40px] h-[40px] rounded-[10px] object-cover"
+                                />
                             ) : (
-                                <UserIcon className="w-5 h-5 text-[#7f7f7f]" />
+                                <div className="w-[40px] h-[40px] rounded-[10px] bg-bg-main flex items-center justify-center">
+                                    <UserIcon className="w-5 h-5 text-[#7f7f7f]" />
+                                </div>
                             )}
-                        </div>
+                        </a>
+                    ) : (
+                        conversationAvatar ? (
+                            <img
+                                src={conversationAvatar}
+                                alt=""
+                                className="w-[40px] h-[40px] rounded-[10px] object-cover"
+                            />
+                        ) : (
+                            <div className="w-[40px] h-[40px] rounded-[10px] bg-bg-main flex items-center justify-center">
+                                {conversationType === 'GROUP' ? (
+                                    <Users className="w-5 h-5 text-[#7f7f7f]" />
+                                ) : (
+                                    <UserIcon className="w-5 h-5 text-[#7f7f7f]" />
+                                )}
+                            </div>
+                        )
                     )}
 
-                    {/* Name */}
+                    {/* Name - clickable for DIRECT chats */}
                     <div className="flex-1 min-w-0">
-                        <h3 className="font-montserrat font-semibold text-[13px] text-white truncate">{conversationName}</h3>
+                        {conversationType === 'DIRECT' && otherUserId ? (
+                            <a
+                                href={`#profile/${otherUserId}`}
+                                className="font-montserrat font-semibold text-[13px] text-white truncate hover:text-primary transition-colors block"
+                            >
+                                {conversationName}
+                            </a>
+                        ) : (
+                            <h3 className="font-montserrat font-semibold text-[13px] text-white truncate">{conversationName}</h3>
+                        )}
                         {typingUsers.length > 0 && (
                             <p className="text-[10px] text-primary font-medium">Đang nhập...</p>
                         )}

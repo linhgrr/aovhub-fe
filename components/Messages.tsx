@@ -19,6 +19,9 @@ interface ConversationListItem {
     last_message_content: string | null;
     last_message_at: string | null;
     unread_count: number;
+    is_online: boolean;
+    last_active_at: string | null;
+    other_user_id: string | null;
 }
 
 interface SearchUser {
@@ -43,6 +46,7 @@ export const Messages: React.FC<MessagesProps> = ({ isOpen, onClose, onRefreshUn
         name: string;
         avatar_url: string | null;
         type: 'DIRECT' | 'GROUP';
+        other_user_id: string | null;
     } | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<SearchUser[]>([]);
@@ -114,6 +118,7 @@ export const Messages: React.FC<MessagesProps> = ({ isOpen, onClose, onRefreshUn
                             name: data.data.name || pendingDirectMessage.username,
                             avatar_url: data.data.avatar_url || pendingDirectMessage.avatar_url,
                             type: 'DIRECT',
+                            other_user_id: pendingDirectMessage.userId,
                         });
                         onDirectMessageOpened?.();
                     }
@@ -200,6 +205,7 @@ export const Messages: React.FC<MessagesProps> = ({ isOpen, onClose, onRefreshUn
                     name: data.data.name || user.username,
                     avatar_url: data.data.avatar_url || user.avatar_url,
                     type: 'DIRECT',
+                    other_user_id: user.id,
                 });
                 setSearchQuery('');
                 setSearchResults([]);
@@ -231,6 +237,7 @@ export const Messages: React.FC<MessagesProps> = ({ isOpen, onClose, onRefreshUn
                 conversationName={selectedConversation.name}
                 conversationAvatar={selectedConversation.avatar_url}
                 conversationType={selectedConversation.type}
+                otherUserId={selectedConversation.other_user_id}
                 onBack={() => {
                     setSelectedConversation(null);
                     fetchConversations();
@@ -330,8 +337,10 @@ export const Messages: React.FC<MessagesProps> = ({ isOpen, onClose, onRefreshUn
                                         className="w-[40px] h-[40px] rounded-[10px] object-cover transition-transform group-hover:scale-105"
                                     />
                                 ) : (
-                                    <div className="w-[40px] h-[40px] rounded-[10px] bg-bg-main flex items-center justify-center">
-                                        <UserIcon className="w-4 h-4 text-[#7f7f7f]" />
+                                    <div className="w-[40px] h-[40px] rounded-[10px] bg-primary/20 flex items-center justify-center">
+                                        <span className="text-[14px] font-bold text-primary uppercase">
+                                            {user.username?.charAt(0) || '?'}
+                                        </span>
                                     </div>
                                 )}
                                 <div>
@@ -374,6 +383,7 @@ export const Messages: React.FC<MessagesProps> = ({ isOpen, onClose, onRefreshUn
                                     name: conversation.name || 'Cuộc trò chuyện',
                                     avatar_url: conversation.avatar_url,
                                     type: conversation.type,
+                                    other_user_id: conversation.other_user_id,
                                 })}
                                 className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors text-left group ${conversation.unread_count > 0 ? 'bg-primary/5' : ''
                                     }`}
@@ -387,16 +397,20 @@ export const Messages: React.FC<MessagesProps> = ({ isOpen, onClose, onRefreshUn
                                             className="w-[43px] h-[43px] rounded-[10px] object-cover transition-transform group-hover:scale-105"
                                         />
                                     ) : (
-                                        <div className="w-[43px] h-[43px] rounded-[10px] bg-bg-main flex items-center justify-center">
+                                        <div className="w-[43px] h-[43px] rounded-[10px] bg-primary/20 flex items-center justify-center">
                                             {conversation.type === 'GROUP' ? (
-                                                <Users className="w-5 h-5 text-[#7f7f7f]" />
+                                                <Users className="w-5 h-5 text-primary" />
                                             ) : (
-                                                <UserIcon className="w-5 h-5 text-[#7f7f7f]" />
+                                                <span className="text-[15px] font-bold text-primary uppercase">
+                                                    {conversation.name?.charAt(0) || '?'}
+                                                </span>
                                             )}
                                         </div>
                                     )}
-                                    {/* Online indicator */}
-                                    <div className="absolute -bottom-0.5 -right-0.5 w-[8px] h-[8px] bg-[#22c55e] rounded-full border-2 border-bg-secondary"></div>
+                                    {/* Online/Offline indicator for DIRECT chats */}
+                                    {conversation.type === 'DIRECT' && (
+                                        <div className={`absolute -bottom-0.5 -right-0.5 w-[12px] h-[12px] rounded-full border-2 border-bg-secondary ${conversation.is_online ? 'bg-[#31a24c]' : 'bg-[#7f7f7f]'}`}></div>
+                                    )}
                                 </div>
 
                                 {/* Content */}
@@ -440,6 +454,7 @@ export const Messages: React.FC<MessagesProps> = ({ isOpen, onClose, onRefreshUn
                         name: groupName,
                         avatar_url: null,
                         type: 'GROUP',
+                        other_user_id: null,
                     });
                     fetchConversations();
                 }}

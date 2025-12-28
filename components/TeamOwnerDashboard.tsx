@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { ArrowLeft, Users, Clock, Trophy, Target, Check, X, Trash2, ExternalLink, MessageSquare } from 'lucide-react';
 import { API_BASE_URL } from '../constants';
 import { useAuth } from '../contexts/authContext';
+import { useSnackbar } from '../contexts/SnackbarContext';
 import { TeamDetail, TeamJoinRequest, TeamMemberInfo } from '../types';
 import { TeamChat } from './TeamChat';
 import { VoiceChat } from './VoiceChat';
@@ -54,6 +55,7 @@ const getRemainingTime = (expiresAt: string): string => {
 
 export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, onBack }) => {
     const { token } = useAuth();
+    const { showError } = useSnackbar();
     const [team, setTeam] = useState<TeamDetail | null>(null);
     const [requests, setRequests] = useState<TeamJoinRequest[]>([]);
     const [loading, setLoading] = useState(true);
@@ -120,7 +122,7 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
             }
             await fetchTeamData();
         } catch (err: any) {
-            alert(err.message || 'Không thể duyệt yêu cầu');
+            showError(err.message || 'Không thể duyệt yêu cầu');
         } finally {
             setProcessingRequest(null);
         }
@@ -138,7 +140,7 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
             if (!res.ok) throw new Error('Failed to reject');
             await fetchTeamData();
         } catch (err) {
-            alert('Không thể từ chối yêu cầu');
+            showError('Không thể từ chối yêu cầu');
         } finally {
             setProcessingRequest(null);
         }
@@ -156,7 +158,7 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
             if (!res.ok) throw new Error('Failed to remove');
             await fetchTeamData();
         } catch (err) {
-            alert('Không thể xóa thành viên');
+            showError('Không thể xóa thành viên');
         } finally {
             setRemovingMember(null);
         }
@@ -174,7 +176,7 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
             if (!res.ok) throw new Error('Failed to delete');
             onBack();
         } catch (err) {
-            alert('Không thể đóng phòng');
+            showError('Không thể đóng phòng');
             setDeletingTeam(false);
         }
     };

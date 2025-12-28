@@ -6,6 +6,7 @@ import {
 } from '../types';
 import { API_BASE_URL } from '../constants';
 import { useAuth } from '../contexts/authContext';
+import { useSnackbar } from '../contexts/SnackbarContext';
 import { formatTimeAgo, formatFullDate } from '../utils/timeUtils';
 
 interface ForumThreadPageProps {
@@ -170,6 +171,7 @@ const CommentSkeleton: React.FC = () => (
 
 export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) => {
   const { token, isAuthenticated, user } = useAuth();
+  const { showSuccess, showError } = useSnackbar();
   const [thread, setThread] = useState<ForumThread | null>(null);
   const [comments, setComments] = useState<ForumComment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -230,11 +232,11 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
         }),
       });
       if (!response.ok) throw new Error('Không thể gửi báo cáo');
-      alert('Báo cáo đã được gửi thành công!');
+      showSuccess('Báo cáo đã được gửi thành công!');
       setShowReportModal(false);
       setReportReason('');
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Không thể gửi báo cáo');
+      showError(err instanceof Error ? err.message : 'Không thể gửi báo cáo');
     } finally {
       setIsReporting(false);
     }
@@ -472,7 +474,7 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
       setCommentMediaUrls([]);
       setReplyingTo(null);
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Không thể đăng bình luận');
+      showError(err instanceof Error ? err.message : 'Không thể đăng bình luận');
     } finally {
       setSubmitting(false);
     }

@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Image, Smile, Send, X, Loader2, Plus, Film } from 'lucide-react';
 import { useAuth } from '../contexts/authContext';
+import { useSnackbar } from '../contexts/SnackbarContext';
 import { MediaItem } from './PostCard';
 import { Firework } from './Firework';
 import { FlyingCharacter } from './FlyingCharacter';
@@ -19,6 +20,7 @@ interface ExtendedMediaItem extends MediaItem {
 
 export const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated, apiUrl }) => {
   const { user, token } = useAuth();
+  const { showError } = useSnackbar();
   const [content, setContent] = useState('');
   const [mediaItems, setMediaItems] = useState<ExtendedMediaItem[]>([]);
   const [isPosting, setIsPosting] = useState(false);
@@ -108,7 +110,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated, apiUrl })
       } catch (err) {
         console.error('Upload failed:', err);
         setMediaItems(prev => prev.filter(item => item.id !== tempId));
-        alert('Tải lên thất bại: ' + (err instanceof Error ? err.message : 'Có lỗi xảy ra'));
+        showError('Tải lên thất bại: ' + (err instanceof Error ? err.message : 'Có lỗi xảy ra'));
       }
     }
     setIsUploading(false);

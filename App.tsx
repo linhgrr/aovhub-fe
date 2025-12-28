@@ -20,6 +20,7 @@ import { RightSidebar } from './components/RightSidebar';
 import { Chatbot } from './components/Chatbot';
 import LandingPage from './components/LandingPage';
 import { AuthProvider, useAuth } from './contexts/authContext';
+import { SnackbarProvider } from './contexts/SnackbarContext';
 
 type Route = 'landing' | 'feed' | 'reels' | 'lfg' | 'friends' | 'profile' | 'settings' | 'register' | 'login' | 'forgot-password' | 'reset-password' | 'forum' | 'forum-category' | 'forum-thread' | 'admin' | 'search' | 'chatbot';
 
@@ -166,7 +167,9 @@ const AppContent: React.FC = () => {
 const App: React.FC = () => {
   return (
     <AuthProvider>
-      <AppContent />
+      <SnackbarProvider>
+        <AppContent />
+      </SnackbarProvider>
     </AuthProvider>
   );
 };

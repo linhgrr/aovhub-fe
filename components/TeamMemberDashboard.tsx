@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { ArrowLeft, Users, Clock, Trophy, Target, LogOut, ExternalLink } from 'lucide-react';
 import { API_BASE_URL } from '../constants';
 import { useAuth } from '../contexts/authContext';
+import { useSnackbar } from '../contexts/SnackbarContext';
 import { TeamDetail, TeamMemberInfo } from '../types';
 import { TeamChat } from './TeamChat';
 import { VoiceChat } from './VoiceChat';
@@ -54,6 +55,7 @@ const getRemainingTime = (expiresAt: string): string => {
 
 export const TeamMemberDashboard: React.FC<TeamMemberDashboardProps> = ({ teamId, onBack }) => {
     const { token } = useAuth();
+    const { showError } = useSnackbar();
     const [team, setTeam] = useState<TeamDetail | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -107,7 +109,7 @@ export const TeamMemberDashboard: React.FC<TeamMemberDashboardProps> = ({ teamId
             }
             onBack();
         } catch (err: any) {
-            alert(err.message || 'Không thể rời phòng');
+            showError(err.message || 'Không thể rời phòng');
             setIsLeaving(false);
         }
     };

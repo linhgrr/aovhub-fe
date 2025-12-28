@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Users, Clock, Trophy, ChevronLeft, ChevronRight, Filter, Settings, Plus, Eye, MessageSquare } from 'lucide-react';
 import { API_BASE_URL } from '../constants';
 import { useAuth } from '../contexts/authContext';
+import { useSnackbar } from '../contexts/SnackbarContext';
 import { TeamListItem, TeamDetail, TeamsResponse, CreateTeamInput, GameMode } from '../types';
 import { TeamDetailModal } from './TeamDetailModal';
 import { CreateTeamModal } from './CreateTeamModal';
@@ -56,6 +57,7 @@ const PAGE_SIZE = 5;
 
 export const LFG: React.FC = () => {
    const { token, user } = useAuth();
+   const { showSuccess, showError } = useSnackbar();
 
    // State
    const [teams, setTeams] = useState<TeamListItem[]>([]);
@@ -76,7 +78,7 @@ export const LFG: React.FC = () => {
    // My team state
    const [myTeam, setMyTeam] = useState<TeamDetail | null>(null);
    const [showMyTeamDashboard, setShowMyTeamDashboard] = useState(false);
-   
+
    // Joined team state (when user is a member but not owner)
    const [joinedTeam, setJoinedTeam] = useState<TeamDetail | null>(null);
    const [showJoinedTeamDashboard, setShowJoinedTeamDashboard] = useState(false);
@@ -183,7 +185,7 @@ export const LFG: React.FC = () => {
          setShowDetailModal(true);
       } catch (err) {
          console.error('Error fetching team detail:', err);
-         alert('Không thể tải thông tin team');
+         showError('Không thể tải thông tin team');
       } finally {
          setLoadingTeamDetail(null);
       }
@@ -217,9 +219,9 @@ export const LFG: React.FC = () => {
             setSelectedTeam(updatedData);
          }
 
-         alert('Đã gửi yêu cầu tham gia!');
+         showSuccess('Đã gửi yêu cầu tham gia!');
       } catch (err: any) {
-         alert(err.message || 'Không thể gửi yêu cầu');
+         showError(err.message || 'Không thể gửi yêu cầu');
       } finally {
          setIsJoining(false);
       }
@@ -248,7 +250,7 @@ export const LFG: React.FC = () => {
          fetchTeams();
          fetchMyTeam();
       } catch (err: any) {
-         alert(err.message || 'Không thể tạo phòng');
+         showError(err.message || 'Không thể tạo phòng');
       } finally {
          setIsCreating(false);
       }

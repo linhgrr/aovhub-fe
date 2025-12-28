@@ -255,6 +255,21 @@
     .animate-bounce-short {
       animation: bounce-short 0.5s ease-in-out infinite;
     }
+
+    /* Snackbar Progress Bar Animation */
+    @keyframes progress-shrink {
+      from {
+        width: 100%;
+      }
+      to {
+        width: 0%;
+      }
+    }
+
+    .animate-progress-shrink {
+      animation-name: progress-shrink;
+      animation-fill-mode: forwards;
+    }
   </style>
 </head>
 

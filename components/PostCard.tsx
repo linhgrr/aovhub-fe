@@ -6,6 +6,7 @@ import { HashtagText } from './HashtagText';
 import { formatTimeAgo, formatDate } from '../utils/timeUtils';
 import { getAvatarUrl } from '../utils/avatarUtils';
 import { API_BASE_URL } from '../constants';
+import { useSnackbar } from '../contexts/SnackbarContext';
 
 // Types matching backend
 export interface MediaItem {
@@ -79,6 +80,7 @@ export const PostCard: React.FC<PostCardProps> = ({
   const [reportReason, setReportReason] = useState('');
   const [isReporting, setIsReporting] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const { showSuccess, showError } = useSnackbar();
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -125,11 +127,11 @@ export const PostCard: React.FC<PostCardProps> = ({
         }),
       });
       if (!response.ok) throw new Error('Không thể gửi báo cáo');
-      alert('Báo cáo đã được gửi thành công!');
+      showSuccess('Báo cáo đã được gửi thành công!');
       setShowReportModal(false);
       setReportReason('');
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Không thể gửi báo cáo');
+      showError(err instanceof Error ? err.message : 'Không thể gửi báo cáo');
     } finally {
       setIsReporting(false);
     }

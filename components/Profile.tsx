@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useAuth, AuthUser } from '../contexts/authContext';
+import { useSnackbar } from '../contexts/SnackbarContext';
 import { Target, Shield, Hexagon, Camera, Loader, UserPlus, UserMinus, Clock, Check, Users, FileText, Loader2 } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { PostCard, FeedPost } from './PostCard';
@@ -43,6 +44,7 @@ interface ProfileProps {
 
 export const Profile: React.FC<ProfileProps> = ({ userId }) => {
   const { user: currentUser, token, updateUser } = useAuth();
+  const { showError } = useSnackbar();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [friendCount, setFriendCount] = useState(0);
@@ -354,7 +356,7 @@ export const Profile: React.FC<ProfileProps> = ({ userId }) => {
       }
     } catch (error) {
       console.error('Avatar upload error:', error);
-      alert('Không thể tải ảnh lên. Vui lòng thử lại.');
+      showError('Không thể tải ảnh lên. Vui lòng thử lại.');
     } finally {
       setIsUploading(false);
       // Reset input
@@ -555,8 +557,8 @@ export const Profile: React.FC<ProfileProps> = ({ userId }) => {
         <button
           onClick={() => setActiveTab('profile')}
           className={`flex items-center gap-2 px-8 py-4 font-bold text-sm transition-all border-b-2 ${activeTab === 'profile'
-              ? 'border-primary text-primary'
-              : 'border-transparent text-[#7f7f7f] hover:text-white'
+            ? 'border-primary text-primary'
+            : 'border-transparent text-[#7f7f7f] hover:text-white'
             }`}
         >
           <Shield className="w-4 h-4" />
@@ -565,8 +567,8 @@ export const Profile: React.FC<ProfileProps> = ({ userId }) => {
         <button
           onClick={() => setActiveTab('posts')}
           className={`flex items-center gap-2 px-8 py-4 font-bold text-sm transition-all border-b-2 ${activeTab === 'posts'
-              ? 'border-primary text-primary'
-              : 'border-transparent text-[#7f7f7f] hover:text-white'
+            ? 'border-primary text-primary'
+            : 'border-transparent text-[#7f7f7f] hover:text-white'
             }`}
         >
           <FileText className="w-4 h-4" />

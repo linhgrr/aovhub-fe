@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { API_BASE_URL } from '../constants';
 import { useAuth } from '../contexts/authContext';
+import { useSnackbar } from '../contexts/SnackbarContext';
 import {
   UserRole,
   ReportStatus,
@@ -43,6 +44,7 @@ type AdminTab = 'dashboard' | 'categories' | 'users' | 'reports';
 
 export const AdminDashboard: React.FC = () => {
   const { token, user } = useAuth();
+  const { showSuccess, showError, showWarning } = useSnackbar();
   const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [categories, setCategories] = useState<ForumCategory[]>([]);
@@ -212,7 +214,7 @@ export const AdminDashboard: React.FC = () => {
       setNewCatDesc('');
       setNewCatIcon('');
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Không thể tạo danh mục');
+      showError(err instanceof Error ? err.message : 'Không thể tạo danh mục');
     } finally {
       setSubmitting(false);
     }
@@ -230,7 +232,7 @@ export const AdminDashboard: React.FC = () => {
       if (!response.ok) throw new Error('Không thể xóa danh mục');
       setCategories(categories.filter(c => c.id !== categoryId));
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Không thể xóa danh mục');
+      showError(err instanceof Error ? err.message : 'Không thể xóa danh mục');
     }
   };
 
@@ -248,7 +250,7 @@ export const AdminDashboard: React.FC = () => {
       setShowRoleModal(null);
       fetchUsers();
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Không thể thay đổi role');
+      showError(err instanceof Error ? err.message : 'Không thể thay đổi role');
     } finally {
       setSubmitting(false);
     }
@@ -256,7 +258,7 @@ export const AdminDashboard: React.FC = () => {
 
   const handleBanUser = async (userId: string) => {
     if (banReason.length < 10) {
-      alert('Lý do cần ít nhất 10 ký tự');
+      showWarning('Lý do cần ít nhất 10 ký tự');
       return;
     }
     try {
@@ -277,7 +279,7 @@ export const AdminDashboard: React.FC = () => {
       setBanDuration(24);
       fetchUsers();
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Không thể cấm người dùng');
+      showError(err instanceof Error ? err.message : 'Không thể cấm người dùng');
     } finally {
       setSubmitting(false);
     }
@@ -296,7 +298,7 @@ export const AdminDashboard: React.FC = () => {
       }
       fetchUsers();
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Không thể bỏ cấm người dùng');
+      showError(err instanceof Error ? err.message : 'Không thể bỏ cấm người dùng');
     }
   };
 
@@ -317,14 +319,14 @@ export const AdminDashboard: React.FC = () => {
         throw new Error(data.detail || 'Không thể xử lý báo cáo');
       }
       const result = await response.json();
-      alert(result.message || 'Đã xử lý báo cáo thành công');
+      showSuccess(result.message || 'Đã xử lý báo cáo thành công');
       setShowResolveModal(null);
       setResolveNote('');
       setSelectedAction('IGNORE');
       fetchReports();
       fetchStats(); // Refresh pending count
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Không thể xử lý báo cáo');
+      showError(err instanceof Error ? err.message : 'Không thể xử lý báo cáo');
     } finally {
       setSubmitting(false);
     }

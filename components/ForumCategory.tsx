@@ -3,6 +3,7 @@ import { MessageCircle, Heart, Eye, ImagePlus, X, ArrowLeft, Plus, Clock, Trendi
 import { ForumCategory, ForumThreadListItem, ForumThreadsResponse, ThreadStatus } from '../types';
 import { API_BASE_URL } from '../constants';
 import { useAuth } from '../contexts/authContext';
+import { useSnackbar } from '../contexts/SnackbarContext';
 import { formatTimeAgo } from '../utils/timeUtils';
 
 interface ForumCategoryPageProps {
@@ -29,6 +30,7 @@ const ThreadSkeleton: React.FC = () => (
 
 export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId }) => {
   const { token, isAuthenticated } = useAuth();
+  const { showError } = useSnackbar();
   const [category, setCategory] = useState<ForumCategory | null>(null);
   const [threads, setThreads] = useState<ForumThreadListItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -213,7 +215,7 @@ export const ForumCategoryPage: React.FC<ForumCategoryPageProps> = ({ categoryId
       // Navigate to new thread
       window.location.hash = `forum/thread/${thread.id}`;
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Không thể tạo chủ đề');
+      showError(err instanceof Error ? err.message : 'Không thể tạo chủ đề');
     } finally {
       setSubmitting(false);
     }

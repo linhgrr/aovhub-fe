@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MoreVertical, Trash2 } from 'lucide-react';
+import { MoreVertical, Trash2, AlertTriangle } from 'lucide-react';
 import { VideoPlayer } from './VideoPlayer';
 import { LikesModal } from './LikesModal';
 import { HashtagText } from './HashtagText';
 import { formatTimeAgo, formatDate } from '../utils/timeUtils';
 import { getAvatarUrl } from '../utils/avatarUtils';
+import { API_BASE_URL } from '../constants';
 
 // Types matching backend
 export interface MediaItem {
@@ -58,6 +59,7 @@ interface PostCardProps {
   onDelete?: (postId: string) => void;
   currentUserId?: string;
   showAuthor?: boolean;
+  token?: string;
 }
 
 export const PostCard: React.FC<PostCardProps> = ({
@@ -68,10 +70,14 @@ export const PostCard: React.FC<PostCardProps> = ({
   onDelete,
   currentUserId,
   showAuthor = true,
+  token,
 }) => {
   const [showLikesModal, setShowLikesModal] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState('');
+  const [isReporting, setIsReporting] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Close menu when clicking outside
@@ -96,6 +102,40 @@ export const PostCard: React.FC<PostCardProps> = ({
     setShowDeleteConfirm(false);
     onDelete?.(post.id);
   };
+
+  const handleReportClick = () => {
+    setShowMenu(false);
+    setShowReportModal(true);
+  };
+
+  const handleSubmitReport = async () => {
+    if (reportReason.length < 10 || !token) return;
+    try {
+      setIsReporting(true);
+      const response = await fetch(`${API_BASE_URL}/forum/report`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          target_type: 'POST',
+          target_id: post.id,
+          reason: reportReason,
+        }),
+      });
+      if (!response.ok) throw new Error('Không thể gửi báo cáo');
+      alert('Báo cáo đã được gửi thành công!');
+      setShowReportModal(false);
+      setReportReason('');
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Không thể gửi báo cáo');
+    } finally {
+      setIsReporting(false);
+    }
+  };
+
+  const isOwnPost = currentUserId && post.author_id === currentUserId;
 
   return (
     <>
@@ -135,6 +175,50 @@ export const PostCard: React.FC<PostCardProps> = ({
           </div>
         </div>
       )}
+
+      {/* Report Modal */}
+      {showReportModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => { setShowReportModal(false); setReportReason(''); }}
+          />
+          <div className="relative bg-bg-secondary rounded-[16px] border border-white/10 p-6 max-w-[360px] w-full animate-in zoom-in-95 fade-in duration-200">
+            <h3 className="text-white font-bold text-[16px] mb-2 flex items-center gap-2">
+              <AlertTriangle className="text-yellow-400" size={20} />
+              Báo cáo bài viết
+            </h3>
+            <p className="text-white/60 text-[13px] mb-4">
+              Nội dung này vi phạm quy định cộng đồng? Hãy cho chúng tôi biết lý do.
+            </p>
+            <textarea
+              value={reportReason}
+              onChange={(e) => setReportReason(e.target.value)}
+              placeholder="Nhập lý do báo cáo (ít nhất 10 ký tự)..."
+              rows={3}
+              className="w-full px-4 py-3 bg-bg-main/50 border border-white/10 rounded-[10px] 
+                         text-white text-[13px] placeholder:text-white/30 focus:outline-none 
+                         focus:border-yellow-500/50 resize-none mb-4"
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setShowReportModal(false); setReportReason(''); }}
+                className="flex-1 py-2.5 rounded-[10px] bg-white/10 text-white text-[13px] font-semibold hover:bg-white/20 transition-colors"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={handleSubmitReport}
+                disabled={isReporting || reportReason.length < 10}
+                className="flex-1 py-2.5 rounded-[10px] bg-yellow-500 text-slate-900 text-[13px] font-semibold 
+                           hover:bg-yellow-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isReporting ? 'Đang gửi...' : 'Gửi báo cáo'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="bg-bg-secondary rounded-[10px] md:rounded-[12px] overflow-hidden mb-4 md:mb-6 border border-white/5">
         {/* Header - Responsive */}
         <div className="p-4 md:p-6 flex items-center justify-between">
@@ -161,8 +245,8 @@ export const PostCard: React.FC<PostCardProps> = ({
             </div>
           </div>
 
-          {/* 3-dot menu - only show for own posts */}
-          {currentUserId && post.author_id === currentUserId && onDelete && (
+          {/* 3-dot menu - show for logged-in users */}
+          {currentUserId && (
             <div className="relative" ref={menuRef}>
               <button
                 onClick={() => setShowMenu(!showMenu)}
@@ -173,14 +257,27 @@ export const PostCard: React.FC<PostCardProps> = ({
 
               {/* Dropdown menu */}
               {showMenu && (
-                <div className="absolute right-0 top-full mt-1 bg-bg-secondary border border-white/10 rounded-[10px] shadow-xl overflow-hidden z-50 min-w-[140px] animate-in fade-in zoom-in-95 duration-150">
-                  <button
-                    onClick={handleDeleteClick}
-                    className="w-full px-4 py-2.5 flex items-center gap-2 text-red-400 hover:bg-white/5 transition-colors text-[13px]"
-                  >
-                    <Trash2 size={16} />
-                    Xóa bài viết
-                  </button>
+                <div className="absolute right-0 top-full mt-1 bg-bg-secondary border border-white/10 rounded-[10px] shadow-xl overflow-hidden z-50 min-w-[150px] animate-in fade-in zoom-in-95 duration-150">
+                  {/* Report option - only for other users' posts */}
+                  {!isOwnPost && (
+                    <button
+                      onClick={handleReportClick}
+                      className="w-full px-4 py-2.5 flex items-center gap-2 text-yellow-400 hover:bg-white/5 transition-colors text-[13px]"
+                    >
+                      <AlertTriangle size={16} />
+                      Báo cáo
+                    </button>
+                  )}
+                  {/* Delete option - only for own posts */}
+                  {isOwnPost && onDelete && (
+                    <button
+                      onClick={handleDeleteClick}
+                      className="w-full px-4 py-2.5 flex items-center gap-2 text-red-400 hover:bg-white/5 transition-colors text-[13px]"
+                    >
+                      <Trash2 size={16} />
+                      Xóa bài viết
+                    </button>
+                  )}
                 </div>
               )}
             </div>

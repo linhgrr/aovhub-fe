@@ -209,6 +209,7 @@ export const Feed: React.FC = () => {
               onShare={setPostToShare}
               onDelete={handleDeletePost}
               currentUserId={user?.id}
+              token={token}
             />
           ))}
         </div>

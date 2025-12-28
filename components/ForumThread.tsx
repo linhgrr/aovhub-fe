@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Heart, MessageCircle, CornerUpLeft, Eye, ImagePlus, X, ArrowLeft, Send, Loader2, AlertCircle, MessageSquare, Lock } from 'lucide-react';
+import { Heart, MessageCircle, CornerUpLeft, Eye, ImagePlus, X, ArrowLeft, Send, Loader2, AlertCircle, MessageSquare, Lock, MoreVertical, AlertTriangle } from 'lucide-react';
 import {
   ForumThread, ForumComment, ForumCommentsResponse,
   ThreadStatus, ForumCommentStatus
@@ -192,6 +192,53 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
   // Infinite scroll
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  // Report modal
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState('');
+  const [isReporting, setIsReporting] = useState(false);
+  const [showThreadMenu, setShowThreadMenu] = useState(false);
+  const threadMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (threadMenuRef.current && !threadMenuRef.current.contains(event.target as Node)) {
+        setShowThreadMenu(false);
+      }
+    };
+    if (showThreadMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showThreadMenu]);
+
+  const handleReportThread = async () => {
+    if (reportReason.length < 10 || !token) return;
+    try {
+      setIsReporting(true);
+      const response = await fetch(`${API_BASE_URL}/forum/report`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          target_type: 'THREAD',
+          target_id: threadId,
+          reason: reportReason,
+        }),
+      });
+      if (!response.ok) throw new Error('Không thể gửi báo cáo');
+      alert('Báo cáo đã được gửi thành công!');
+      setShowReportModal(false);
+      setReportReason('');
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Không thể gửi báo cáo');
+    } finally {
+      setIsReporting(false);
+    }
+  };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -548,6 +595,33 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
                 )}
               </div>
             </div>
+
+            {/* 3-dot menu - show for logged-in users viewing other's posts */}
+            {isAuthenticated && thread.authorId !== user?.id && (
+              <div className="relative" ref={threadMenuRef}>
+                <button
+                  onClick={() => setShowThreadMenu(!showThreadMenu)}
+                  className="p-2 hover:bg-white/10 rounded-full text-white/40 hover:text-white transition-all"
+                >
+                  <MoreVertical size={18} />
+                </button>
+
+                {showThreadMenu && (
+                  <div className="absolute right-0 top-full mt-1 bg-bg-secondary border border-white/10 
+                                  rounded-[10px] shadow-xl overflow-hidden z-50 min-w-[150px] 
+                                  animate-in fade-in zoom-in-95 duration-150">
+                    <button
+                      onClick={() => { setShowThreadMenu(false); setShowReportModal(true); }}
+                      className="w-full px-4 py-2.5 flex items-center gap-2 text-yellow-400 
+                                 hover:bg-white/5 transition-colors text-[13px]"
+                    >
+                      <AlertTriangle size={16} />
+                      Báo cáo
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Title */}
@@ -792,6 +866,50 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
               <Lock className="w-4 h-4" strokeWidth={1.5} />
               Chủ đề này đã bị khóa, không thể bình luận thêm
             </p>
+          </div>
+        </div>
+      )}
+
+      {/* Report Modal */}
+      {showReportModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => { setShowReportModal(false); setReportReason(''); }}
+          />
+          <div className="relative bg-bg-secondary rounded-[16px] border border-white/10 p-6 max-w-[360px] w-full animate-in zoom-in-95 fade-in duration-200">
+            <h3 className="text-white font-bold text-[16px] mb-2 flex items-center gap-2">
+              <AlertTriangle className="text-yellow-400" size={20} />
+              Báo cáo bài viết
+            </h3>
+            <p className="text-white/60 text-[13px] mb-4">
+              Nội dung này vi phạm quy định cộng đồng? Hãy cho chúng tôi biết lý do.
+            </p>
+            <textarea
+              value={reportReason}
+              onChange={(e) => setReportReason(e.target.value)}
+              placeholder="Nhập lý do báo cáo (ít nhất 10 ký tự)..."
+              rows={3}
+              className="w-full px-4 py-3 bg-bg-main/50 border border-white/10 rounded-[10px] 
+                         text-white text-[13px] placeholder:text-white/30 focus:outline-none 
+                         focus:border-yellow-500/50 resize-none mb-4"
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setShowReportModal(false); setReportReason(''); }}
+                className="flex-1 py-2.5 rounded-[10px] bg-white/10 text-white text-[13px] font-semibold hover:bg-white/20 transition-colors"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={handleReportThread}
+                disabled={isReporting || reportReason.length < 10}
+                className="flex-1 py-2.5 rounded-[10px] bg-yellow-500 text-slate-900 text-[13px] font-semibold 
+                           hover:bg-yellow-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isReporting ? 'Đang gửi...' : 'Gửi báo cáo'}
+              </button>
+            </div>
           </div>
         </div>
       )}

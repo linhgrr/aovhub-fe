@@ -287,3 +287,69 @@ export interface JoinTeamInput {
   message?: string;
 }
 
+// ============== ADMIN TYPES ==============
+
+export enum ReportStatus {
+  PENDING = 'PENDING',
+  RESOLVED = 'RESOLVED',
+  DISMISSED = 'DISMISSED'
+}
+
+export enum ReportTargetType {
+  THREAD = 'THREAD',
+  COMMENT = 'COMMENT',
+  USER = 'USER',
+  POST = 'POST'
+}
+
+export enum ReportAction {
+  IGNORE = 'IGNORE',
+  HIDE_CONTENT = 'HIDE_CONTENT',
+  DELETE_CONTENT = 'DELETE_CONTENT',
+  WARN_USER = 'WARN_USER'
+}
+
+export interface AdminUserPublic {
+  id: string;
+  email: string;
+  username: string;
+  is_active: boolean;
+  is_superuser: boolean;
+  full_name?: string;
+  role: UserRole;
+  rank?: string;
+  main_role?: string;
+  level?: number;
+  avatar_url?: string;
+  profile_verified: boolean;
+  win_rate?: number;
+  total_matches?: number;
+  credibility_score?: number;
+  last_active_at?: string;
+}
+
+export interface AdminUsersResponse {
+  data: AdminUserPublic[];
+  count: number;
+}
+
+export interface AdminReport {
+  id: string;
+  reporter_id: string;
+  reporter_username?: string;
+  target_type: ReportTargetType;
+  target_id: string;
+  target_preview?: string;
+  reason: string;
+  status: ReportStatus;
+  moderator_id?: string;
+  moderator_note?: string;
+  resolved_at?: string;
+  created_at: string;
+}
+
+export interface AdminReportsResponse {
+  data: AdminReport[];
+  count: number;
+  pending_count: number;
+}

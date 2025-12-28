@@ -52,6 +52,8 @@ interface NotificationItem {
     content: string;
     post_id: string | null;
     comment_id: string | null;
+    friendship_id: string | null;
+    team_id: string | null;
     is_read: boolean;
     created_at: string;
 }
@@ -214,6 +216,23 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
 
     const handleNotificationItemClick = async (notification: NotificationItem) => {
         setShowNotifications(false);
+
+        // Handle friend request notification - navigate to friends page
+        if (notification.type === 'friend_request') {
+            window.location.hash = 'friends';
+            return;
+        }
+
+        // Handle team notifications - navigate to LFG page
+        if (notification.team_id && (
+            notification.type === 'team_join_request' ||
+            notification.type === 'team_request_approved' ||
+            notification.type === 'team_request_rejected'
+        )) {
+            window.location.hash = 'lfg';
+            return;
+        }
+
         if (notification.post_id) {
             try {
                 const authToken = localStorage.getItem('auth_token');

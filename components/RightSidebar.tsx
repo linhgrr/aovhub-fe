@@ -550,11 +550,6 @@ export const RightSidebar: React.FC = () => {
             <div className="bg-bg-secondary rounded-[20px] p-6 shadow-xl">
                 <div className="flex items-center justify-between mb-6">
                     <h3 className="font-montserrat font-extrabold text-[13px] text-white uppercase tracking-wider">GỢI Ý CHO BẠN</h3>
-                    <button className="opacity-40 hover:opacity-100 transition-opacity flex gap-[3px]">
-                        <div className="w-[3px] h-[3px] bg-white rounded-full"></div>
-                        <div className="w-[3px] h-[3px] bg-white rounded-full"></div>
-                        <div className="w-[3px] h-[3px] bg-white rounded-full"></div>
-                    </button>
                 </div>
                 <div className="space-y-5 max-h-[275px] overflow-y-auto no-scrollbar">
                     {isLoadingUsers ? (
@@ -616,14 +611,6 @@ export const RightSidebar: React.FC = () => {
                     <h3 className="font-montserrat font-extrabold text-[13px] text-white uppercase tracking-wider">
                         Người liên hệ
                     </h3>
-                    <div className="flex items-center gap-3">
-                        <Search className="w-4 h-4 text-white/50 cursor-pointer hover:text-white/80 transition-colors" />
-                        <button className="opacity-40 hover:opacity-100 transition-opacity flex gap-[3px]">
-                            <div className="w-1 h-1 bg-white rounded-full"></div>
-                            <div className="w-1 h-1 bg-white rounded-full"></div>
-                            <div className="w-1 h-1 bg-white rounded-full"></div>
-                        </button>
-                    </div>
                 </div>
 
                 <div className="space-y-1 overflow-y-auto flex-1 no-scrollbar">

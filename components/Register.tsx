@@ -482,6 +482,10 @@ export const Register: React.FC = () => {
                   <label className="block text-[#7f7f7f] text-[10px] font-bold mb-2 uppercase tracking-widest">
                     Ảnh hồ sơ game *
                   </label>
+                  <p className="text-[#7f7f7f]/70 text-[11px] mb-3 leading-relaxed">
+                    Chụp ảnh màn hình hồ sơ trong game Liên Quân Mobile. 
+                    Ảnh cần hiển thị rõ <span className="text-primary/80">Rank, Level, Tổng số trận và Tỷ lệ thắng</span>.
+                  </p>
 
                   <div className={`border-2 border-dashed ${errors.profileScreenshot ? 'border-red-500' : 'border-white/5'
                     } bg-bg-main/30 p-6 rounded-[12px] transition-all hover:border-primary/50 cursor-pointer relative`}>

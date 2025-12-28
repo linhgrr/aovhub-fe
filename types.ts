@@ -340,6 +340,7 @@ export interface AdminReport {
   target_type: ReportTargetType;
   target_id: string;
   target_preview?: string;
+  thread_id?: string;  // Thread ID for COMMENT reports (for navigation)
   reason: string;
   status: ReportStatus;
   moderator_id?: string;

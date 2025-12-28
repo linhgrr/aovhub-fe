@@ -18,12 +18,30 @@ const CommentItem: React.FC<{
   comment: ForumComment;
   onReply: (commentId: string, authorUsername: string) => void;
   onLike: (commentId: string) => void;
+  onReport: (commentId: string) => void;
   isAuthenticated: boolean;
+  currentUserId?: string;
   commentNumber?: number;
-}> = ({ comment, onReply, onLike, isAuthenticated, commentNumber }) => {
+}> = ({ comment, onReply, onLike, onReport, isAuthenticated, currentUserId, commentNumber }) => {
+  const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+    if (showMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showMenu]);
 
   // Handle snake_case from API
   const createdAt = comment.createdAt || (comment as any).created_at;
+  const authorId = comment.author.id || (comment.author as any).id;
 
   // Use shared time utility
   const formatDate = (dateStr: string | undefined): string => {
@@ -37,6 +55,9 @@ const CommentItem: React.FC<{
   const mediaUrls = comment.mediaUrls || (comment as any).media_urls || [];
   const quotedContent = (comment as any).quotedContent || (comment as any).quoted_content || null;
   const replyToUsername = comment.replyToUsername || (comment as any).reply_to_username;
+
+  // Show report option only for other users' comments
+  const canReport = isAuthenticated && currentUserId && authorId !== currentUserId;
 
   return (
     <div className={`bg-bg-secondary rounded-[16px] border border-white/5 overflow-hidden 
@@ -72,10 +93,37 @@ const CommentItem: React.FC<{
                 {formatDate(createdAt)}
               </span>
               {commentNumber && (
-                <span className="text-white/20 text-[11px] ml-auto">#{commentNumber}</span>
+                <span className="text-white/20 text-[11px]">#{commentNumber}</span>
               )}
             </div>
           </div>
+
+          {/* 3-dot menu for report */}
+          {canReport && (
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={() => setShowMenu(!showMenu)}
+                className="p-1.5 hover:bg-white/10 rounded-full text-white/40 hover:text-white transition-all"
+              >
+                <MoreVertical size={16} />
+              </button>
+
+              {showMenu && (
+                <div className="absolute right-0 top-full mt-1 bg-bg-secondary border border-white/10 
+                                rounded-[10px] shadow-xl overflow-hidden z-50 min-w-[130px] 
+                                animate-in fade-in zoom-in-95 duration-150">
+                  <button
+                    onClick={() => { setShowMenu(false); onReport(comment.id); }}
+                    className="w-full px-3 py-2 flex items-center gap-2 text-yellow-400 
+                               hover:bg-white/5 transition-colors text-[12px]"
+                  >
+                    <AlertTriangle size={14} />
+                    Báo cáo
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Quote box for replies */}
@@ -200,6 +248,7 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
   const [reportReason, setReportReason] = useState('');
   const [isReporting, setIsReporting] = useState(false);
   const [showThreadMenu, setShowThreadMenu] = useState(false);
+  const [reportingCommentId, setReportingCommentId] = useState<string | null>(null);
   const threadMenuRef = useRef<HTMLDivElement>(null);
 
   // Close menu when clicking outside
@@ -215,10 +264,12 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showThreadMenu]);
 
-  const handleReportThread = async () => {
+  // Generic report handler for both thread and comments
+  const handleSubmitReport = async () => {
     if (reportReason.length < 10 || !token) return;
     try {
       setIsReporting(true);
+      const isCommentReport = reportingCommentId !== null;
       const response = await fetch(`${API_BASE_URL}/forum/report`, {
         method: 'POST',
         headers: {
@@ -226,8 +277,8 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
           'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
-          target_type: 'THREAD',
-          target_id: threadId,
+          target_type: isCommentReport ? 'COMMENT' : 'THREAD',
+          target_id: isCommentReport ? reportingCommentId : threadId,
           reason: reportReason,
         }),
       });
@@ -235,11 +286,18 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
       showSuccess('Báo cáo đã được gửi thành công!');
       setShowReportModal(false);
       setReportReason('');
+      setReportingCommentId(null);
     } catch (err) {
       showError(err instanceof Error ? err.message : 'Không thể gửi báo cáo');
     } finally {
       setIsReporting(false);
     }
+  };
+
+  // Handler to open report modal for a comment
+  const handleReportComment = (commentId: string) => {
+    setReportingCommentId(commentId);
+    setShowReportModal(true);
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -613,7 +671,7 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
                                   rounded-[10px] shadow-xl overflow-hidden z-50 min-w-[150px] 
                                   animate-in fade-in zoom-in-95 duration-150">
                     <button
-                      onClick={() => { setShowThreadMenu(false); setShowReportModal(true); }}
+                      onClick={() => { setShowThreadMenu(false); setReportingCommentId(null); setShowReportModal(true); }}
                       className="w-full px-4 py-2.5 flex items-center gap-2 text-yellow-400 
                                  hover:bg-white/5 transition-colors text-[13px]"
                     >
@@ -728,7 +786,9 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
                   comment={comment}
                   onReply={(id, username) => setReplyingTo({ id, username })}
                   onLike={handleLikeComment}
+                  onReport={handleReportComment}
                   isAuthenticated={isAuthenticated}
+                  currentUserId={user?.id}
                   commentNumber={index + 1}
                 />
               </div>
@@ -877,12 +937,12 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-            onClick={() => { setShowReportModal(false); setReportReason(''); }}
+            onClick={() => { setShowReportModal(false); setReportReason(''); setReportingCommentId(null); }}
           />
           <div className="relative bg-bg-secondary rounded-[16px] border border-white/10 p-6 max-w-[360px] w-full animate-in zoom-in-95 fade-in duration-200">
             <h3 className="text-white font-bold text-[16px] mb-2 flex items-center gap-2">
               <AlertTriangle className="text-yellow-400" size={20} />
-              Báo cáo bài viết
+              {reportingCommentId ? 'Báo cáo bình luận' : 'Báo cáo bài viết'}
             </h3>
             <p className="text-white/60 text-[13px] mb-4">
               Nội dung này vi phạm quy định cộng đồng? Hãy cho chúng tôi biết lý do.
@@ -898,13 +958,13 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
             />
             <div className="flex gap-3">
               <button
-                onClick={() => { setShowReportModal(false); setReportReason(''); }}
+                onClick={() => { setShowReportModal(false); setReportReason(''); setReportingCommentId(null); }}
                 className="flex-1 py-2.5 rounded-[10px] bg-white/10 text-white text-[13px] font-semibold hover:bg-white/20 transition-colors"
               >
                 Hủy
               </button>
               <button
-                onClick={handleReportThread}
+                onClick={handleSubmitReport}
                 disabled={isReporting || reportReason.length < 10}
                 className="flex-1 py-2.5 rounded-[10px] bg-yellow-500 text-slate-900 text-[13px] font-semibold 
                            hover:bg-yellow-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"

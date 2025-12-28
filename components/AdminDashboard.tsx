@@ -1014,6 +1014,11 @@ export const AdminDashboard: React.FC = () => {
                             let url = '';
                             if (report.target_type === 'THREAD') {
                               url = `#forum/thread/${report.target_id}`;
+                            } else if (report.target_type === 'COMMENT') {
+                              // For comments, navigate to the thread that contains the comment
+                              if (report.thread_id) {
+                                url = `#forum/thread/${report.thread_id}`;
+                              }
                             } else if (report.target_type === 'POST') {
                               url = `#feed`; // Posts in feed
                             } else if (report.target_type === 'USER') {

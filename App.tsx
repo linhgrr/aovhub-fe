@@ -8,6 +8,8 @@ import { Profile } from './components/Profile';
 import { Settings } from './components/Settings';
 import { Register } from './components/Register';
 import { Login } from './components/Login';
+import { ForgotPassword } from './components/ForgotPassword';
+import { ResetPassword } from './components/ResetPassword';
 import { Forum } from './components/Forum';
 import { ForumCategoryPage } from './components/ForumCategory';
 import { ForumThreadPage } from './components/ForumThread';
@@ -19,7 +21,7 @@ import { Chatbot } from './components/Chatbot';
 import LandingPage from './components/LandingPage';
 import { AuthProvider, useAuth } from './contexts/authContext';
 
-type Route = 'landing' | 'feed' | 'reels' | 'lfg' | 'friends' | 'profile' | 'settings' | 'register' | 'login' | 'forum' | 'forum-category' | 'forum-thread' | 'admin' | 'search' | 'chatbot';
+type Route = 'landing' | 'feed' | 'reels' | 'lfg' | 'friends' | 'profile' | 'settings' | 'register' | 'login' | 'forgot-password' | 'reset-password' | 'forum' | 'forum-category' | 'forum-thread' | 'admin' | 'search' | 'chatbot';
 
 const AppContent: React.FC = () => {
   const [currentRoute, setCurrentRoute] = useState<Route>('landing');
@@ -81,7 +83,7 @@ const AppContent: React.FC = () => {
 
   // Redirect to landing if not authenticated (except for public routes)
   useEffect(() => {
-    const publicRoutes: Route[] = ['landing', 'login', 'register', 'forum', 'forum-category', 'forum-thread'];
+    const publicRoutes: Route[] = ['landing', 'login', 'register', 'forgot-password', 'reset-password', 'forum', 'forum-category', 'forum-thread'];
     if (!isLoading && !isAuthenticated && !publicRoutes.includes(currentRoute)) {
       window.location.hash = 'landing';
     }
@@ -104,6 +106,8 @@ const AppContent: React.FC = () => {
       case 'landing': return <LandingPage />;
       case 'register': return <Register />;
       case 'login': return <Login />;
+      case 'forgot-password': return <ForgotPassword />;
+      case 'reset-password': return <ResetPassword />;
       case 'feed': return <Feed />;
       case 'reels': return <Reels />;
       case 'lfg': return <LFG />;
@@ -121,7 +125,7 @@ const AppContent: React.FC = () => {
   };
 
   // Hide navigation only on landing and auth pages
-  const showNavigation = currentRoute !== 'landing' && currentRoute !== 'register' && currentRoute !== 'login';
+  const showNavigation = currentRoute !== 'landing' && currentRoute !== 'register' && currentRoute !== 'login' && currentRoute !== 'forgot-password' && currentRoute !== 'reset-password';
   // Hide header on reels and landing page
   const showHeader = showNavigation && currentRoute !== 'reels';
 

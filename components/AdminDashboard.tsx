@@ -3,8 +3,14 @@ import {
   LayoutDashboard, FolderOpen, Users, AlertTriangle, Plus, Search,
   Shield, UserX, UserCheck, ChevronLeft, ChevronRight, ChevronDown, MessageSquare,
   FileText, TrendingUp, Eye, EyeOff, Trash2, AlertCircle, Check, X,
-  Bell, BellOff, Loader2
+  Bell, BellOff, Loader2, Clock, CheckCircle2, XCircle, Ban, ListFilter,
+  PartyPopper, FolderX, UsersRound, ShieldAlert, EyeOff as EyeOffIcon, AlertOctagon,
+  Activity, PieChart as PieChartIcon, BarChart3
 } from 'lucide-react';
+import {
+  PieChart, Pie, Cell, ResponsiveContainer, AreaChart, Area,
+  XAxis, YAxis, Tooltip, CartesianGrid, Legend, BarChart, Bar
+} from 'recharts';
 import { API_BASE_URL } from '../constants';
 import { useAuth } from '../contexts/authContext';
 import { useSnackbar } from '../contexts/SnackbarContext';
@@ -18,9 +24,17 @@ import {
   AdminReportsResponse
 } from '../types';
 
+interface DailyActivity {
+  date: string;
+  users: number;
+  threads: number;
+  comments: number;
+}
+
 interface AdminStats {
   totalUsers: number;
   usersByRole: Record<string, number>;
+  usersByRank: Record<string, number>;
   totalCategories: number;
   totalThreads: number;
   totalForumComments: number;
@@ -28,6 +42,8 @@ interface AdminStats {
   newUsersToday: number;
   newThreadsToday: number;
   newCommentsToday: number;
+  activityLast7Days: DailyActivity[];
+  reportsByType: Record<string, number>;
 }
 
 interface ForumCategory {
@@ -113,6 +129,7 @@ export const AdminDashboard: React.FC = () => {
       setStats({
         totalUsers: data.total_users,
         usersByRole: data.users_by_role,
+        usersByRank: data.users_by_rank || {},
         totalCategories: data.total_categories,
         totalThreads: data.total_threads,
         totalForumComments: data.total_forum_comments,
@@ -120,6 +137,8 @@ export const AdminDashboard: React.FC = () => {
         newUsersToday: data.new_users_today,
         newThreadsToday: data.new_threads_today,
         newCommentsToday: data.new_comments_today,
+        activityLast7Days: data.activity_last_7_days || [],
+        reportsByType: data.reports_by_type || {},
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Đã xảy ra lỗi');
@@ -345,7 +364,9 @@ export const AdminDashboard: React.FC = () => {
     return (
       <div className="p-4 md:p-6 max-w-4xl mx-auto">
         <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-6 text-center">
-          <div className="text-4xl mb-3">🚫</div>
+          <div className="w-16 h-16 mx-auto mb-4 bg-red-500/20 rounded-full flex items-center justify-center">
+            <Ban className="w-8 h-8 text-red-400" />
+          </div>
           <h1 className="text-xl font-bold text-red-400 mb-2">Không có quyền truy cập</h1>
           <p className="text-slate-400">Bạn cần quyền Admin để truy cập trang này.</p>
           <button
@@ -459,23 +480,254 @@ export const AdminDashboard: React.FC = () => {
                 <StatCard icon={<MessageSquare size={20} />} label="Bình luận" value={stats.totalForumComments} color="yellow" />
               </div>
 
+              {/* Charts Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Activity Chart - Area Chart */}
+                <div className="bg-bg-secondary border border-white/5 rounded-[20px] p-6">
+                  <div className="flex items-center gap-2 mb-6">
+                    <div className="p-2 bg-primary/20 rounded-[10px]">
+                      <Activity size={18} className="text-primary" />
+                    </div>
+                    <h3 className="font-semibold text-white">Hoạt động 7 ngày qua</h3>
+                  </div>
+                  <div className="h-[280px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart
+                        data={stats.activityLast7Days.map(d => ({
+                          ...d,
+                          dateLabel: new Date(d.date).toLocaleDateString('vi-VN', { weekday: 'short', day: 'numeric' })
+                        }))}
+                        margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                      >
+                        <defs>
+                          <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#22c55e" stopOpacity={0.4} />
+                            <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+                          </linearGradient>
+                          <linearGradient id="colorThreads" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4} />
+                            <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                          </linearGradient>
+                          <linearGradient id="colorComments" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#a855f7" stopOpacity={0.4} />
+                            <stop offset="95%" stopColor="#a855f7" stopOpacity={0} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                        <XAxis
+                          dataKey="dateLabel"
+                          stroke="rgba(255,255,255,0.3)"
+                          fontSize={11}
+                          tickLine={false}
+                          axisLine={false}
+                        />
+                        <YAxis
+                          stroke="rgba(255,255,255,0.3)"
+                          fontSize={11}
+                          tickLine={false}
+                          axisLine={false}
+                        />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: 'rgba(30, 30, 40, 0.95)',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            borderRadius: '12px',
+                            boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                          }}
+                          labelStyle={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}
+                          itemStyle={{ color: 'rgba(255,255,255,0.9)' }}
+                        />
+                        <Area
+                          type="monotone"
+                          dataKey="users"
+                          name="Người dùng mới"
+                          stroke="#22c55e"
+                          strokeWidth={2}
+                          fillOpacity={1}
+                          fill="url(#colorUsers)"
+                        />
+                        <Area
+                          type="monotone"
+                          dataKey="threads"
+                          name="Chủ đề mới"
+                          stroke="#3b82f6"
+                          strokeWidth={2}
+                          fillOpacity={1}
+                          fill="url(#colorThreads)"
+                        />
+                        <Area
+                          type="monotone"
+                          dataKey="comments"
+                          name="Bình luận mới"
+                          stroke="#a855f7"
+                          strokeWidth={2}
+                          fillOpacity={1}
+                          fill="url(#colorComments)"
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                  {/* Legend */}
+                  <div className="flex items-center justify-center gap-6 mt-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                      <span className="text-[12px] text-white/50">Người dùng</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                      <span className="text-[12px] text-white/50">Chủ đề</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-purple-500"></div>
+                      <span className="text-[12px] text-white/50">Bình luận</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Rank Distribution Pie Chart */}
+                <div className="bg-bg-secondary border border-white/5 rounded-[20px] p-6">
+                  <div className="flex items-center gap-2 mb-6">
+                    <div className="p-2 bg-gradient-to-br from-gold/30 to-orange-500/20 rounded-[10px]">
+                      <BarChart3 size={18} className="text-gold" />
+                    </div>
+                    <h3 className="font-semibold text-white">Phân bổ mức rank người dùng</h3>
+                  </div>
+                  <div className="h-[280px] flex items-center justify-center">
+                    {(() => {
+                      const RANK_ORDER = ['BRONZE', 'SILVER', 'GOLD', 'PLATINUM', 'DIAMOND', 'VETERAN', 'MASTER', 'CONQUEROR'];
+                      const RANK_LABELS: Record<string, string> = {
+                        BRONZE: 'Đồng',
+                        SILVER: 'Bạc',
+                        GOLD: 'Vàng',
+                        PLATINUM: 'Bạch Kim',
+                        DIAMOND: 'Kim Cương',
+                        VETERAN: 'Tinh Anh',
+                        MASTER: 'Cao Thủ',
+                        CONQUEROR: 'Thách Đấu',
+                      };
+                      const RANK_COLORS: Record<string, string> = {
+                        BRONZE: '#cd7f32',
+                        SILVER: '#c0c0c0',
+                        GOLD: '#ffd700',
+                        PLATINUM: '#00d4aa',
+                        DIAMOND: '#60a5fa',
+                        VETERAN: '#a855f7',
+                        MASTER: '#f97316',
+                        CONQUEROR: '#ef4444',
+                      };
+                      const RANK_ICONS: Record<string, string> = {
+                        BRONZE: '🥉',
+                        SILVER: '🥈',
+                        GOLD: '🥇',
+                        PLATINUM: '💎',
+                        DIAMOND: '💠',
+                        VETERAN: '💜',
+                        MASTER: '🔥',
+                        CONQUEROR: '🏆',
+                      };
+
+                      const rankData = RANK_ORDER.map(rank => ({
+                        rank,
+                        name: RANK_LABELS[rank] || rank,
+                        value: stats.usersByRank[rank] || 0,
+                        fill: RANK_COLORS[rank] || '#6b7280',
+                        icon: RANK_ICONS[rank] || '⭐',
+                      })).filter(d => d.value > 0);
+
+                      const totalUsers = rankData.reduce((sum, d) => sum + d.value, 0);
+
+                      if (totalUsers === 0) {
+                        return (
+                          <div className="text-white/40 text-center">
+                            <div className="text-4xl mb-2">📊</div>
+                            <div>Chưa có dữ liệu rank</div>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div className="flex items-center gap-6 w-full">
+                          <div className="flex-1 relative">
+                            <ResponsiveContainer width="100%" height={240}>
+                              <PieChart>
+                                <Pie
+                                  data={rankData}
+                                  cx="50%"
+                                  cy="50%"
+                                  innerRadius={60}
+                                  outerRadius={95}
+                                  paddingAngle={2}
+                                  dataKey="value"
+                                  stroke="rgba(0,0,0,0.3)"
+                                  strokeWidth={1}
+                                >
+                                  {rankData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                                  ))}
+                                </Pie>
+                                <Tooltip
+                                  contentStyle={{
+                                    backgroundColor: 'rgba(20, 20, 30, 0.95)',
+                                    border: '1px solid rgba(255,255,255,0.15)',
+                                    borderRadius: '12px',
+                                    boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                                  }}
+                                  formatter={(value: number, _name: string, props: { payload: { icon: string; name: string } }) => [
+                                    `${props.payload.icon} ${value} người (${Math.round(value / totalUsers * 100)}%)`,
+                                    props.payload.name
+                                  ]}
+                                />
+                              </PieChart>
+                            </ResponsiveContainer>
+                            {/* Center text */}
+                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                              <div className="text-center">
+                                <div className="text-2xl font-bold text-white">{totalUsers}</div>
+                                <div className="text-[11px] text-white/50">người chơi</div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                            {rankData.map((entry) => (
+                              <div key={entry.rank} className="flex items-center gap-2">
+                                <span className="text-sm">{entry.icon}</span>
+                                <div>
+                                  <div className="text-[12px] font-medium" style={{ color: entry.fill }}>
+                                    {entry.name}
+                                  </div>
+                                  <div className="text-[10px] text-white/40">
+                                    {entry.value} ({Math.round(entry.value / totalUsers * 100)}%)
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                </div>
+              </div>
+
               {/* Today's activity */}
-              <div className="bg-bg-secondary border border-white/5 rounded-[16px] p-5">
-                <div className="flex items-center gap-2 mb-4">
-                  <TrendingUp size={18} className="text-primary" />
+              <div className="bg-bg-secondary border border-white/5 rounded-[20px] p-6">
+                <div className="flex items-center gap-2 mb-5">
+                  <div className="p-2 bg-green-500/20 rounded-[10px]">
+                    <TrendingUp size={18} className="text-green-400" />
+                  </div>
                   <h3 className="font-semibold text-white">Hoạt động hôm nay</h3>
                 </div>
                 <div className="grid grid-cols-3 gap-4 text-center">
-                  <div className="bg-white/5 rounded-[12px] p-4">
-                    <div className="text-2xl font-bold text-green-400">{stats.newUsersToday}</div>
+                  <div className="bg-gradient-to-br from-green-500/10 to-green-600/5 border border-green-500/10 rounded-[16px] p-5">
+                    <div className="text-3xl font-bold text-green-400">{stats.newUsersToday}</div>
                     <div className="text-[12px] text-white/50 mt-1">Người dùng mới</div>
                   </div>
-                  <div className="bg-white/5 rounded-[12px] p-4">
-                    <div className="text-2xl font-bold text-blue-400">{stats.newThreadsToday}</div>
+                  <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border border-blue-500/10 rounded-[16px] p-5">
+                    <div className="text-3xl font-bold text-blue-400">{stats.newThreadsToday}</div>
                     <div className="text-[12px] text-white/50 mt-1">Chủ đề mới</div>
                   </div>
-                  <div className="bg-white/5 rounded-[12px] p-4">
-                    <div className="text-2xl font-bold text-purple-400">{stats.newCommentsToday}</div>
+                  <div className="bg-gradient-to-br from-purple-500/10 to-purple-600/5 border border-purple-500/10 rounded-[16px] p-5">
+                    <div className="text-3xl font-bold text-purple-400">{stats.newCommentsToday}</div>
                     <div className="text-[12px] text-white/50 mt-1">Bình luận mới</div>
                   </div>
                 </div>
@@ -483,14 +735,14 @@ export const AdminDashboard: React.FC = () => {
 
               {/* Pending reports */}
               {stats.pendingReports > 0 && (
-                <div className="bg-red-500/10 border border-red-500/20 rounded-[16px] p-5">
+                <div className="bg-gradient-to-r from-red-500/10 to-orange-500/5 border border-red-500/20 rounded-[20px] p-6">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-start gap-3">
-                      <div className="p-2 bg-red-500/20 rounded-[10px]">
-                        <Bell size={20} className="text-red-400" />
+                    <div className="flex items-start gap-4">
+                      <div className="p-3 bg-red-500/20 rounded-[14px]">
+                        <Bell size={22} className="text-red-400" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-red-400">
+                        <h3 className="text-lg font-semibold text-red-400">
                           {stats.pendingReports} báo cáo đang chờ xử lý
                         </h3>
                         <p className="text-[13px] text-white/50 mt-1">
@@ -500,8 +752,9 @@ export const AdminDashboard: React.FC = () => {
                     </div>
                     <button
                       onClick={() => setActiveTab('reports')}
-                      className="flex items-center gap-2 px-4 py-2 bg-red-500/20 hover:bg-red-500/30 
-                                 text-red-400 rounded-[10px] transition-colors text-[13px] font-medium"
+                      className="flex items-center gap-2 px-5 py-2.5 bg-red-500/20 hover:bg-red-500/30 
+                                 text-red-400 rounded-[12px] transition-all text-[13px] font-semibold
+                                 border border-red-500/20 hover:border-red-500/30"
                     >
                       <Eye size={16} />
                       Xem báo cáo
@@ -539,7 +792,9 @@ export const AdminDashboard: React.FC = () => {
             </div>
           ) : categories.length === 0 ? (
             <div className="bg-bg-secondary border border-white/5 rounded-[16px] p-8 text-center text-white/30">
-              <div className="text-4xl mb-3">📭</div>
+              <div className="w-14 h-14 mx-auto mb-3 bg-white/5 rounded-full flex items-center justify-center">
+                <FolderX className="w-7 h-7 text-white/30" />
+              </div>
               <p>Chưa có danh mục nào</p>
             </div>
           ) : (
@@ -712,7 +967,9 @@ export const AdminDashboard: React.FC = () => {
             </div>
           ) : users.length === 0 ? (
             <div className="bg-bg-secondary border border-white/5 rounded-[16px] p-8 text-center text-white/30">
-              <div className="text-4xl mb-3">👥</div>
+              <div className="w-14 h-14 mx-auto mb-3 bg-white/5 rounded-full flex items-center justify-center">
+                <UsersRound className="w-7 h-7 text-white/30" />
+              </div>
               <p>Không tìm thấy người dùng nào</p>
             </div>
           ) : (
@@ -836,7 +1093,12 @@ export const AdminDashboard: React.FC = () => {
                           : 'bg-bg-main/50 border border-white/5 hover:border-white/10 text-white/60 hover:text-white'}
                                   disabled:opacity-50`}
                     >
-                      <span className="font-medium text-[15px]">{role === UserRole.USER ? '👤 Người dùng' : role === UserRole.MODERATOR ? '🛡️ Điều hành viên' : '⚡ Quản trị viên'}</span>
+                      <span className="font-medium text-[15px] flex items-center gap-2">
+                        {role === UserRole.USER && <Users size={16} />}
+                        {role === UserRole.MODERATOR && <Shield size={16} />}
+                        {role === UserRole.ADMIN && <ShieldAlert size={16} />}
+                        {role === UserRole.USER ? 'Người dùng' : role === UserRole.MODERATOR ? 'Điều hành viên' : 'Quản trị viên'}
+                      </span>
                       {showRoleModal.role === role && <Check size={18} />}
                     </button>
                   ))}
@@ -928,10 +1190,10 @@ export const AdminDashboard: React.FC = () => {
           {/* Filter tabs */}
           <div className="flex gap-2 mb-6 overflow-x-auto pb-1 no-scrollbar">
             {[
-              { value: '', label: 'Tất cả', icon: '📋' },
-              { value: 'PENDING', label: 'Đang chờ', icon: '⏳' },
-              { value: 'RESOLVED', label: 'Đã xử lý', icon: '✅' },
-              { value: 'DISMISSED', label: 'Đã bỏ qua', icon: '❌' },
+              { value: '', label: 'Tất cả', icon: <ListFilter size={14} /> },
+              { value: 'PENDING', label: 'Đang chờ', icon: <Clock size={14} /> },
+              { value: 'RESOLVED', label: 'Đã xử lý', icon: <CheckCircle2 size={14} /> },
+              { value: 'DISMISSED', label: 'Đã bỏ qua', icon: <XCircle size={14} /> },
             ].map((filter) => (
               <button
                 key={filter.value}
@@ -969,7 +1231,9 @@ export const AdminDashboard: React.FC = () => {
             </div>
           ) : reports.length === 0 ? (
             <div className="bg-bg-secondary border border-white/5 rounded-[16px] p-8 text-center text-white/30">
-              <div className="text-4xl mb-3">🎉</div>
+              <div className="w-14 h-14 mx-auto mb-3 bg-green-500/10 rounded-full flex items-center justify-center">
+                <PartyPopper className="w-7 h-7 text-green-400" />
+              </div>
               <p>Không có báo cáo nào</p>
             </div>
           ) : (
@@ -1126,7 +1390,7 @@ export const AdminDashboard: React.FC = () => {
                           : 'bg-white/5 border-white/5 text-white/40 hover:border-white/10 hover:text-white/60'
                           }`}
                       >
-                        <span className="text-xl">🔕</span> Bỏ qua
+                        <BellOff className="w-5 h-5" /> Bỏ qua
                       </button>
                       <button
                         onClick={() => setSelectedAction('HIDE_CONTENT')}
@@ -1135,7 +1399,7 @@ export const AdminDashboard: React.FC = () => {
                           : 'bg-white/5 border-white/5 text-white/40 hover:border-white/10 hover:text-white/60'
                           }`}
                       >
-                        <span className="text-xl">👁️</span> Ẩn nội dung
+                        <EyeOff className="w-5 h-5" /> Ẩn nội dung
                       </button>
                       <button
                         onClick={() => setSelectedAction('DELETE_CONTENT')}
@@ -1144,7 +1408,7 @@ export const AdminDashboard: React.FC = () => {
                           : 'bg-white/5 border-white/5 text-white/40 hover:border-white/10 hover:text-white/60'
                           }`}
                       >
-                        <span className="text-xl">🗑️</span> Xóa nội dung
+                        <Trash2 className="w-5 h-5" /> Xóa nội dung
                       </button>
                       <button
                         onClick={() => setSelectedAction('WARN_USER')}
@@ -1153,7 +1417,7 @@ export const AdminDashboard: React.FC = () => {
                           : 'bg-white/5 border-white/5 text-white/40 hover:border-white/10 hover:text-white/60'
                           }`}
                       >
-                        <span className="text-xl">⚠️</span> Cảnh cáo
+                        <AlertOctagon className="w-5 h-5" /> Cảnh cáo
                       </button>
                     </div>
                   </div>

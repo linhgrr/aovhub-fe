@@ -117,7 +117,7 @@ const SnackbarNotification: React.FC<SnackbarNotificationProps> = ({ snackbar, o
             bg: 'bg-gradient-to-r from-emerald-500/20 to-emerald-600/10',
             border: 'border-emerald-500/30',
             icon: (
-                <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <svg className="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
             ),
@@ -128,7 +128,7 @@ const SnackbarNotification: React.FC<SnackbarNotificationProps> = ({ snackbar, o
             bg: 'bg-gradient-to-r from-red-500/20 to-red-600/10',
             border: 'border-red-500/30',
             icon: (
-                <svg className="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <svg className="w-4 h-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             ),
@@ -139,7 +139,7 @@ const SnackbarNotification: React.FC<SnackbarNotificationProps> = ({ snackbar, o
             bg: 'bg-gradient-to-r from-amber-500/20 to-amber-600/10',
             border: 'border-amber-500/30',
             icon: (
-                <svg className="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <svg className="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
             ),
@@ -150,7 +150,7 @@ const SnackbarNotification: React.FC<SnackbarNotificationProps> = ({ snackbar, o
             bg: 'bg-gradient-to-r from-blue-500/20 to-blue-600/10',
             border: 'border-blue-500/30',
             icon: (
-                <svg className="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
             ),
@@ -164,25 +164,25 @@ const SnackbarNotification: React.FC<SnackbarNotificationProps> = ({ snackbar, o
     return (
         <div
             className={`pointer-events-auto animate-in slide-in-from-right-full fade-in duration-300 ease-out
-        ${config.bg} ${config.border} border backdrop-blur-xl rounded-xl shadow-2xl overflow-hidden`}
+        ${config.bg} ${config.border} border backdrop-blur-xl rounded-lg shadow-xl overflow-hidden`}
         >
-            <div className="flex items-start gap-3 p-4">
+            <div className="flex items-center gap-2 px-3 py-2">
                 {/* Icon */}
-                <div className={`flex-shrink-0 w-8 h-8 rounded-lg ${config.iconBg} flex items-center justify-center`}>
+                <div className={`flex-shrink-0 w-6 h-6 rounded-md ${config.iconBg} flex items-center justify-center`}>
                     {config.icon}
                 </div>
 
                 {/* Message */}
-                <div className="flex-1 min-w-0 pt-0.5">
-                    <p className="text-white/90 text-sm font-medium leading-relaxed">{snackbar.message}</p>
+                <div className="flex-1 min-w-0">
+                    <p className="text-white/90 text-xs font-medium leading-snug">{snackbar.message}</p>
                 </div>
 
                 {/* Close Button */}
                 <button
                     onClick={onClose}
-                    className="flex-shrink-0 p-1 rounded-lg hover:bg-white/10 text-white/40 hover:text-white/80 transition-all"
+                    className="flex-shrink-0 p-0.5 rounded hover:bg-white/10 text-white/40 hover:text-white/80 transition-all"
                 >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>

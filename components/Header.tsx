@@ -54,6 +54,7 @@ interface NotificationItem {
     comment_id: string | null;
     friendship_id: string | null;
     team_id: string | null;
+    report_id: string | null;
     is_read: boolean;
     created_at: string;
 }

@@ -606,24 +606,24 @@ export const AdminDashboard: React.FC = () => {
                         CONQUEROR: 'Thách Đấu',
                       };
                       const RANK_COLORS: Record<string, string> = {
-                        BRONZE: '#cd7f32',
-                        SILVER: '#c0c0c0',
-                        GOLD: '#ffd700',
-                        PLATINUM: '#00d4aa',
-                        DIAMOND: '#60a5fa',
-                        VETERAN: '#a855f7',
-                        MASTER: '#f97316',
-                        CONQUEROR: '#ef4444',
+                        BRONZE: '#CD7F32',
+                        SILVER: '#E8E8E8',
+                        GOLD: '#FFD700',
+                        PLATINUM: '#00E5CC',
+                        DIAMOND: '#4FC3F7',
+                        VETERAN: '#B388FF',
+                        MASTER: '#FF6B35',
+                        CONQUEROR: '#FF1744',
                       };
-                      const RANK_ICONS: Record<string, string> = {
-                        BRONZE: '🥉',
-                        SILVER: '🥈',
-                        GOLD: '🥇',
-                        PLATINUM: '💎',
-                        DIAMOND: '💠',
-                        VETERAN: '💜',
-                        MASTER: '🔥',
-                        CONQUEROR: '🏆',
+                      const RANK_IMAGES: Record<string, string> = {
+                        BRONZE: '/assets/images/rank/bronze.png',
+                        SILVER: '/assets/images/rank/silver.png',
+                        GOLD: '/assets/images/rank/gold.png',
+                        PLATINUM: '/assets/images/rank/platinum.png',
+                        DIAMOND: '/assets/images/rank/diamond.png',
+                        VETERAN: '/assets/images/rank/veteran.png',
+                        MASTER: '/assets/images/rank/master.png',
+                        CONQUEROR: '/assets/images/rank/conqueror.png',
                       };
 
                       const rankData = RANK_ORDER.map(rank => ({
@@ -631,7 +631,7 @@ export const AdminDashboard: React.FC = () => {
                         name: RANK_LABELS[rank] || rank,
                         value: stats.usersByRank[rank] || 0,
                         fill: RANK_COLORS[rank] || '#6b7280',
-                        icon: RANK_ICONS[rank] || '⭐',
+                        image: RANK_IMAGES[rank] || '/assets/images/rank/bronze.png',
                       })).filter(d => d.value > 0);
 
                       const totalUsers = rankData.reduce((sum, d) => sum + d.value, 0);
@@ -672,8 +672,8 @@ export const AdminDashboard: React.FC = () => {
                                     borderRadius: '12px',
                                     boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
                                   }}
-                                  formatter={(value: number, _name: string, props: { payload: { icon: string; name: string } }) => [
-                                    `${props.payload.icon} ${value} người (${Math.round(value / totalUsers * 100)}%)`,
+                                  formatter={(value: number, _name: string, props: { payload: { name: string } }) => [
+                                    `${value} người (${Math.round(value / totalUsers * 100)}%)`,
                                     props.payload.name
                                   ]}
                                 />
@@ -690,7 +690,7 @@ export const AdminDashboard: React.FC = () => {
                           <div className="grid grid-cols-2 gap-x-4 gap-y-2">
                             {rankData.map((entry) => (
                               <div key={entry.rank} className="flex items-center gap-2">
-                                <span className="text-sm">{entry.icon}</span>
+                                <img src={entry.image} alt={entry.name} className="w-6 h-6 object-contain" />
                                 <div>
                                   <div className="text-[12px] font-medium" style={{ color: entry.fill }}>
                                     {entry.name}

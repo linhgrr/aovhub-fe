@@ -442,38 +442,61 @@ export const PostCard: React.FC<PostCardProps> = ({
 
         {/* Stats and Content - Responsive */}
         <div className="px-4 md:px-6 pb-4 md:pb-6">
-          {/* Clickable Likes Section - Only show if there are likes */}
-          {post.like_count > 0 && (
-            <button
-              onClick={() => setShowLikesModal(true)}
-              className="flex items-center gap-2 mb-2 md:mb-3 hover:opacity-80 transition-opacity cursor-pointer"
-            >
-              {/* Show real avatars of recent likers */}
-              {post.recent_likers && post.recent_likers.length > 0 && (
-                <div className="flex -space-x-2">
-                  {post.recent_likers.slice(0, 3).map((liker) => (
-                    <img
-                      key={liker.id}
-                      src={getAvatarUrl(liker.avatar_url, liker.username)}
-                      alt={liker.username}
-                      className="w-5 h-5 md:w-6 md:h-6 rounded-full border-2 border-bg-secondary object-cover"
-                    />
-                  ))}
+          {/* Stats Line - Likes on left, Comments and Shares on right */}
+          {(post.like_count > 0 || post.comment_count > 0 || post.share_count > 0) && (
+            <div className="flex items-center justify-between mb-2 md:mb-3">
+              {/* Clickable Likes Section - Only show if there are likes */}
+              {post.like_count > 0 ? (
+                <button
+                  onClick={() => setShowLikesModal(true)}
+                  className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
+                >
+                  {/* Show real avatars of recent likers */}
+                  {post.recent_likers && post.recent_likers.length > 0 && (
+                    <div className="flex -space-x-2">
+                      {post.recent_likers.slice(0, 3).map((liker) => (
+                        <img
+                          key={liker.id}
+                          src={getAvatarUrl(liker.avatar_url, liker.username)}
+                          alt={liker.username}
+                          className="w-5 h-5 md:w-6 md:h-6 rounded-full border-2 border-bg-secondary object-cover"
+                        />
+                      ))}
+                    </div>
+                  )}
+                  <p className="text-white/80 text-[11px] md:text-[13px] text-left">
+                    {post.recent_likers && post.recent_likers.length > 0 ? (
+                      <>
+                        <span className="font-semibold">{post.recent_likers[0].username}</span> đã thích
+                        {post.like_count > 1 && (
+                          <> cùng <span className="font-semibold">{post.like_count - 1} người khác</span></>
+                        )}
+                      </>
+                    ) : (
+                      <><span className="font-semibold">{post.like_count}</span> người thích</>
+                    )}
+                  </p>
+                </button>
+              ) : (
+                <div></div>
+              )}
+
+              {/* Comment and Share counts on the right */}
+              {(post.comment_count > 0 || post.share_count > 0) && (
+                <div className="flex items-center gap-3 md:gap-4 text-white/60 text-[11px] md:text-[13px]">
+                  {post.comment_count > 0 && (
+                    <span className="hover:text-white/80 transition-colors cursor-pointer" onClick={() => onOpenComments(post)}>
+                      {post.comment_count} bình luận
+                    </span>
+                  )}
+                  {post.share_count > 0 && (
+                    <span>
+                      {post.share_count} lượt chia sẻ
+                    </span>
+                  )}
                 </div>
               )}
-              <p className="text-white/80 text-[11px] md:text-[13px] text-left">
-                {post.recent_likers && post.recent_likers.length > 0 ? (
-                  <>
-                    <span className="font-semibold">{post.recent_likers[0].username}</span> đã thích
-                    {post.like_count > 1 && (
-                      <> cùng <span className="font-semibold">{post.like_count - 1} người khác</span></>
-                    )}
-                  </>
-                ) : (
-                  <><span className="font-semibold">{post.like_count}</span> người thích</>
-                )}
-              </p>
-            </button>
+            </div>
           )}
 
 

@@ -563,15 +563,19 @@ export const RightSidebar: React.FC = () => {
                             <div key={user.id} className="flex items-center justify-between group">
                                 <a href={`#profile/${user.id}`} className="flex items-center gap-3 flex-1 min-w-0">
                                     <div className="relative">
-                                        <img
-                                            src={getAvatarUrl(user.avatar_url, user.username)}
-                                            className="w-[52px] h-[52px] rounded-[12px] object-cover transition-transform group-hover:scale-105"
-                                            alt={user.username}
-                                        />
-                                        {user.level && (
-                                            <div className="absolute -bottom-1 -right-1 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full px-1.5 py-0.5 text-[9px] font-bold text-white shadow-md">
-                                                {user.level}
-                                            </div>
+                                        <div className="p-[2px] bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 rounded-[14px]">
+                                            <img
+                                                src={getAvatarUrl(user.avatar_url, user.username)}
+                                                className="w-[52px] h-[52px] rounded-[12px] object-cover transition-transform group-hover:scale-105"
+                                                alt={user.username}
+                                            />
+                                        </div>
+                                        {user.rank && (
+                                            <img
+                                                src={`/assets/images/rank/${user.rank.toLowerCase()}.png`}
+                                                alt={user.rank}
+                                                className="absolute -bottom-1 -right-1 w-[24px] h-[24px] object-contain shadow-lg"
+                                            />
                                         )}
                                     </div>
                                     <div className="min-w-0 flex-1">

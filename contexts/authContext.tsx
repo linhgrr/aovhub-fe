@@ -6,6 +6,7 @@ export interface AuthUser {
   username: string;
   email: string;
   avatar_url: string | null;
+  cover_image_url: string | null;
   rank: string | null;
   main_role: string | null;
   level: number | null;
@@ -49,7 +50,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               'Authorization': `Bearer ${savedToken}`,
             },
           });
-          
+
           if (response.ok) {
             const result = await response.json();
             setUser(result.user);
@@ -91,14 +92,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const fetchCurrentUser = async () => {
     if (!token) return;
-    
+
     try {
       const response = await fetch(`${API_URL}/auth/me`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
-      
+
       if (response.ok) {
         const result = await response.json();
         setUser(result.user);
@@ -109,14 +110,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   return (
-    <AuthContext.Provider 
-      value={{ 
-        user, 
-        token, 
-        isAuthenticated: !!user, 
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        isAuthenticated: !!user,
         isLoading,
-        login, 
-        logout, 
+        login,
+        logout,
         updateUser,
         fetchCurrentUser,
       }}

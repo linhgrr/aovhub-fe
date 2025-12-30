@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useAuth, AuthUser } from '../contexts/authContext';
 import { useSnackbar } from '../contexts/SnackbarContext';
-import { Target, Shield, Hexagon, Camera, Loader, UserPlus, UserMinus, Clock, Check, Users, FileText, Loader2 } from 'lucide-react';
+import { Target, Shield, Hexagon, Camera, Loader, UserPlus, UserMinus, Clock, Check, Users, FileText, Loader2, X } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { PostCard, FeedPost } from './PostCard';
 import { PostDetailModal } from './PostDetailModal';
@@ -46,6 +46,7 @@ export const Profile: React.FC<ProfileProps> = ({ userId }) => {
   const { user: currentUser, token, updateUser } = useAuth();
   const { showError } = useSnackbar();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [friendCount, setFriendCount] = useState(0);
   const [friendshipStatus, setFriendshipStatus] = useState<FriendshipStatus | null>(null);
@@ -64,6 +65,9 @@ export const Profile: React.FC<ProfileProps> = ({ userId }) => {
   const [selectedPost, setSelectedPost] = useState<FeedPost | null>(null);
   const [postToShare, setPostToShare] = useState<FeedPost | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isAvatarViewerOpen, setIsAvatarViewerOpen] = useState(false);
+  const [isCoverViewerOpen, setIsCoverViewerOpen] = useState(false);
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
 
   // Determine if viewing own profile or someone else's
   const isOwnProfile = !userId || userId === currentUser?.id;
@@ -172,6 +176,23 @@ export const Profile: React.FC<ProfileProps> = ({ userId }) => {
 
     fetchUserPosts();
   }, [activeTab, displayUser?.id, token]);
+
+  // Handle Escape key to close avatar viewer
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (isAvatarViewerOpen) {
+          setIsAvatarViewerOpen(false);
+        }
+        if (isCoverViewerOpen) {
+          setIsCoverViewerOpen(false);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [isAvatarViewerOpen, isCoverViewerOpen]);
 
   // Handle friend actions
   const handleSendFriendRequest = async () => {
@@ -314,6 +335,8 @@ export const Profile: React.FC<ProfileProps> = ({ userId }) => {
   const handleAvatarClick = () => {
     if (isOwnProfile) {
       fileInputRef.current?.click();
+    } else {
+      setIsAvatarViewerOpen(true);
     }
   };
 
@@ -362,6 +385,63 @@ export const Profile: React.FC<ProfileProps> = ({ userId }) => {
       // Reset input
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleCoverClick = () => {
+    if (isOwnProfile) {
+      coverInputRef.current?.click();
+    } else {
+      setIsCoverViewerOpen(true);
+    }
+  };
+
+  const handleCoverFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !token) return;
+
+    setIsUploadingCover(true);
+
+    try {
+      // Step 1: Upload image to ImgBB via backend
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const uploadResponse = await fetch(`${API_URL}/auth/upload-image`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const uploadResult = await uploadResponse.json();
+
+      if (!uploadResponse.ok || !uploadResult.success) {
+        throw new Error('Upload failed');
+      }
+
+      // Step 2: Update user cover image
+      const coverResponse = await fetch(`${API_URL}/auth/me/cover-image`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ cover_image_url: uploadResult.url }),
+      });
+
+      const coverResult = await coverResponse.json();
+
+      if (coverResponse.ok && coverResult.success) {
+        updateUser({ cover_image_url: coverResult.cover_image_url });
+      }
+    } catch (error) {
+      console.error('Cover image upload error:', error);
+      showError('Không thể tải ảnh bìa lên. Vui lòng thử lại.');
+    } finally {
+      setIsUploadingCover(false);
+      // Reset input
+      if (coverInputRef.current) {
+        coverInputRef.current.value = '';
       }
     }
   };
@@ -456,16 +536,60 @@ export const Profile: React.FC<ProfileProps> = ({ userId }) => {
       {/* Banner / Header */}
       <div className="relative mb-8 group">
         {/* Background Banner */}
-        <div className="h-48 w-full bg-gradient-to-r from-bg-main via-bg-secondary to-bg-main rounded-t-none border-b-4 border-primary relative overflow-hidden rounded-[20px]">
-          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
-          <div className="absolute right-0 top-0 h-full w-1/2 bg-gradient-to-l from-primary/10 to-transparent transform skew-x-12 translate-x-20"></div>
+        <div
+          className="h-48 w-full rounded-[20px] border-b-4 border-primary relative overflow-hidden cursor-pointer group/cover"
+          onClick={handleCoverClick}
+        >
+          {isOwnProfile && (
+            <input
+              type="file"
+              ref={coverInputRef}
+              onChange={handleCoverFileChange}
+              accept="image/jpeg,image/png,image/gif,image/webp"
+              className="hidden"
+            />
+          )}
+
+          {displayUser?.cover_image_url ? (
+            <>
+              <img
+                src={displayUser.cover_image_url}
+                alt="Cover"
+                className="w-full h-full object-cover"
+              />
+              {isOwnProfile && (
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/cover:opacity-100 transition-opacity flex items-center justify-center z-10">
+                  {isUploadingCover ? (
+                    <Loader className="w-8 h-8 text-primary animate-spin" />
+                  ) : (
+                    <Camera className="w-8 h-8 text-primary" />
+                  )}
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              <div className="absolute inset-0 bg-gradient-to-r from-bg-main via-bg-secondary to-bg-main"></div>
+              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
+              <div className="absolute right-0 top-0 h-full w-1/2 bg-gradient-to-l from-primary/10 to-transparent transform skew-x-12 translate-x-20"></div>
+              {isOwnProfile && (
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/cover:opacity-100 transition-opacity flex items-center justify-center z-10">
+                  {isUploadingCover ? (
+                    <Loader className="w-8 h-8 text-primary animate-spin" />
+                  ) : (
+                    <Camera className="w-8 h-8 text-primary" />
+                  )}
+                </div>
+              )}
+            </>
+          )}
         </div>
 
         {/* User Info Overlay */}
         <div className="px-6 md:px-10 relative -mt-16 flex flex-col md:flex-row items-end gap-6">
           {/* Avatar with Frame */}
           <div
-            className={`relative w-36 h-36 flex-shrink-0 mx-auto md:mx-0 ${isOwnProfile ? 'cursor-pointer' : ''} group/avatar`}
+            className={`relative w-36 h-36 flex-shrink-0 mx-auto md:mx-0 cursor-pointer group/avatar`}
             onClick={handleAvatarClick}
           >
             {isOwnProfile && (
@@ -536,15 +660,25 @@ export const Profile: React.FC<ProfileProps> = ({ userId }) => {
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
         {[
           { label: 'Bạn Bè', value: friendCount.toString(), color: 'text-cyan-400', sub: 'Friends', icon: Users },
-          { label: 'Xếp Hạng', value: displayUser.rank ? RANK_DISPLAY[displayUser.rank] || displayUser.rank : 'Chưa xếp hạng', color: 'text-purple-400', sub: 'Mùa 24' },
+          { label: 'Xếp Hạng', value: displayUser.rank ? RANK_DISPLAY[displayUser.rank] || displayUser.rank : 'Chưa xếp hạng', color: 'text-purple-400', sub: 'Mùa 24', rank: displayUser.rank },
           { label: 'Vị Trí', value: displayUser.main_role ? ROLE_DISPLAY[displayUser.main_role] || displayUser.main_role : 'Chưa chọn', color: 'text-blue-400', sub: 'Chuyên Gia' },
           { label: 'Tỉ Lệ Thắng', value: `${displayUser.win_rate?.toFixed(1) || 0}%`, color: 'text-green-400', sub: 'Thượng thừa' },
           { label: 'Số Trận', value: displayUser.total_matches?.toLocaleString() || '0', color: 'text-white', sub: 'Total Games' },
         ].map((stat, idx) => (
           <div key={idx} className="bg-bg-secondary p-5 rounded-[20px] border border-white/5 relative overflow-hidden group hover:border-primary/30 transition-colors shadow-lg">
-            <div className="absolute top-0 right-0 p-2 opacity-5 group-hover:opacity-10 transition-opacity">
-              <Hexagon className="w-12 h-12 text-white" />
-            </div>
+            {stat.label === 'Xếp Hạng' && stat.rank ? (
+              <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                <img
+                  src={`/assets/images/rank/${stat.rank.toLowerCase()}.png`}
+                  alt={stat.rank}
+                  className="w-12 h-12 object-contain"
+                />
+              </div>
+            ) : (
+              <div className="absolute top-0 right-0 p-2 opacity-5 group-hover:opacity-10 transition-opacity">
+                <Hexagon className="w-12 h-12 text-white" />
+              </div>
+            )}
             <div className="text-[#7f7f7f] text-[10px] uppercase font-bold tracking-wider mb-1">{stat.label}</div>
             <div className={`font-montserrat font-bold text-2xl ${stat.color}`}>{stat.value}</div>
             <div className="text-[#7f7f7f]/60 text-[10px] mt-1 font-mono">{stat.sub}</div>
@@ -695,6 +829,48 @@ export const Profile: React.FC<ProfileProps> = ({ userId }) => {
             });
           }}
         />
+      )}
+
+      {/* Avatar Viewer Modal */}
+      {isAvatarViewerOpen && (
+        <div
+          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+          onClick={() => setIsAvatarViewerOpen(false)}
+        >
+          <button
+            onClick={() => setIsAvatarViewerOpen(false)}
+            className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors z-10"
+          >
+            <X className="w-6 h-6 text-white" />
+          </button>
+          <img
+            src={displayUser?.avatar_url || 'https://via.placeholder.com/200?text=Avatar'}
+            alt={displayUser?.username}
+            className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
+
+      {/* Cover Image Viewer Modal */}
+      {isCoverViewerOpen && displayUser?.cover_image_url && (
+        <div
+          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+          onClick={() => setIsCoverViewerOpen(false)}
+        >
+          <button
+            onClick={() => setIsCoverViewerOpen(false)}
+            className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors z-10"
+          >
+            <X className="w-6 h-6 text-white" />
+          </button>
+          <img
+            src={displayUser.cover_image_url}
+            alt="Cover"
+            className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
       )}
     </div>
   );

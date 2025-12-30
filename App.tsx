@@ -62,6 +62,14 @@ const AppContent: React.FC = () => {
         setSearchQuery(q);
         setCurrentRoute('search');
       }
+      // Check for reset-password?token= pattern
+      else if (hash.startsWith('reset-password?')) {
+        setProfileUserId(undefined);
+        setForumCategoryId(undefined);
+        setForumThreadId(undefined);
+        setSearchQuery('');
+        setCurrentRoute('reset-password');
+      }
       else {
         setProfileUserId(undefined);
         setForumCategoryId(undefined);

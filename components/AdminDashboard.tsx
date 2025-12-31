@@ -14,6 +14,7 @@ import {
 import { API_BASE_URL } from '../constants';
 import { useAuth } from '../contexts/authContext';
 import { useSnackbar } from '../contexts/SnackbarContext';
+import { ConfirmModal, ConfirmType } from './ConfirmModal';
 import {
   UserRole,
   ReportStatus,
@@ -66,6 +67,19 @@ export const AdminDashboard: React.FC = () => {
   const [categories, setCategories] = useState<ForumCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [confirmConfig, setConfirmConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    type: ConfirmType;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => { },
+    type: 'info',
+  });
 
   // New category form
   const [showNewCategory, setShowNewCategory] = useState(false);
@@ -240,19 +254,27 @@ export const AdminDashboard: React.FC = () => {
   };
 
   const handleDeleteCategory = async (categoryId: string) => {
-    if (!confirm('Bạn có chắc muốn xóa danh mục này?')) return;
+    setConfirmConfig({
+      isOpen: true,
+      title: 'Xóa danh mục',
+      message: 'Bạn có chắc muốn xóa danh mục này? Thao tác này không thể hoàn tác.',
+      type: 'danger',
+      onConfirm: async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/admin/categories/${categoryId}`, {
+            method: 'DELETE',
+            headers,
+          });
 
-    try {
-      const response = await fetch(`${API_BASE_URL}/admin/categories/${categoryId}`, {
-        method: 'DELETE',
-        headers,
-      });
-
-      if (!response.ok) throw new Error('Không thể xóa danh mục');
-      setCategories(categories.filter(c => c.id !== categoryId));
-    } catch (err) {
-      showError(err instanceof Error ? err.message : 'Không thể xóa danh mục');
-    }
+          if (!response.ok) throw new Error('Không thể xóa danh mục');
+          setCategories(categories.filter(c => c.id !== categoryId));
+        } catch (err) {
+          showError(err instanceof Error ? err.message : 'Không thể xóa danh mục');
+        } finally {
+          setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+        }
+      },
+    });
   };
 
   const handleChangeRole = async (userId: string, newRole: UserRole) => {
@@ -305,20 +327,29 @@ export const AdminDashboard: React.FC = () => {
   };
 
   const handleUnbanUser = async (userId: string) => {
-    if (!confirm('Bạn có chắc muốn bỏ cấm người dùng này?')) return;
-    try {
-      const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/unban`, {
-        method: 'POST',
-        headers,
-      });
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.detail || 'Không thể bỏ cấm người dùng');
-      }
-      fetchUsers();
-    } catch (err) {
-      showError(err instanceof Error ? err.message : 'Không thể bỏ cấm người dùng');
-    }
+    setConfirmConfig({
+      isOpen: true,
+      title: 'Bỏ cấm người dùng',
+      message: 'Bạn có chắc muốn bỏ cấm người dùng này?',
+      type: 'info',
+      onConfirm: async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/unban`, {
+            method: 'POST',
+            headers,
+          });
+          if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.detail || 'Không thể bỏ cấm người dùng');
+          }
+          fetchUsers();
+        } catch (err) {
+          showError(err instanceof Error ? err.message : 'Không thể bỏ cấm người dùng');
+        } finally {
+          setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+        }
+      },
+    });
   };
 
   const handleResolveReport = async (reportId: string, status: ReportStatus) => {

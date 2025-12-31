@@ -526,7 +526,7 @@ export const Reels: React.FC = () => {
         </div>
 
         {/* Right Side Actions */}
-        <div className="absolute right-4 bottom-32 flex flex-col items-center gap-6 z-20">
+        <div className="absolute right-4 bottom-[calc(128px+56px)] md:bottom-32 flex flex-col items-center gap-6 z-20">
           {/* User Avatar */}
           <a
             href={`#profile/${currentReel.user_id}`}
@@ -595,7 +595,7 @@ export const Reels: React.FC = () => {
         </div>
 
         {/* Bottom Info */}
-        <div className="absolute left-4 right-24 bottom-8 z-20">
+        <div className="absolute left-4 right-24 bottom-[calc(32px+56px)] md:bottom-8 z-20">
           {/* Username */}
           <a href={`#profile/${currentReel.user_id}`} className="inline-block mb-2">
             <p className="text-white font-montserrat font-bold text-[15px] hover:text-primary transition-colors">
@@ -697,7 +697,7 @@ export const Reels: React.FC = () => {
         </div>
 
         {/* Swipe Hint (Mobile) */}
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 md:hidden z-20">
+        <div className="absolute bottom-[calc(8px+56px)] left-1/2 -translate-x-1/2 md:hidden z-20">
           <span className="text-white/30 text-[10px]">Vuốt lên/xuống để xem thêm</span>
         </div>
       </div>

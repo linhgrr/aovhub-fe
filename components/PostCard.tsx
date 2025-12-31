@@ -234,7 +234,7 @@ export const PostCard: React.FC<PostCardProps> = ({
             </a>
             <div>
               <div className="flex items-center gap-1.5">
-                <a href={`#profile/${post.author.id}`} className="font-montserrat font-semibold text-white text-[12px] md:text-[14px] hover:text-primary transition-colors">
+                <a href={`#profile/${post.author.id}`} className="font-montserrat font-semibold text-white text-[13px] md:text-[15px] hover:text-primary transition-colors">
                   {post.author.username}
                 </a>
                 {post.shared_post && (
@@ -289,7 +289,7 @@ export const PostCard: React.FC<PostCardProps> = ({
         {/* Caption - shown before media for both regular and shared posts */}
         {post.content && (
           <div className="px-4 md:px-6 pb-3">
-            <p className="text-white/90 text-[11px] md:text-[12px] leading-relaxed">
+            <p className="text-white/90 text-[13px] md:text-[15px] leading-relaxed">
               <HashtagText content={post.content} />
             </p>
           </div>
@@ -308,10 +308,10 @@ export const PostCard: React.FC<PostCardProps> = ({
                 />
               </a>
               <div>
-                <a href={`#profile/${post.shared_post.author.id}`} className="font-montserrat font-semibold text-white text-[11px] md:text-[12px] block hover:text-primary transition-colors">
+                <a href={`#profile/${post.shared_post.author.id}`} className="font-montserrat font-semibold text-white text-[12px] md:text-[14px] block hover:text-primary transition-colors">
                   {post.shared_post.author.username}
                 </a>
-                <span className="text-[#7f7f7f] text-[8px] md:text-[9px]">
+                <span className="text-[#7f7f7f] text-[10px] md:text-[11px]">
                   {formatDate(post.shared_post.created_at)}
                 </span>
               </div>
@@ -355,7 +355,7 @@ export const PostCard: React.FC<PostCardProps> = ({
             {/* Shared Post Content */}
             {post.shared_post.content && (
               <div className="px-3 md:px-4 pb-3 md:pb-4">
-                <p className="text-white/70 text-[10px] md:text-[11px] leading-relaxed line-clamp-3">
+                <p className="text-white/70 text-[12px] md:text-[14px] leading-relaxed line-clamp-3">
                   <HashtagText content={post.shared_post.content} />
                 </p>
               </div>
@@ -464,7 +464,7 @@ export const PostCard: React.FC<PostCardProps> = ({
                       ))}
                     </div>
                   )}
-                  <p className="text-white/80 text-[11px] md:text-[13px] text-left">
+                  <p className="text-white/80 text-[12px] md:text-[14px] text-left">
                     {post.recent_likers && post.recent_likers.length > 0 ? (
                       <>
                         <span className="font-semibold">{post.recent_likers[0].username}</span> đã thích
@@ -483,7 +483,7 @@ export const PostCard: React.FC<PostCardProps> = ({
 
               {/* Comment and Share counts on the right */}
               {(post.comment_count > 0 || post.share_count > 0) && (
-                <div className="flex items-center gap-3 md:gap-4 text-white/60 text-[11px] md:text-[13px]">
+                <div className="flex items-center gap-3 md:gap-4 text-white/60 text-[12px] md:text-[14px]">
                   {post.comment_count > 0 && (
                     <span className="hover:text-white/80 transition-colors cursor-pointer" onClick={() => onOpenComments(post)}>
                       {post.comment_count} bình luận

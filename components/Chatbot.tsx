@@ -104,10 +104,10 @@ export const Chatbot: React.FC = () => {
                 {messages.length === 0 ? (
                     <div className="chatbot-welcome">
                         <div className="chatbot-welcome-icon">
-                            <img src="https://i.ibb.co/20KhSst0/image.png" alt="Chatbot" />
+                            <img src="https://i.ibb.co/XfZwpZrN/gptung.jpg" alt="Chatbot" />
                         </div>
                         <h2>Xin chào! 👋</h2>
-                        <p>Tôi là AI Trợ Lý Liên Quân: Chuối nho nhỏ. Tôi có thể giúp bạn:</p>
+                        <p>Tôi là AI Trợ Lý Liên Quân: GPTung. Tôi có thể giúp bạn:</p>
                         <div className="chatbot-suggestions-grid">
                             <div className="chatbot-suggestion-card" onClick={() => setInputValue('Gợi ý tướng đi rừng cho rank Kim Cương')}>
                                 <span>Gợi ý tướng phù hợp</span>

@@ -6,6 +6,7 @@ import { useSnackbar } from '../contexts/SnackbarContext';
 import { TeamDetail, TeamJoinRequest, TeamMemberInfo } from '../types';
 import { TeamChat } from './TeamChat';
 import { VoiceChat } from './VoiceChat';
+import { ConfirmModal, ConfirmType } from './ConfirmModal';
 
 interface TeamOwnerDashboardProps {
     teamId: string;
@@ -64,6 +65,19 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
     const [removingMember, setRemovingMember] = useState<string | null>(null);
     const [deletingTeam, setDeletingTeam] = useState(false);
     const [remainingTime, setRemainingTime] = useState('');
+    const [confirmConfig, setConfirmConfig] = useState<{
+        isOpen: boolean;
+        title: string;
+        message: string;
+        onConfirm: () => void;
+        type: ConfirmType;
+    }>({
+        isOpen: false,
+        title: '',
+        message: '',
+        onConfirm: () => { },
+        type: 'info',
+    });
 
     const fetchTeamData = useCallback(async () => {
         if (!token) return;
@@ -147,38 +161,55 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
     };
 
     const handleRemoveMember = async (userId: string) => {
-        if (!token || !confirm('Bạn có chắc muốn xóa thành viên này?')) return;
-        setRemovingMember(userId);
-
-        try {
-            const res = await fetch(`${API_BASE_URL}/teams/${teamId}/members/${userId}`, {
-                method: 'DELETE',
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            if (!res.ok) throw new Error('Failed to remove');
-            await fetchTeamData();
-        } catch (err) {
-            showError('Không thể xóa thành viên');
-        } finally {
-            setRemovingMember(null);
-        }
+        if (!token) return;
+        setConfirmConfig({
+            isOpen: true,
+            title: 'Xác nhận xóa',
+            message: 'Bạn có chắc muốn xóa thành viên này khỏi phòng?',
+            type: 'danger',
+            onConfirm: async () => {
+                setRemovingMember(userId);
+                try {
+                    const res = await fetch(`${API_BASE_URL}/teams/${teamId}/members/${userId}`, {
+                        method: 'DELETE',
+                        headers: { Authorization: `Bearer ${token}` },
+                    });
+                    if (!res.ok) throw new Error('Failed to remove');
+                    await fetchTeamData();
+                } catch (err) {
+                    showError('Không thể xóa thành viên');
+                } finally {
+                    setRemovingMember(null);
+                    setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+                }
+            },
+        });
     };
 
     const handleDeleteTeam = async () => {
-        if (!token || !confirm('Bạn có chắc muốn đóng phòng này? Thao tác này không thể hoàn tác.')) return;
-        setDeletingTeam(true);
-
-        try {
-            const res = await fetch(`${API_BASE_URL}/teams/${teamId}`, {
-                method: 'DELETE',
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            if (!res.ok) throw new Error('Failed to delete');
-            onBack();
-        } catch (err) {
-            showError('Không thể đóng phòng');
-            setDeletingTeam(false);
-        }
+        if (!token) return;
+        setConfirmConfig({
+            isOpen: true,
+            title: 'Đóng phòng',
+            message: 'Bạn có chắc muốn đóng phòng này? Thao tác này không thể hoàn tác.',
+            type: 'danger',
+            onConfirm: async () => {
+                setDeletingTeam(true);
+                try {
+                    const res = await fetch(`${API_BASE_URL}/teams/${teamId}`, {
+                        method: 'DELETE',
+                        headers: { Authorization: `Bearer ${token}` },
+                    });
+                    if (!res.ok) throw new Error('Failed to delete');
+                    onBack();
+                } catch (err) {
+                    showError('Không thể đóng phòng');
+                    setDeletingTeam(false);
+                } finally {
+                    setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+                }
+            },
+        });
     };
 
     const handleNavigateToProfile = (userId: string) => {
@@ -421,6 +452,17 @@ export const TeamOwnerDashboard: React.FC<TeamOwnerDashboardProps> = ({ teamId, 
                     />
                 </div>
             )}
+
+            <ConfirmModal
+                isOpen={confirmConfig.isOpen}
+                title={confirmConfig.title}
+                message={confirmConfig.message}
+                type={confirmConfig.type}
+                onConfirm={confirmConfig.onConfirm}
+                onCancel={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}
+                confirmText="Xác nhận"
+                cancelText="Hủy"
+            />
         </div>
     );
 };

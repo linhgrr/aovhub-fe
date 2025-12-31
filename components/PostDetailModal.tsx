@@ -612,7 +612,7 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-white/5 shrink-0">
           <div className="w-10" />
-          <h2 className="text-[14px] font-montserrat font-bold text-white">Bài viết của {post.author.username}</h2>
+          <h2 className="text-[15px] font-montserrat font-bold text-white">Bài viết của {post.author.username}</h2>
           <button
             onClick={onClose}
             className="w-10 h-10 flex items-center justify-center rounded-[12px] bg-bg-main hover:bg-white/10 transition-colors"
@@ -635,7 +635,7 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
                 />
               </a>
               <div>
-                <a href={`#profile/${post.author.id}`} className="font-montserrat font-semibold text-white text-[14px] hover:text-primary transition-colors">
+                <a href={`#profile/${post.author.id}`} className="font-montserrat font-semibold text-white text-[15px] hover:text-primary transition-colors">
                   {post.author.username}
                 </a>
                 <p className="text-[#7f7f7f] text-[11px]">{formatTime(post.created_at)}</p>
@@ -643,7 +643,7 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
             </div>
 
             {/* Content */}
-            <p className="text-white/90 text-[13px] leading-relaxed mb-4 whitespace-pre-wrap">{renderContentWithMentions(post.content, friends, userMapping)}</p>
+            <p className="text-white/90 text-[16px] leading-relaxed mb-4 whitespace-pre-wrap">{renderContentWithMentions(post.content, friends, userMapping)}</p>
 
             {/* Media */}
             {post.media.length > 0 && (
@@ -745,10 +745,10 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
                       </a>
                       <div className="flex-1">
                         <div className="bg-bg-main rounded-[12px] px-4 py-3 inline-block">
-                          <a href={`#profile/${comment.author.id}`} className="font-montserrat font-semibold text-white text-[12px] hover:text-primary transition-colors">
+                          <a href={`#profile/${comment.author.id}`} className="font-montserrat font-semibold text-white text-[14px] hover:text-primary transition-colors">
                             {comment.author.username}
                           </a>
-                          <p className="text-white/80 text-[12px] mt-1">
+                          <p className="text-white/80 text-[14px] mt-1">
                             {renderContentWithMentions(comment.content, friends, userMapping)}
                           </p>
                         </div>
@@ -804,10 +804,10 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
                                     </a>
                                     <div className="flex-1">
                                       <div className="bg-bg-main rounded-[10px] px-3 py-2 inline-block">
-                                        <a href={`#profile/${reply.author.id}`} className="font-montserrat font-semibold text-white text-[11px] hover:text-primary transition-colors">
+                                        <a href={`#profile/${reply.author.id}`} className="font-montserrat font-semibold text-white text-[13px] hover:text-primary transition-colors">
                                           {reply.author.username}
                                         </a>
-                                        <p className="text-white/80 text-[11px] mt-0.5">
+                                        <p className="text-white/80 text-[13px] mt-0.5">
                                           {renderContentWithMentions(reply.content, friends, userMapping)}
                                         </p>
                                       </div>
@@ -880,7 +880,7 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
                 placeholder={`Bình luận dưới tên ${user?.username}...`}
-                className="w-full bg-bg-main rounded-[10px] px-4 py-3 text-white text-[12px] placeholder-[#7f7f7f] focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all"
+                className="w-full bg-bg-main rounded-[10px] px-4 py-3 text-white text-[14px] placeholder-[#7f7f7f] focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all"
               />
 
               {/* Mention Dropdown */}

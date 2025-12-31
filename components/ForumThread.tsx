@@ -552,7 +552,7 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
 
   if (loading) {
     return (
-      <div className="max-w-3xl mx-auto p-4 pb-32 md:pb-28 pt-6 w-full">
+      <div className="max-w-3xl mx-auto p-4 pb-48 md:pb-28 pt-6 w-full">
         {/* Thread Skeleton */}
         <div className="bg-bg-secondary rounded-[16px] border border-white/5 p-4 md:p-6 mb-6 animate-pulse">
           <div className="h-4 bg-white/5 rounded-full w-24 mb-4" />
@@ -602,7 +602,7 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-4 pb-32 md:pb-28 pt-6 w-full">
+    <div className="max-w-3xl mx-auto p-4 pb-48 md:pb-28 pt-6 w-full">
       {/* Thread Content */}
       <article className="bg-bg-secondary rounded-[16px] border border-white/5 overflow-hidden 
                           mb-6 animate-in fade-in slide-in-from-top-4 duration-500">
@@ -806,7 +806,7 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
 
       {/* Comment Form - Fixed at bottom */}
       {isAuthenticated && thread.status !== ThreadStatus.LOCKED && (
-        <div className="fixed bottom-0 left-0 md:left-[126px] right-0 bg-bg-main/95 backdrop-blur-lg 
+        <div className="fixed bottom-[56px] md:bottom-0 left-0 md:left-[126px] right-0 bg-bg-main/95 backdrop-blur-lg 
                         border-t border-white/5 py-4 z-40">
           <form onSubmit={handleSubmitComment} className="max-w-3xl mx-auto px-4">
             {/* Replying indicator */}
@@ -921,7 +921,7 @@ export const ForumThreadPage: React.FC<ForumThreadPageProps> = ({ threadId }) =>
 
       {/* Locked thread message */}
       {thread.status === ThreadStatus.LOCKED && (
-        <div className="fixed bottom-0 left-0 md:left-[126px] right-0 bg-bg-main/95 backdrop-blur-lg 
+        <div className="fixed bottom-[56px] md:bottom-0 left-0 md:left-[126px] right-0 bg-bg-main/95 backdrop-blur-lg 
                         border-t border-white/5 py-4 text-center z-40">
           <div className="max-w-3xl mx-auto px-4">
             <p className="flex items-center justify-center gap-2 text-white/50 text-[13px]">

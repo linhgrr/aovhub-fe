@@ -441,7 +441,7 @@ export const LFG: React.FC = () => {
                               <button
                                  onClick={() => handleViewDetail(team.id)}
                                  disabled={loadingTeamDetail === team.id}
-                                 className="flex-1 md:w-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary/30 text-white font-medium py-2.5 px-4 rounded-full transition-all text-[13px] flex items-center justify-center gap-2"
+                                 className="flex-1 md:w-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary/30 text-white font-medium py-2 px-3.5 rounded-xl transition-all text-[13px] flex items-center justify-center gap-2"
                               >
                                  {loadingTeamDetail === team.id ? (
                                     <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />

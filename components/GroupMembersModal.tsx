@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, UserPlus, UserMinus, Crown, Search, Loader2, LogOut } from 'lucide-react';
+import { ConfirmModal, ConfirmType } from './ConfirmModal';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
@@ -41,6 +42,19 @@ export const GroupMembersModal: React.FC<GroupMembersModalProps> = ({
     const [searchResults, setSearchResults] = useState<SearchUser[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [confirmConfig, setConfirmConfig] = useState<{
+        isOpen: boolean;
+        title: string;
+        message: string;
+        onConfirm: () => void;
+        type: ConfirmType;
+    }>({
+        isOpen: false,
+        title: '',
+        message: '',
+        onConfirm: () => { },
+        type: 'info',
+    });
 
     const currentUserRole = participants.find(p => p.user_id === currentUserId)?.role;
     const isAdmin = currentUserRole === 'ADMIN';
@@ -136,56 +150,70 @@ export const GroupMembersModal: React.FC<GroupMembersModalProps> = ({
     };
 
     const removeMember = async (userId: string) => {
-        if (!confirm('Bạn có chắc muốn xóa thành viên này?')) return;
+        setConfirmConfig({
+            isOpen: true,
+            title: 'Xác nhận xóa',
+            message: 'Bạn có chắc muốn xóa thành viên này khỏi nhóm?',
+            type: 'danger',
+            onConfirm: async () => {
+                try {
+                    setIsProcessing(true);
+                    const token = localStorage.getItem('auth_token');
+                    if (!token) return;
 
-        try {
-            setIsProcessing(true);
-            const token = localStorage.getItem('auth_token');
-            if (!token) return;
+                    const response = await fetch(
+                        `${API_URL}/messages/conversations/${conversationId}/participants/${userId}`,
+                        {
+                            method: 'DELETE',
+                            headers: { 'Authorization': `Bearer ${token}` },
+                        }
+                    );
 
-            const response = await fetch(
-                `${API_URL}/messages/conversations/${conversationId}/participants/${userId}`,
-                {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` },
+                    if (response.ok) {
+                        await fetchParticipants();
+                    }
+                } catch (error) {
+                    console.error('Failed to remove member:', error);
+                } finally {
+                    setIsProcessing(false);
+                    setConfirmConfig(prev => ({ ...prev, isOpen: false }));
                 }
-            );
-
-            if (response.ok) {
-                await fetchParticipants();
-            }
-        } catch (error) {
-            console.error('Failed to remove member:', error);
-        } finally {
-            setIsProcessing(false);
-        }
+            },
+        });
     };
 
     const leaveGroup = async () => {
-        if (!confirm('Bạn có chắc muốn rời khỏi nhóm này?')) return;
+        setConfirmConfig({
+            isOpen: true,
+            title: 'Rời khỏi nhóm',
+            message: 'Bạn có chắc muốn rời khỏi nhóm này?',
+            type: 'warning',
+            onConfirm: async () => {
+                try {
+                    setIsProcessing(true);
+                    const token = localStorage.getItem('auth_token');
+                    if (!token) return;
 
-        try {
-            setIsProcessing(true);
-            const token = localStorage.getItem('auth_token');
-            if (!token) return;
+                    const response = await fetch(
+                        `${API_URL}/messages/conversations/${conversationId}/participants/${currentUserId}`,
+                        {
+                            method: 'DELETE',
+                            headers: { 'Authorization': `Bearer ${token}` },
+                        }
+                    );
 
-            const response = await fetch(
-                `${API_URL}/messages/conversations/${conversationId}/participants/${currentUserId}`,
-                {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` },
+                    if (response.ok) {
+                        onLeaveGroup();
+                        onClose();
+                    }
+                } catch (error) {
+                    console.error('Failed to leave group:', error);
+                } finally {
+                    setIsProcessing(false);
+                    setConfirmConfig(prev => ({ ...prev, isOpen: false }));
                 }
-            );
-
-            if (response.ok) {
-                onLeaveGroup();
-                onClose();
-            }
-        } catch (error) {
-            console.error('Failed to leave group:', error);
-        } finally {
-            setIsProcessing(false);
-        }
+            },
+        });
     };
 
     if (!isOpen) return null;
@@ -342,6 +370,17 @@ export const GroupMembersModal: React.FC<GroupMembersModalProps> = ({
                     </button>
                 </div>
             </div>
+
+            <ConfirmModal
+                isOpen={confirmConfig.isOpen}
+                title={confirmConfig.title}
+                message={confirmConfig.message}
+                type={confirmConfig.type}
+                onConfirm={confirmConfig.onConfirm}
+                onCancel={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}
+                confirmText="Xác nhận"
+                cancelText="Hủy"
+            />
         </div>
     );
 };

@@ -58,7 +58,16 @@ export const Forum: React.FC<ForumProps> = ({ onNavigate }) => {
       if (!response.ok) throw new Error('Failed to fetch categories');
 
       const data: ForumCategoriesResponse = await response.json();
-      setCategories(data.data);
+
+      // Normalize snake_case to camelCase from API
+      const normalizedData = data.data.map((cat: any) => ({
+        ...cat,
+        threadCount: cat.threadCount ?? cat.thread_count ?? 0,
+        displayOrder: cat.displayOrder ?? cat.display_order ?? 0,
+        createdAt: cat.createdAt ?? cat.created_at,
+      }));
+
+      setCategories(normalizedData);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Đã xảy ra lỗi');
     } finally {

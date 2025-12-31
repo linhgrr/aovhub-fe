@@ -76,6 +76,7 @@ export const RightSidebar: React.FC = () => {
         name: string;
         avatar_url: string | null;
         type: 'DIRECT' | 'GROUP';
+        otherUserId?: string | null;
     } | null>(null);
     const [messages, setMessages] = useState<MessageItem[]>([]);
     const [isLoadingMessages, setIsLoadingMessages] = useState(false);
@@ -210,6 +211,7 @@ export const RightSidebar: React.FC = () => {
                     name: username,
                     avatar_url: avatarUrl,
                     type: 'DIRECT',
+                    otherUserId: userId,
                 });
             }
         } catch (error) {
@@ -386,19 +388,38 @@ export const RightSidebar: React.FC = () => {
                             <ChevronLeft className="w-5 h-5 text-white/60" />
                         </button>
 
-                        <img
-                            src={selectedConversation.type === 'GROUP'
-                                ? (selectedConversation.avatar_url || '/assets/images/home.svg')
-                                : getAvatarUrl(selectedConversation.avatar_url, selectedConversation.name || undefined)
-                            }
-                            alt={selectedConversation.name || ''}
-                            className="w-[38px] h-[38px] rounded-[10px] object-cover"
-                        />
+                        {selectedConversation.type === 'DIRECT' && selectedConversation.otherUserId ? (
+                            <a href={`#profile/${selectedConversation.otherUserId}`} className="block hover:opacity-80 transition-all active:scale-95">
+                                <img
+                                    src={getAvatarUrl(selectedConversation.avatar_url, selectedConversation.name || undefined)}
+                                    alt={selectedConversation.name || ''}
+                                    className="w-[38px] h-[38px] rounded-[10px] object-cover"
+                                />
+                            </a>
+                        ) : (
+                            <img
+                                src={selectedConversation.type === 'GROUP'
+                                    ? (selectedConversation.avatar_url || '/assets/images/home.svg')
+                                    : getAvatarUrl(selectedConversation.avatar_url, selectedConversation.name || undefined)
+                                }
+                                alt={selectedConversation.name || ''}
+                                className="w-[38px] h-[38px] rounded-[10px] object-cover"
+                            />
+                        )}
 
                         <div className="flex-1 min-w-0">
-                            <h3 className="font-montserrat font-semibold text-[12px] text-white truncate">
-                                {selectedConversation.name}
-                            </h3>
+                            {selectedConversation.type === 'DIRECT' && selectedConversation.otherUserId ? (
+                                <a
+                                    href={`#profile/${selectedConversation.otherUserId}`}
+                                    className="font-montserrat font-semibold text-[12px] text-white truncate hover:text-primary transition-colors block"
+                                >
+                                    {selectedConversation.name}
+                                </a>
+                            ) : (
+                                <h3 className="font-montserrat font-semibold text-[12px] text-white truncate">
+                                    {selectedConversation.name}
+                                </h3>
+                            )}
                             {typingUsers.length > 0 && (
                                 <p className="text-[9px] text-primary">Đang nhập...</p>
                             )}

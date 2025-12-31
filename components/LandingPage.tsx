@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Menu, Play, Heart, Instagram, Facebook, Twitter, Apple, Monitor, ChevronLeft, ChevronRight, Users, MessageSquare, Brain, ShieldCheck } from 'lucide-react';
+import { Search, Menu, Play, Heart, Instagram, Facebook, Twitter, Apple, Monitor, ChevronLeft, ChevronRight, Users, MessageSquare, Brain, ShieldCheck, X } from 'lucide-react';
 
 const LandingPage: React.FC = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
+    const [showTrailer, setShowTrailer] = useState(false);
 
     const carouselImages = [
         "https://i.ibb.co/HpVr8m9Q/image.png",
@@ -130,7 +131,10 @@ const LandingPage: React.FC = () => {
 
                         <div className="flex items-center gap-6">
                             <div className="w-[1px] h-10 bg-white/10 hidden sm:block"></div>
-                            <button className="flex items-center gap-4 group">
+                            <button
+                                onClick={() => setShowTrailer(true)}
+                                className="flex items-center gap-4 group"
+                            >
                                 <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-primary/20 backdrop-blur-xl border border-primary/50 flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg shadow-primary/20">
                                     <Play className="w-5 h-5 md:w-6 md:h-6 text-primary fill-primary" />
                                 </div>
@@ -287,6 +291,33 @@ const LandingPage: React.FC = () => {
                     </div>
                 </div>
             </footer>
+
+            {/* Trailer Modal */}
+            {showTrailer && (
+                <div
+                    className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md"
+                    onClick={() => setShowTrailer(false)}
+                >
+                    <div
+                        className="relative w-full max-w-5xl aspect-video"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <button
+                            onClick={() => setShowTrailer(false)}
+                            className="absolute -top-12 right-0 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all group"
+                        >
+                            <X className="w-6 h-6 group-hover:scale-110 transition-transform" />
+                        </button>
+                        <iframe
+                            className="w-full h-full rounded-2xl shadow-2xl"
+                            src="https://www.youtube.com/embed/zoEtcR5EW08?autoplay=1"
+                            title="ArenaHub Trailer"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MoreVertical, Trash2, AlertTriangle } from 'lucide-react';
+import { MoreVertical, Trash2, AlertTriangle, Edit3 } from 'lucide-react';
 import { VideoPlayer } from './VideoPlayer';
 import { LikesModal } from './LikesModal';
 import { HashtagText } from './HashtagText';
@@ -58,6 +58,7 @@ interface PostCardProps {
   onOpenComments: (post: FeedPost) => void;
   onShare?: (post: FeedPost) => void;
   onDelete?: (postId: string) => void;
+  onEdit?: (post: FeedPost) => void;
   currentUserId?: string;
   showAuthor?: boolean;
   token?: string;
@@ -69,6 +70,7 @@ export const PostCard: React.FC<PostCardProps> = ({
   onOpenComments,
   onShare,
   onDelete,
+  onEdit,
   currentUserId,
   showAuthor = true,
   token,
@@ -98,6 +100,11 @@ export const PostCard: React.FC<PostCardProps> = ({
   const handleDeleteClick = () => {
     setShowMenu(false);
     setShowDeleteConfirm(true);
+  };
+
+  const handleEditClick = () => {
+    setShowMenu(false);
+    onEdit?.(post);
   };
 
   const handleConfirmDelete = () => {
@@ -268,6 +275,16 @@ export const PostCard: React.FC<PostCardProps> = ({
                     >
                       <AlertTriangle size={16} />
                       Báo cáo
+                    </button>
+                  )}
+                  {/* Edit option - only for own posts without shared content */}
+                  {isOwnPost && onEdit && !post.shared_post && (
+                    <button
+                      onClick={handleEditClick}
+                      className="w-full px-4 py-2.5 flex items-center gap-2 text-primary hover:bg-white/5 transition-colors text-[13px]"
+                    >
+                      <Edit3 size={16} />
+                      Chỉnh sửa
                     </button>
                   )}
                   {/* Delete option - only for own posts */}

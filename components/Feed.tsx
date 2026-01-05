@@ -6,6 +6,7 @@ import { PostCard, FeedPost } from './PostCard';
 import { SharePostModal } from './SharePostModal';
 import { CreatePost } from './CreatePost';
 import { ConfirmDialog } from './ConfirmDialog';
+import { EditPostModal } from './EditPostModal';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
@@ -82,6 +83,9 @@ export const Feed: React.FC = () => {
   const [postToDelete, setPostToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // Edit modal state
+  const [postToEdit, setPostToEdit] = useState<FeedPost | null>(null);
+
   const fetchFeed = async (cursor?: string) => {
     if (!token) return;
     try {
@@ -157,6 +161,16 @@ export const Feed: React.FC = () => {
     setPostToDelete(postId);
   }, []);
 
+  // Open edit modal
+  const handleEditPost = useCallback((post: FeedPost) => {
+    setPostToEdit(post);
+  }, []);
+
+  // Handle post update from edit modal
+  const handlePostUpdated = useCallback((updatedPost: FeedPost) => {
+    setPosts(prev => prev.map(p => p.id === updatedPost.id ? updatedPost : p));
+  }, []);
+
   // Confirm and execute deletion
   const confirmDeletePost = useCallback(async () => {
     if (!token || !postToDelete) return;
@@ -208,6 +222,7 @@ export const Feed: React.FC = () => {
               onOpenComments={setSelectedPost}
               onShare={setPostToShare}
               onDelete={handleDeletePost}
+              onEdit={handleEditPost}
               currentUserId={user?.id}
               token={token}
             />
@@ -254,6 +269,17 @@ export const Feed: React.FC = () => {
           isLoading={isDeleting}
           variant="danger"
         />
+
+        {/* Edit Post Modal */}
+        {postToEdit && (
+          <EditPostModal
+            post={postToEdit}
+            isOpen={!!postToEdit}
+            onClose={() => setPostToEdit(null)}
+            onPostUpdated={handlePostUpdated}
+            token={token || ''}
+          />
+        )}
       </div>
     </>
   );

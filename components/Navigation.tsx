@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/authContext';
+import {
+  Home,
+  Clapperboard,
+  Gamepad2,
+  MessageSquareText,
+  Users,
+  LogOut
+} from 'lucide-react';
 
 interface NavigationProps {
   activeTab: string;
@@ -11,11 +19,11 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab 
   const [indicatorTop, setIndicatorTop] = useState(0);
 
   const navItems = [
-    { id: 'feed', icon: '/assets/images/home.svg', label: 'Trang chủ' },
-    { id: 'reels', icon: '/assets/images/game.svg', label: 'Reels' },
-    { id: 'lfg', icon: '/assets/images/chart.svg', label: 'LFG' },
-    { id: 'forum', icon: '/assets/images/activity.svg', label: 'Diễn đàn' },
-    { id: 'friends', icon: '/assets/images/friends.svg', label: 'Bạn bè' },
+    { id: 'feed', icon: Home, label: 'Trang chủ' },
+    { id: 'reels', icon: Clapperboard, label: 'Reels' },
+    { id: 'lfg', icon: Gamepad2, label: 'LFG' },
+    { id: 'forum', icon: MessageSquareText, label: 'Diễn đàn' },
+    { id: 'friends', icon: Users, label: 'Bạn bè' },
     { id: 'chatbot', icon: 'https://i.ibb.co/20KhSst0/image.png', label: 'Trợ lý thông minh' },
   ];
 
@@ -74,6 +82,8 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab 
                 const isActive = activeTab === item.id ||
                   (item.id === 'forum' && (activeTab === 'forum-category' || activeTab === 'forum-thread'));
 
+                const IconComponent = item.icon;
+
                 return (
                   <div key={item.id} className="nav-item-wrapper">
                     <button
@@ -81,11 +91,17 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab 
                       className={`nav-icon-container ${isActive ? 'active' : 'opacity-50 hover:opacity-100 hover:bg-white/5'}`}
                       title={item.label}
                     >
-                      <img
-                        src={item.icon}
-                        alt={item.label}
-                        className={`w-6 h-6 transition-all ${item.id === 'chatbot' ? 'rounded-full object-cover' : (isActive ? 'filter-primary brightness-125' : 'filter-white')}`}
-                      />
+                      {typeof IconComponent === 'string' ? (
+                        <img
+                          src={IconComponent}
+                          alt={item.label}
+                          className="w-6 h-6 rounded-full object-cover"
+                        />
+                      ) : (
+                        <IconComponent
+                          className={`w-6 h-6 transition-all ${isActive ? 'text-primary brightness-125' : 'text-white'}`}
+                        />
+                      )}
                     </button>
                   </div>
                 );
@@ -100,11 +116,7 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab 
                 className="group opacity-40 hover:opacity-100 transition-all hover:scale-110"
                 title="Đăng xuất"
               >
-                <img
-                  src="/assets/images/logout.svg"
-                  alt="Logout"
-                  className="w-6 h-6 filter-white"
-                />
+                <LogOut className="w-6 h-6 text-white" />
               </button>
             </div>
           </div>
@@ -120,25 +132,33 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab 
           {navItems.map((item) => {
             const isActive = activeTab === item.id ||
               (item.id === 'forum' && (activeTab === 'forum-category' || activeTab === 'forum-thread'));
+
+            const IconComponent = item.icon;
+
             return (
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`p-1.5 transition-all duration-200 ${isActive ? 'scale-110' : 'opacity-50 hover:opacity-100'}`}
+                className={`p-1.5 transition-all duration-200 relative ${isActive ? 'scale-110' : 'opacity-50 hover:opacity-100'}`}
                 title={item.label}
               >
                 {isActive && (
                   <div className="absolute inset-0 bg-primary/20 blur-md rounded-full"></div>
                 )}
-                <img
-                  src={item.icon}
-                  alt={item.label}
-                  className={`w-5 h-5 relative z-10 ${item.id === 'chatbot' ? 'rounded-full object-cover' : (isActive ? 'filter-primary brightness-150' : 'filter-white')}`}
-                />
+                {typeof IconComponent === 'string' ? (
+                  <img
+                    src={IconComponent}
+                    alt={item.label}
+                    className="w-5 h-5 relative z-10 rounded-full object-cover"
+                  />
+                ) : (
+                  <IconComponent
+                    className={`w-5 h-5 relative z-10 ${isActive ? 'text-primary brightness-150' : 'text-white'}`}
+                  />
+                )}
               </button>
             );
           })}
-
         </div>
       </nav>
     </>

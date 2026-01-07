@@ -13,6 +13,8 @@
     "@daily-co/daily-react": "^0.24.0",
     "@google/genai": "^1.30.0",
     "@jitsi/react-sdk": "^1.4.4",
+    "@langchain/core": "^0.3.0",
+    "@langchain/openai": "^0.4.0",
     "@livekit/components-react": "^2.9.17",
     "@livekit/components-styles": "^1.2.0",
     "emoji-picker-react": "^4.16.1",
